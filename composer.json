@@ -1,0 +1,5 @@
+{
+    "require": {
+        "greg0/lazer-database": "1.1.6"
+    }
+}
