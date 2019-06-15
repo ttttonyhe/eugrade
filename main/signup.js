@@ -27,8 +27,8 @@ var antd = new Vue({
         return {
             login_status: 0,
             form: null,
-            email_valid: null,
-            valid_text: null
+            valid: null,
+            valid_text: null,
         }
     },
     mounted() {
@@ -40,13 +40,14 @@ var antd = new Vue({
             this.form.validateFields((err, values) => {
                 console.log(values);
                 if (!err) { //无填写错误
-                    this.email_valid = 'validating';
                     var formData = new FormData();
+                    formData.append('name', values['name']);
                     formData.append('email', values['email']);
                     formData.append('password', values['password']);
+                    formData.append('type', values['type']);
 
                     $.ajax({
-                        url: 'interact/login.php',
+                        url: 'interact/register.php',
                         type: "POST",
                         data: formData,
                         cache: false,
@@ -55,19 +56,16 @@ var antd = new Vue({
                         contentType: false,
                         success: function (data) {
                             if (data.status) {
-                                antd.email_valid = 'success';
-                                antd.valid_text = null;
-                                cookie.set('logged_in_id',parseInt(data.user_id));
-                                window.location.href = 'pro';
+                                antd.valid = 'success';
+                                antd.$message.success('Welcome to Pokers');
                             } else {
-                                antd.email_valid = 'error';
-                                antd.valid_text = data.mes;
+                                antd.valid = 'error';
+                                antd.$message.error(data.mes);
                             }
                         }
                     });
                 } else {
-                    this.email_valid = 'warning';
-                    this.valid_text = 'Incorrect email or password';
+                    this.$message.error('Incorrect information entered');
                 }
             });
         },

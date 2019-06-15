@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Pokers | Clear & Organized Student-Teachers Communication</title>
+    <script type="text/javascript" src="statics/js/vue.js"></script>
+    <script type="text/javascript" src="statics/js/axios.min.js"></script>
+    <link type="text/css" rel="stylesheet" href="statics/css/antd.css">
+    <script type="text/javascript" src="statics/js/antd.js"></script>
+    <script type="text/javascript" src="statics/js/jquery.min.js"></script>
+    <script type="text/javascript" src="statics/js/moment.min.js"></script>
+    <link type="text/css" rel="stylesheet" href="statics/css/main.css">
+</head>
+
+<body>
+    <div id="app">
+        <div>
+            <a-menu mode="horizontal" style="padding: 0 13px">
+                <a-menu-item class="header-placeholder"></a-menu-item>
+                <a-menu-item class="header-placeholder" style="margin-left: 20px"></a-menu-item>
+                <a-menu-item class="header-placeholder" style="margin-left: 20px"></a-menu-item>
+                <a-menu-item style="float:right" class="header-placeholder-2"></a-menu-item>
+            </a-menu>
+            </a-menu-item>
+        </div>
+        <div class="login-hover"></div>
+
+        <div class="login-card">
+            <div style="text-align: center">
+                <h1>Create/Join Pokers</h1>
+                <p>Let’s set up your account</p>
+            </div>
+            <a-form
+    id="components-form-demo-normal-login"
+    :form="form"
+    class="login-form"
+    @submit="handleSubmit"
+    style="padding: 0px 20px"
+  >
+  <a-form-item
+        style="margin-bottom: 15px;"
+    >
+      <a-input
+        v-decorator="[
+        'name',
+        {
+          rules: [{
+            required: true, message: 'Please input your E-mail!',
+          }]
+        }
+      ]"
+        placeholder="Username"
+      >
+        <a-icon
+          slot="prefix"
+          type="user"
+          style="color: rgba(0,0,0,.25)"
+        />
+      </a-input>
+    </a-form-item>
+
+    <a-form-item
+        style="margin-bottom: 15px;"
+    >
+      <a-input
+        v-decorator="[
+        'email',
+        {
+          rules: [{
+            type: 'email', message: 'The input is not valid E-mail!',
+          }, {
+            required: true, message: 'Please input your E-mail!',
+          }]
+        }
+      ]"
+        placeholder="Email"
+      >
+        <a-icon
+          slot="prefix"
+          type="mail"
+          style="color: rgba(0,0,0,.25)"
+        />
+      </a-input>
+    </a-form-item>
+
+    <a-form-item>
+      <a-input
+        v-decorator="[
+          'password',
+          { rules: [{ required: true, message: 'Please input your Password!' }] }
+        ]"
+        type="password"
+        placeholder="Password"
+      >
+        <a-icon
+          slot="prefix"
+          type="lock"
+          style="color: rgba(0,0,0,.25)"
+        />
+      </a-input>
+    </a-form-item>
+
+    <a-form-item
+    label="Account type"
+  >
+    <a-radio-group v-decorator="[
+    'type',
+    { rules: [{ required: true, message: 'Please choose your account type' }] }
+  ]">
+      <a-radio-button value="a">
+        Student
+      </a-radio-button>
+      <a-radio-button value="b">
+        Teacher
+      </a-radio-button>
+    </a-radio-group>
+  </a-form-item>
+
+    <a-form-item>
+      <a-button
+        type="primary"
+        html-type="submit"
+        class="login-form-button"
+      >
+        Sign up
+      </a-button>
+      Or <a href="login.html">
+        log in now!
+      </a>
+    </a-form-item>
+  </a-form>
+        </div>
+
+    </div>
+</body>
+<script type="text/javascript" src="main/signup.js"></script>
+
+</html>

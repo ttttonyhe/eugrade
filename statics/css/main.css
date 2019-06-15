@@ -1,3 +1,79 @@
 html,body{
     background: #f9f9f9;
 }
+
+.header-placeholder{
+    width: 60px;background: #f1f2f3;height: 25px;transform: translateY(-11px);
+}
+
+.header-placeholder-2{
+    width: 60px;background: rgb(193, 224, 255);height: 25px;transform: translateY(11px)
+}
+
+.login-hover{
+    background: rgba(0, 0, 0, 0.15);
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    z-index: 9;
+    transform: translateY(-50px);
+}
+
+.login-card{
+    background: #fff;
+    z-index: 999;
+    position: absolute;
+    left: 32.5%;
+    width: 35%;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    padding: 50px;
+    top: 20%;
+}
+
+.login-card p{
+    font-size: 1.3rem;
+    font-weight: 300;
+    color: #999;
+    margin-bottom: 30px;
+}
+
+.login-card h1{
+    margin-bottom: 0px;
+}
+
+.header-user{
+    float: right;
+    border: none;
+    color: rgb(68, 68, 68);
+    margin-top: -34px;
+    margin-right: 15px;
+}
+
+.main-iframe{
+    height:calc(100vh - 48px);
+}
+
+.main-container{
+    display: flex;
+    width: 100%;
+    height: 100vh;
+}
+
+.main-container div:nth-child(1){
+    width: 18.3333%;
+    flex-basis:18.3333%;
+    height: 100vh;
+}
+
+.main-container div:nth-child(2){
+    width: 25.3333%;
+    flex-basis:25.3333%;
+    height: 100vh;
+}
+
+.main-container div:nth-child(3){
+    width: 57.3333%;
+    flex-basis:57.3333%;
+    height: 100vh;
+}
