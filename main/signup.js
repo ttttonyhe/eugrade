@@ -58,6 +58,8 @@ var antd = new Vue({
                             if (data.status) {
                                 antd.valid = 'success';
                                 antd.$message.success('Welcome to Pokers');
+                                cookie.set('logged_in_id',parseInt(data.mes));
+                                setTimeout('window.location.href = "pro"',1000);
                             } else {
                                 antd.valid = 'error';
                                 antd.$message.error(data.mes);

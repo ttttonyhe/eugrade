@@ -12,6 +12,12 @@
     define('LAZER_DATA_PATH', dirname(dirname(__FILE__)) . '/data/');
     use Lazer\Classes\Database as Lazer;
 
+    try {
+        \Lazer\Classes\Helpers\Validate::table('users')->exists();
+    } catch (\Lazer\Classes\LazerException $e) {
+        die();
+    }
+
     session_start();
     if (!isset($_SESSION['logged_in_id'])) {
         ?>
@@ -39,14 +45,14 @@
 <body>
     <div id="app" style="max-height: 100vh;overflow-y: hidden;">
     <div>
-    <a-menu mode="horizontal" v-model="current">
-        <a-menu-item key="messages" @click="switch('messages')">
+    <a-menu mode="horizontal" v-model="current.nav">
+        <a-menu-item key="messages" @click="switch_section('messages')">
             <a-icon type="project"></a-icon>Messages
         </a-menu-item>
-        <a-menu-item key="files" @click="switch('files')">
+        <a-menu-item key="files" @click="switch_section('files')">
             <a-icon type="save"></a-icon>Files
         </a-menu-item>
-        <a-menu-item key="Classes" @click="switch('classes')">
+        <a-menu-item key="Classes" @click="switch_section('classes')">
             <a-icon type="bank"></a-icon>Classes
         </a-menu-item>
     </a-menu>
@@ -75,7 +81,19 @@
             </a-dropdown>
         </div>
 </div>
-<iframe name='main' id="main" src="messages.php" frameborder="0" width="100%" class="main-iframe"></iframe>
+
+<a-spin :spinning="spinning">
+    <iframe 
+        name='main' 
+        id="main" 
+        :src="current.page" 
+        frameborder="0" 
+        width="100%" 
+        class="main-iframe"
+    ></iframe>
+</a-spin>
+
+
 </div>
 </body>
 <script type="text/javascript" src="../main/pro.js"></script>

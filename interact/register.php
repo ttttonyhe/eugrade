@@ -1,4 +1,6 @@
 <?php
+
+error_reporting(E_ALL & ~E_NOTICE);
 //引入composer
 require '../vendor/autoload.php';
 define('LAZER_DATA_PATH', dirname(dirname(__FILE__)) . '/data/');
@@ -14,7 +16,9 @@ try {
         'email' => 'string',
         'avatar' => 'string',
         'type' => 'integer',
-        'pwd' => 'string'
+        'pwd' => 'string',
+        'class' => 'string',
+        'date' => 'integer'
     ));
 }
 
@@ -72,8 +76,9 @@ if (!empty($_POST['email']) && !empty($_POST['password']) && !empty($_POST['name
     if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
         if ($check->email()) {
             if ($check->name()) {
+                    $this_id = Lazer::table('users')->findAll()->count() + 1;
                     $row = Lazer::table('users');
-                    $row->id = Lazer::table('users')->findAll()->count() + 1;
+                    $row->id = $this_id;
                     $row->name = $name;
                     $row->email = $email;
                     $row->pwd = md5(md5($pwd).md5($pwd));
@@ -82,10 +87,16 @@ if (!empty($_POST['email']) && !empty($_POST['password']) && !empty($_POST['name
                     }else{
                         $row->type = 1;
                     }
+                    $row->date = time();
                     $row->save();
                 $status = 1;
                 $code = 104;
-                $mes = 'Successfully Signed up';
+                $mes = $this_id;
+
+                //自动登录
+                session_start();
+                $_SESSION['logged_in_id'] = (int)$this_id;
+
             } else {
                 $status = 0;
                 $code = 103;
