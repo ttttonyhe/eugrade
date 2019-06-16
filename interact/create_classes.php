@@ -20,7 +20,10 @@ try {
     ));
 }
 
-if (!empty($_POST['name']) && !empty($_POST['des']) && !empty($_POST['super'])) {
+session_start();
+
+//判断发送参数是否齐全，请求创建班级的用户是否为当前登录用户
+if (!empty($_POST['name']) && !empty($_POST['des']) && !empty($_POST['super']) && ($_SESSION['logged_in_id'] == (int)$_POST['super'])) {
 
     //输入处理
     function input($data)
@@ -43,9 +46,10 @@ if (!empty($_POST['name']) && !empty($_POST['des']) && !empty($_POST['super'])) 
         $code = 101;
         $mes = 'Class name has been used';
     } else {
-        $array = Lazer::table('users')->where('id', '=', (int)$super)->findAll()->asArray();
+        $array = Lazer::table('users')->limit(1)->where('id', '=', (int)$super)->findAll()->asArray();
         if (!!$array) {
             if ($array[0]['type'] == 2) {
+                //建立 class
                 $this_id = Lazer::table('classes')->findAll()->count() + 1;
                 $row = Lazer::table('classes');
                 $row->id = $this_id;
@@ -56,6 +60,23 @@ if (!empty($_POST['name']) && !empty($_POST['des']) && !empty($_POST['super'])) 
                 $row->count = 1;
                 $row->date = time();
                 $row->save();
+
+                //更改管理员的 class 字段
+                $array = Lazer::table('users')->limit(1)->where('id', '=', (int)$super)->find();
+                if (!empty($array->class)) {
+                    if (!in_array($this_id, explode(',',$array->class))) {
+                        $array->set(array(
+                            'class' => $array->class . ',' . $this_id
+                        ));
+                        $array->save();
+                    }
+                } else {
+                    $array->set(array(
+                        'class' => (string)$this_id
+                    ));
+                    $array->save();
+                }
+
                 $status = 1;
                 $code = 102;
                 $mes = 'Successfully created a class';

@@ -80,6 +80,7 @@ html,body{
     width: 57.3333%;
     flex-basis:57.3333%;
     height: 100vh;
+    background:#fff;
 }
 
 .class-item{
@@ -98,6 +99,10 @@ html,body{
 
 .class-item:hover{
     background: #f7f8f9;
+}
+
+.clicked{
+    background: #f7f8f9 !important;
 }
 
 .class-item h3{
@@ -130,7 +135,7 @@ html,body{
 }
 
 .main-header{
-    padding: 20px;
+    padding: 20px 25px;
     background: #fff;
     border-bottom: 1px solid #eee;
 }
@@ -259,4 +264,42 @@ html,body{
     color: #999;
     margin-top: 8px;
     padding-right: 10px;
+}
+
+.class-member-header{
+    padding: 30px 40px;
+    border-bottom: 1px solid #eee
+}
+
+.class-member-content{
+    padding: 40px 45px;
+}
+
+.class-member-subscribe{
+    margin-top: 23px;
+    display: flex;
+}
+
+.class-member-subscribe button:nth-child(1){
+    margin-right: 10px;
+}
+
+.class-member-img{
+    width: 80px !important;height: 80px !important;margin-top: 0px !important;
+}
+
+.class-member-info h2{
+    font-size: 2.4rem;
+    max-width: 250px;
+}
+
+.class-member-info p{
+    font-size: 1.3rem;
+    letter-spacing: .5px;
+    margin-left: 2px;
+}
+
+.class-member-img p{
+    font-size: 3.5rem;
+    margin-top: 40px;
 }
