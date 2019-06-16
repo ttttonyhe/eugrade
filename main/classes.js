@@ -13,6 +13,7 @@ var antd = new Vue({
                 right: false
             },
             opened_class_info: {
+                id: null,
                 status: 0,
                 name: null,
                 des: null,
@@ -27,9 +28,9 @@ var antd = new Vue({
                 confirm_join_loading: false,
                 class: {
                     name: null,
-                    des: null
+                        des: null
                 },
-                join : {
+                join: {
                     id: null
                 }
             },
@@ -37,21 +38,22 @@ var antd = new Vue({
                 status: 0,
                 info: null,
                 superid: null
-            }
+            },
+            remove_id: null
         }
     },
     mounted() {
         axios.get('../interact/select_users.php?type=class&id=' + cookie.get('logged_in_id') + '&form=single')
             .then(re => {
-                if(!!re.data.class){
-                this.user.joined_classes = re.data.class.split(',');
-                console.log(this.user.joined_classes);
-                axios.get('../interact/select_classes.php?type=class&id=' + re.data.class + '&form=all')
-                    .then(res => {
-                        this.user.classes_info = res.data;
-                        this.spinning.left = false;
-                    })
-                }else{
+                if (!!re.data.class) {
+                    this.user.joined_classes = re.data.class.split(',');
+                    console.log(this.user.joined_classes);
+                    axios.get('../interact/select_classes.php?type=class&id=' + re.data.class + '&form=all')
+                        .then(res => {
+                            this.user.classes_info = res.data;
+                            this.spinning.left = false;
+                        })
+                } else {
                     //若不存在班级信息
                     this.spinning.left = false;
                 }
@@ -59,17 +61,17 @@ var antd = new Vue({
     },
     methods: {
         //创建/加入新班级后重新加载列表
-        get_all_classes(){
+        get_all_classes() {
             axios.get('../interact/select_users.php?type=class&id=' + cookie.get('logged_in_id') + '&form=single')
-            .then(re => {
-                this.user.joined_classes = re.data.class.split(',');
-                console.log(this.user.joined_classes);
-                axios.get('../interact/select_classes.php?type=class&id=' + re.data.class + '&form=all')
-                    .then(res => {
-                        this.user.classes_info = res.data;
-                        this.spinning.left = false;
-                    })
-            });
+                .then(re => {
+                    this.user.joined_classes = re.data.class.split(',');
+                    console.log(this.user.joined_classes);
+                    axios.get('../interact/select_classes.php?type=class&id=' + re.data.class + '&form=all')
+                        .then(res => {
+                            this.user.classes_info = res.data;
+                            this.spinning.left = false;
+                        })
+                });
         },
         //判断是否为班级管理员，输出特殊样式
         class_super(index) {
@@ -119,7 +121,7 @@ var antd = new Vue({
             this.add.visible = false
         },
         //处理加入班级
-        handle_join_submit(){
+        handle_join_submit() {
             this.add.confirm_join_loading = true;
             var formData = new FormData();
             formData.append('class_id', this.add.join.id);
@@ -158,20 +160,23 @@ var antd = new Vue({
             this.spinning.center = true;
             this.opened_class_info.name = this.user.classes_info[index].name;
             this.opened_class_info.des = this.user.classes_info[index].des;
+            this.opened_class_info.id = this.user.classes_info[index].id;
             axios.get('../interact/select_users.php?type=name&id=' + parseInt(this.user.classes_info[index].super) + '&form=single')
                 .then(rec => {
                     this.opened_class_info.supername = rec.data.name;
-                });
-            this.opened_class_info.superid = this.user.classes_info[index].super;
+                    this.opened_class_info.superid = this.user.classes_info[index].super;
 
-            axios.get('../interact/select_users.php?type=name&id=' + this.user.classes_info[index].member + '&form=all')
-                .then(rec => {
-                    this.opened_class_info.members = rec.data;
+                    axios.get('../interact/select_classes.php?type=member&id='+this.opened_class_info.id+'&form=single')
+                    .then(recc=>{
+                        axios.get('../interact/select_users.php?type=name&id=' + recc.data.member + '&form=all')
+                        .then(rec => {
+                            this.opened_class_info.members = rec.data;
+                            this.opened_class_info.img = this.user.classes_info[index].img;
+                            this.opened_class_info.status = 1;
+                            this.spinning.center = false;
+                        });
+                    })
                 });
-
-            this.opened_class_info.img = this.user.classes_info[index].img;
-            this.opened_class_info.status = 1;
-            this.spinning.center = false;
         },
         //获取用户类型
         get_level(type) {
@@ -195,6 +200,7 @@ var antd = new Vue({
                     this.opened_member_info.info = resp.data[0];
                     this.opened_member_info.status = 1;
                     this.opened_member_info.superid = this.opened_class_info.superid;
+                    this.opened_member_info.classid = this.opened_class_info.id;
                     this.spinning.right = false;
                 })
         },
@@ -214,6 +220,73 @@ var antd = new Vue({
             minute = minute < 10 ? ('0' + minute) : minute;
             second = second < 10 ? ('0' + second) : second;
             return y + '-' + m + '-' + d + ' ' + h + ':' + minute + ':' + second;
+        },
+        stu_remove(class_id) {
+            this.remove_id = class_id;
+            this.$confirm({
+                title: 'Do you want to leave the class?',
+                content: 'the process can not be redone',
+                onOk() {
+                    var formData = new FormData();
+                    formData.append('class_id', antd.remove_id);
+                    formData.append('stu_id', antd.user.id);
+                    formData.append('from', 'student');
+
+                    $.ajax({
+                        url: '../interact/exit_classes.php',
+                        type: "POST",
+                        data: formData,
+                        cache: false,
+                        dataType: 'json',
+                        processData: false,
+                        contentType: false,
+                        success: function (data) {
+                            if (data.status) {
+                                antd.$message.success(data.mes);
+                                antd.get_all_classes();
+                                antd.opened_member_info.status = 0;
+                                antd.opened_class_info.status = 0;
+                            } else {
+                                antd.$message.error(data.mes);
+                            }
+                        }
+                    });
+                },
+            });
+        },
+        tea_remove(class_id, stu_id) {
+            this.remove_id = class_id;
+            this.remove_stu_id = stu_id;
+            this.$confirm({
+                title: 'Do you want to remove this student from the class?',
+                content: 'the process can not be redone',
+                onOk() {
+                    var formData = new FormData();
+                    formData.append('class_id', antd.remove_id);
+                    formData.append('stu_id', antd.remove_stu_id);
+                    formData.append('from', 'teacher');
+                    formData.append('tea_id', antd.user.id);
+
+                    $.ajax({
+                        url: '../interact/exit_classes.php',
+                        type: "POST",
+                        data: formData,
+                        cache: false,
+                        dataType: 'json',
+                        processData: false,
+                        contentType: false,
+                        success: function (data) {
+                            if (data.status) {
+                                antd.$message.success(data.mes);
+                                antd.opened_member_info.status = 0;
+                                antd.opened_class_info.status = 0;
+                            } else {
+                                antd.$message.error(data.mes);
+                            }
+                        }
+                    });
+                }
+            })
         }
     }
 });

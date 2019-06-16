@@ -12,22 +12,22 @@
                 <p>All the classes you joined</p>
             </div>
             <template v-if="!!user.joined_classes">
-            <div v-for="(joined,index) in user.joined_classes" :class="'class-item ' + class_super(index)" @click="open_class_info(index)" :id="'class'+index">
-                <div style="margin-right: 10px;">
-                    <template v-if="!!user.classes_info[index].img">
-                        <img :src="user.classes_info[index].img" class="class-item-img" />
-                    </template>
-                    <template v-else>
-                        <div class="class-img-default">
-                            <p>{{ user.classes_info[index].name.substring(0,1) }}</p>
-                        </div>
-                    </template>
+                <div v-for="(joined,index) in user.joined_classes" :class="'class-item ' + class_super(index)" @click="open_class_info(index)" :id="'class'+index">
+                    <div style="margin-right: 10px;">
+                        <template v-if="!!user.classes_info[index].img">
+                            <img :src="user.classes_info[index].img" class="class-item-img" />
+                        </template>
+                        <template v-else>
+                            <div class="class-img-default">
+                                <p>{{ user.classes_info[index].name.substring(0,1) }}</p>
+                            </div>
+                        </template>
+                    </div>
+                    <div>
+                        <h3 v-html="user.classes_info[index].name+'<em>'+user.classes_info[index].member.split(',').length+'</em>'"></h3>
+                        <p v-html="user.classes_info[index].des"></p>
+                    </div>
                 </div>
-                <div>
-                    <h3 v-html="user.classes_info[index].name+'<em>'+user.classes_info[index].member.split(',').length+'</em>'"></h3>
-                    <p v-html="user.classes_info[index].des"></p>
-                </div>
-            </div>
             </template>
             <div class="class-item" @click="add_class()">
                 <?php if ($type == 1) { ?>
@@ -85,15 +85,16 @@
                         <a-dropdown placement="bottomRight">
                             <a-button>Settings</a-button>
                             <a-menu slot="overlay">
-                                <a-menu-item>
-                                    <a target="_blank" rel="noopener noreferrer" href="http://www.alipay.com/">1st menu item</a>
-                                </a-menu-item>
-                                <a-menu-item>
-                                    <a target="_blank" rel="noopener noreferrer" href="http://www.taobao.com/">2nd menu item</a>
-                                </a-menu-item>
-                                <a-menu-item>
-                                    <a target="_blank" rel="noopener noreferrer" href="http://www.tmall.com/">3rd menu item</a>
-                                </a-menu-item>
+                                <template v-if="user.id == opened_class_info.superid">
+                                    <a-menu-item>
+                                        <a>Edit Info</a>
+                                    </a-menu-item>
+                                </template>
+                                <template v-else>
+                                    <a-menu-item>
+                                        <a @click="stu_remove(opened_class_info.id)">Leave the class</a>
+                                    </a-menu-item>
+                                </template>
                             </a-menu>
                         </a-dropdown>
                     </div>
@@ -150,7 +151,7 @@
                     <div class="class-member-subscribe">
                         <!-- 只允许 opened_member 对应的 super 删除账户,super 不可删除自己 -->
                         <template v-if="(parseInt(opened_member_info.superid) == parseInt(user.id)) && (parseInt(user.id) !== parseInt(opened_member_info.info.id))">
-                            <a-button type="danger">
+                            <a-button type="danger" @click="tea_remove(opened_member_info.classid,opened_member_info.info.id)">
                                 <a-icon type="delete"></a-icon>
                             </a-button>
                         </template>
@@ -175,7 +176,7 @@
                         </a-button>
                         <a-button type="primary"><a :href="'mailto:'+opened_member_info.info.email">Mail To</a></a-button>
                     </a-button-group>
-                    <br/><br/>
+                    <br /><br />
                     <a-button-group>
                         <a-button>
                             <a-icon type="team"></a-icon> Joined {{ opened_member_info.info.class.split(',').length }} Class

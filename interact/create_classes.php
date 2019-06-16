@@ -1,4 +1,6 @@
 <?php
+
+error_reporting(E_ALL & ~E_NOTICE);
 //引入composer
 require '../vendor/autoload.php';
 define('LAZER_DATA_PATH', dirname(dirname(__FILE__)) . '/data/');
