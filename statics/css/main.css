@@ -66,6 +66,7 @@ html,body{
     height: 100vh;
     background: #fff;
     border-right:1px solid #eee;
+    overflow-y: auto;
 }
 
 .main-container .center{
@@ -74,6 +75,7 @@ html,body{
     height: 100vh;
     background:#fff;
     border-right:1px solid #eee;
+    overflow-y: auto;
 }
 
 .main-container .right{
@@ -81,6 +83,7 @@ html,body{
     flex-basis:57.3333%;
     height: 100vh;
     background:#fff;
+    overflow-y: auto;
 }
 
 .class-item{
@@ -147,7 +150,9 @@ html,body{
 
 .main-header p{
     margin: 0px;
-    color:#999
+    color:#999;
+    font-weight: 300;
+    margin-top: -3px;
 }
 
 .class-img-default{

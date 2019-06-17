@@ -87,12 +87,22 @@
                             <a-menu slot="overlay">
                                 <template v-if="user.id == opened_class_info.superid">
                                     <a-menu-item>
-                                        <a>Edit Info</a>
+                                        <a><a-icon type="edit"></a-icon> Edit Info</a>
                                     </a-menu-item>
                                 </template>
                                 <template v-else>
                                     <a-menu-item>
-                                        <a @click="stu_remove(opened_class_info.id)">Leave the class</a>
+                                        <a @click="stu_remove(opened_class_info.id)"><a-icon type="logout"></a-icon> Leave the class</a>
+                                    </a-menu-item>
+                                </template>
+                                <template v-if="class_marked">
+                                    <a-menu-item>
+                                        <a style="color:#FF4040" @click="demark_process(opened_class_info.id,'class')"><a-icon type="delete"></a-icon> Remove the mark</a>
+                                    </a-menu-item>
+                                </template>
+                                <template v-else>
+                                    <a-menu-item>
+                                        <a style="color:#FFC125" @click="mark_process(opened_class_info.id,'class')"><a-icon type="star"></a-icon> Mark this class</a>
                                     </a-menu-item>
                                 </template>
                             </a-menu>
@@ -155,9 +165,16 @@
                                 <a-icon type="delete"></a-icon>
                             </a-button>
                         </template>
-                        <a-button type="default">
-                            <a-icon type="star"></a-icon>
-                        </a-button>
+                        <template v-if="member_marked">
+                            <a-button type="default" @click="demark_process(opened_member_info.info.id,'user')">
+                                <a-icon type="star" style="color:#FFC125"></a-icon>
+                            </a-button>
+                        </template>
+                        <template v-else>
+                            <a-button type="default" @click="mark_process(opened_member_info.info.id,'user')">
+                                <a-icon type="star"></a-icon>
+                            </a-button>
+                        </template>
                     </div>
                 </div>
                 <div class="class-member-content">

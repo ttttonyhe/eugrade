@@ -39,7 +39,12 @@ var antd = new Vue({
                 info: null,
                 superid: null
             },
-            remove_id: null
+            remove_id: null,
+            member_marked: false,
+            class_marked: false,
+            mark: {
+                id: null
+            }
         }
     },
     mounted() {
@@ -166,16 +171,17 @@ var antd = new Vue({
                     this.opened_class_info.supername = rec.data.name;
                     this.opened_class_info.superid = this.user.classes_info[index].super;
 
-                    axios.get('../interact/select_classes.php?type=member&id='+this.opened_class_info.id+'&form=single')
-                    .then(recc=>{
-                        axios.get('../interact/select_users.php?type=name&id=' + recc.data.member + '&form=all')
-                        .then(rec => {
-                            this.opened_class_info.members = rec.data;
-                            this.opened_class_info.img = this.user.classes_info[index].img;
-                            this.opened_class_info.status = 1;
-                            this.spinning.center = false;
-                        });
-                    })
+                    axios.get('../interact/select_classes.php?type=member&id=' + this.opened_class_info.id + '&form=single')
+                        .then(recc => {
+                            axios.get('../interact/select_users.php?type=name&id=' + recc.data.member + '&form=all')
+                                .then(rec => {
+                                    this.opened_class_info.members = rec.data;
+                                    this.opened_class_info.img = this.user.classes_info[index].img;
+                                    this.opened_class_info.status = 1;
+                                    this.check_mark(this.opened_class_info.id,'class');
+                                    this.spinning.center = false;
+                                });
+                        })
                 });
         },
         //获取用户类型
@@ -201,6 +207,7 @@ var antd = new Vue({
                     this.opened_member_info.status = 1;
                     this.opened_member_info.superid = this.opened_class_info.superid;
                     this.opened_member_info.classid = this.opened_class_info.id;
+                    this.check_mark(this.opened_member_info.info.id,'user'); //判断是否收藏用户
                     this.spinning.right = false;
                 })
         },
@@ -287,6 +294,157 @@ var antd = new Vue({
                     });
                 }
             })
+        },
+        //判断当前展示用户是否被标记
+        check_mark(id, type) {
+            if (type == 'user') {
+                axios.get('../interact/select_marks.php?form=user&marker=' + this.user.id)
+                    .then(res => {
+                        this.member_marked = false; //.user 在数组为空时无法获取,直接初始值 false
+                        if (!!res.data[id.toString()].user) {
+                            this.member_marked = true;
+                        } else {
+                            this.member_marked = false;
+                        }
+                    })
+            } else {
+                axios.get('../interact/select_marks.php?form=class&marker=' + this.user.id)
+                    .then(res => {
+                        this.class_marked = false; //.class 在数组为空时无法获取,直接初始值 false
+                        if (!!res.data[id.toString()].class) {
+                            this.class_marked = true;
+                        } else {
+                            this.class_marked = false;
+                        }
+                    })
+            }
+        },
+        //标记收藏
+        mark_process(id, type) {
+            this.mark.id = id;
+            if (type == 'user') {
+                this.$confirm({
+                    title: 'Do you want to mark this student?',
+                    content: 'you can remove the mark by clicking the button again',
+                    onOk() {
+                        var formData = new FormData();
+                        formData.append('stu_id', antd.mark.id);
+                        formData.append('type', 'user');
+                        formData.append('marker', antd.user.id);
+
+                        $.ajax({
+                            url: '../interact/create_mark.php',
+                            type: "POST",
+                            data: formData,
+                            cache: false,
+                            dataType: 'json',
+                            processData: false,
+                            contentType: false,
+                            success: function (data) {
+                                if (data.status) {
+                                    antd.$message.success(data.mes);
+                                    antd.check_mark(antd.opened_member_info.info.id, 'user');
+                                } else {
+                                    antd.$message.error(data.mes);
+                                }
+                            }
+                        });
+                    }
+                })
+            } else {
+                this.$confirm({
+                    title: 'Do you want to mark this class?',
+                    content: 'you can remove the mark later',
+                    onOk() {
+                        var formData = new FormData();
+                        formData.append('class_id', antd.mark.id);
+                        formData.append('type', 'class');
+                        formData.append('marker', antd.user.id);
+
+                        $.ajax({
+                            url: '../interact/create_mark.php',
+                            type: "POST",
+                            data: formData,
+                            cache: false,
+                            dataType: 'json',
+                            processData: false,
+                            contentType: false,
+                            success: function (data) {
+                                if (data.status) {
+                                    antd.$message.success(data.mes);
+                                    antd.check_mark(antd.opened_class_info.id, 'class');
+                                } else {
+                                    antd.$message.error(data.mes);
+                                }
+                            }
+                        });
+                    }
+                })
+            }
+        },
+        //删除标记
+        demark_process(id, type) {
+            this.mark.id = id;
+            if (type == 'user') {
+                this.$confirm({
+                    title: 'Do you want to remove the mark of this student?',
+                    content: 'you can mark back by clicking the button again',
+                    onOk() {
+                        var formData = new FormData();
+                        formData.append('stu_id', antd.mark.id);
+                        formData.append('type', 'user');
+                        formData.append('marker', antd.user.id);
+
+                        $.ajax({
+                            url: '../interact/delete_mark.php',
+                            type: "POST",
+                            data: formData,
+                            cache: false,
+                            dataType: 'json',
+                            processData: false,
+                            contentType: false,
+                            success: function (data) {
+                                if (data.status) {
+                                    antd.$message.success(data.mes);
+                                    antd.check_mark_user(antd.opened_member_info.info.id, 'user');
+                                } else {
+                                    antd.$message.error(data.mes);
+                                }
+                            }
+                        });
+                    }
+                })
+            } else {
+                this.$confirm({
+                    title: 'Do you want to remove the mark of this class?',
+                    content: 'you are able to mark back',
+                    onOk() {
+                        var formData = new FormData();
+                        formData.append('class_id', antd.mark.id);
+                        formData.append('type', 'class');
+                        formData.append('marker', antd.user.id);
+
+                        $.ajax({
+                            url: '../interact/delete_mark.php',
+                            type: "POST",
+                            data: formData,
+                            cache: false,
+                            dataType: 'json',
+                            processData: false,
+                            contentType: false,
+                            success: function (data) {
+                                if (data.status) {
+                                    antd.$message.success(data.mes);
+                                    antd.check_mark(antd.opened_class_info.id, 'class');
+                                } else {
+                                    antd.$message.error(data.mes);
+                                }
+                            }
+                        });
+                    }
+                })
+            }
+
         }
     }
 });
