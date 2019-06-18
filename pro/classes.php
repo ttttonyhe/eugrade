@@ -44,6 +44,7 @@
     </div>
 
     <?php if ((int)$type == 2) { ?>
+        <script src="https://unpkg.com/qiniu-js@2.5.4/dist/qiniu.min.js"></script>
         <!-- 新建班级 -->
         <a-modal title="Create a new Class" :visible="add.visible" @ok="handle_create_submit" :confirm-loading="add.confirm_create_loading" @cancel="handle_create_cancel">
             <a-input placeholder="Class Name" v-model="add.class.name">
@@ -53,6 +54,30 @@
             <a-textarea placeholder="Class Description" v-model="add.class.des" :rows="4" />
         </a-modal>
         <!-- 新建班级结束 -->
+        <!-- 班级信息修改 -->
+        <a-modal title="Edit Class" :visible="edit.class.visible" @ok="handle_edit_class_submit" :confirm-loading="edit.confirm_edit_class_loading" @cancel="handle_edit_class_cancel">
+            <div>
+                <template v-if="!!opened_class_info.img">
+                    <a-avatar size="large" :src="opened_class_info.img"></a-avatar>
+                </template>
+                <template v-else>
+                    <a-avatar size="large" :style="{backgroundColor: '#32a3bf', verticalAlign: 'middle'}">{{ opened_class_info.name }}</a-avatar>
+                </template>
+                <input type="file" name="class_img" id="class_img"/>
+                <a-button size="small" :style="{ marginLeft: 16, verticalAlign: 'middle' }" @click="upload_class_img('<?php echo $upToken; ?>')">Upload</a-button>
+            </div>
+            <div v-show="edit.class.display_percent">
+                <a-progress :percent="edit.class.percent" status="active"></a-progress>
+                <br/>
+            </div>
+            <br />
+            <a-input placeholder="Class Name" v-model="edit.class.name">
+                <a-icon slot="prefix" type="team" />
+            </a-input>
+            <br /><br />
+            <a-textarea placeholder="Class Description" v-model="edit.class.des" :rows="4" />
+        </a-modal>
+        <!-- 班级信息修改结束 -->
     <?php } else { ?>
         <!-- 加入班级 -->
         <a-modal title="Join a new Class" :visible="add.visible" @ok="handle_join_submit" :confirm-loading="add.confirm_join_loading" @cancel="handle_create_cancel">
@@ -87,22 +112,30 @@
                             <a-menu slot="overlay">
                                 <template v-if="user.id == opened_class_info.superid">
                                     <a-menu-item>
-                                        <a><a-icon type="edit"></a-icon> Edit Info</a>
+                                        <a @click="edit.class.visible = true">
+                                            <a-icon type="edit"></a-icon> Edit Info
+                                        </a>
                                     </a-menu-item>
                                 </template>
                                 <template v-else>
                                     <a-menu-item>
-                                        <a @click="stu_remove(opened_class_info.id)"><a-icon type="logout"></a-icon> Leave the class</a>
+                                        <a @click="stu_remove(opened_class_info.id)">
+                                            <a-icon type="logout"></a-icon> Leave the class
+                                        </a>
                                     </a-menu-item>
                                 </template>
                                 <template v-if="class_marked">
                                     <a-menu-item>
-                                        <a style="color:#FF4040" @click="demark_process(opened_class_info.id,'class')"><a-icon type="delete"></a-icon> Remove the mark</a>
+                                        <a style="color:#FF4040" @click="demark_process(opened_class_info.id,'class')">
+                                            <a-icon type="delete"></a-icon> Remove the mark
+                                        </a>
                                     </a-menu-item>
                                 </template>
                                 <template v-else>
                                     <a-menu-item>
-                                        <a style="color:#FFC125" @click="mark_process(opened_class_info.id,'class')"><a-icon type="star"></a-icon> Mark this class</a>
+                                        <a style="color:#FFC125" @click="mark_process(opened_class_info.id,'class')">
+                                            <a-icon type="star"></a-icon> Mark this class
+                                        </a>
                                     </a-menu-item>
                                 </template>
                             </a-menu>

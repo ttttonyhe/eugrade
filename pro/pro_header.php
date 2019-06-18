@@ -10,6 +10,13 @@
     require '../vendor/autoload.php';
     define('LAZER_DATA_PATH', dirname(dirname(__FILE__)) . '/data/');
     use Lazer\Classes\Database as Lazer;
+    use Qiniu\Auth;
+    $bucket = 'ouorz';
+    $accessKey = '4mGogia1PY-PXaYvct65vITq9PeZtZXa1qxE5Ce8';
+    $secretKey = 'J-NECV03NfUfVgrdIfA1jkSoqMf6PS5XauY-BcxN';
+    $auth = new Auth($accessKey, $secretKey);
+    $upToken = $auth->uploadToken($bucket);
+    header('Access-Control-Allow-Origin:*');
 
     session_start();
     if (!isset($_SESSION['logged_in_id'])) {

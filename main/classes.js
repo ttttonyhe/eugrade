@@ -44,6 +44,18 @@ var antd = new Vue({
             class_marked: false,
             mark: {
                 id: null
+            },
+            edit: {
+                confirm_edit_class_loading: false,
+                confirm_edit_user_loading: false,
+                class: {
+                    visible: false,
+                        name: null,
+                        des: null,
+                        percent: 0,
+                        id: null,
+                        display_percent: false
+                }
             }
         }
     },
@@ -163,9 +175,9 @@ var antd = new Vue({
             $('#class' + index).addClass('clicked');
 
             this.spinning.center = true;
-            this.opened_class_info.name = this.user.classes_info[index].name;
-            this.opened_class_info.des = this.user.classes_info[index].des;
-            this.opened_class_info.id = this.user.classes_info[index].id;
+            this.edit.class.name = this.opened_class_info.name = this.user.classes_info[index].name;
+            this.edit.class.des = this.opened_class_info.des = this.user.classes_info[index].des;
+            this.edit.class.id = this.opened_class_info.id = this.user.classes_info[index].id;
             axios.get('../interact/select_users.php?type=name&id=' + parseInt(this.user.classes_info[index].super) + '&form=single')
                 .then(rec => {
                     this.opened_class_info.supername = rec.data.name;
@@ -178,7 +190,7 @@ var antd = new Vue({
                                     this.opened_class_info.members = rec.data;
                                     this.opened_class_info.img = this.user.classes_info[index].img;
                                     this.opened_class_info.status = 1;
-                                    this.check_mark(this.opened_class_info.id,'class');
+                                    this.check_mark(this.opened_class_info.id, 'class');
                                     this.spinning.center = false;
                                 });
                         })
@@ -207,7 +219,7 @@ var antd = new Vue({
                     this.opened_member_info.status = 1;
                     this.opened_member_info.superid = this.opened_class_info.superid;
                     this.opened_member_info.classid = this.opened_class_info.id;
-                    this.check_mark(this.opened_member_info.info.id,'user'); //判断是否收藏用户
+                    this.check_mark(this.opened_member_info.info.id, 'user'); //判断是否收藏用户
                     this.spinning.right = false;
                 })
         },
@@ -406,7 +418,7 @@ var antd = new Vue({
                             success: function (data) {
                                 if (data.status) {
                                     antd.$message.success(data.mes);
-                                    antd.check_mark_user(antd.opened_member_info.info.id, 'user');
+                                    antd.check_mark(antd.opened_member_info.info.id, 'user');
                                 } else {
                                     antd.$message.error(data.mes);
                                 }
@@ -445,6 +457,121 @@ var antd = new Vue({
                 })
             }
 
+        },
+        //处理创建班级
+        handle_edit_class_submit() {
+            this.edit.confirm_edit_class_loading = true;
+            var formData = new FormData();
+            formData.append('class_id', this.edit.class.id);
+            formData.append('name', this.edit.class.name);
+            formData.append('des', this.edit.class.des);
+            formData.append('super', this.user.id);
+            formData.append('type', 'info');
+
+            $.ajax({
+                url: '../interact/edit_classes.php',
+                type: "POST",
+                data: formData,
+                cache: false,
+                dataType: 'json',
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    if (data.status) {
+                        antd.$message.success(data.mes);
+                        antd.edit.confirm_edit_class_loading = false;
+                        antd.handle_edit_class_cancel();
+                        antd.get_all_classes(); //重新获取班级列表
+                        antd.edit.class.name = null; //清空编辑框
+                        antd.edit.class.des = null;
+                        antd.opened_class_info.status = 0; //关闭中栏
+                    } else {
+                        antd.$message.error(data.mes);
+                        antd.edit.confirm_edit_class_loading = false;
+                    }
+                }
+            });
+        },
+        //关闭 modal
+        handle_edit_class_cancel() {
+            this.edit.class.visible = false;
+        },
+        upload_class_img(token) {
+            if ($("#class_img")[0].files[0] !== undefined) {
+                if($("#class_img")[0].files[0].size <= 2000000){
+                this.edit.confirm_edit_class_loading = true;
+                this.edit.class.display_percent = true;
+                var get_suffix = function (name) {
+                    var index = name.lastIndexOf('.');
+                    return name.substring(index);
+                }
+                var pre_name = new Date().getTime();
+                var suffix = get_suffix($("#class_img")[0].files[0].name);
+                var name = pre_name + suffix;
+                var config = {
+                    useCdnDomain: true
+                };
+                var putExtra = {
+                    mimeType: ["image/png", "image/jpeg"]
+                  };
+
+                var file = $("#class_img")[0].files[0];
+                var observable = qiniu.upload(file, name, token, putExtra, config)
+                var observer = {
+                    next(res) {
+                        antd.edit.class.percent = res.total.percent;
+                    },
+                    error(err) {
+                        antd.$message.error(err.message);
+                        antd.edit.confirm_edit_class_loading = false;
+                        antd.edit.class.display_percent = false;
+                    },
+                    complete(res) {
+                        var formData = new FormData();
+                        formData.append('class_id', antd.edit.class.id);
+                        formData.append('super', antd.user.id);
+                        formData.append('type', 'img');
+                        formData.append('url', 'https://static.ouorz.com/' + name)
+
+                        $.ajax({
+                            url: '../interact/edit_classes.php',
+                            type: "POST",
+                            data: formData,
+                            cache: false,
+                            dataType: 'json',
+                            processData: false,
+                            contentType: false,
+                            success: function (data) {
+                                if (data.status) {
+                                    antd.$message.success(data.mes);
+                                    antd.edit.confirm_edit_class_loading = false;
+                                    antd.handle_edit_class_cancel();
+                                    antd.get_all_classes(); //重新获取班级列表
+                                    /* 清空编辑内容 */
+                                    antd.edit.class.display_percent = false;
+                                    antd.edit.class.name = null;
+                                    antd.edit.class.des = null;
+                                    antd.edit.class.id = null;
+                                    antd.edit.class.percent = 0;
+                                    antd.edit.class.display_percent = false;
+                                    $("#class_img").val('');
+                                    /* 结束清空编辑内容 */
+                                    antd.opened_class_info.status = 0; //关闭中栏
+                                } else {
+                                    antd.$message.error(data.mes);
+                                    antd.edit.confirm_edit_class_loading = false;
+                                }
+                            }
+                        });
+                    }
+                }
+                var subscription = observable.subscribe(observer);
+            }else{
+                antd.$message.error('This img exceeded 2MB upload limit');
+            }
+            } else {
+                antd.$message.error('No img selected');
+            }
         }
     }
 });

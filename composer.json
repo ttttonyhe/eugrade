@@ -1,5 +1,6 @@
 {
     "require": {
-        "greg0/lazer-database": "1.1.6"
+        "greg0/lazer-database": "1.1.6",
+        "qiniu/php-sdk": "^7.2"
     }
 }
