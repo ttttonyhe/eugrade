@@ -8,7 +8,7 @@
     <div class="left">
         <a-spin :spinning="spinning.left">
             <div class="main-header">
-                <h3>All Classes</h3>
+                <h3>Classes</h3>
                 <p>All the classes you joined</p>
             </div>
             <template v-if="!!user.joined_classes">
@@ -42,51 +42,6 @@
             </div>
         </a-spin>
     </div>
-
-    <?php if ((int)$type == 2) { ?>
-        <script src="https://unpkg.com/qiniu-js@2.5.4/dist/qiniu.min.js"></script>
-        <!-- 新建班级 -->
-        <a-modal title="Create a new Class" :visible="add.visible" @ok="handle_create_submit" :confirm-loading="add.confirm_create_loading" @cancel="handle_create_cancel">
-            <a-input placeholder="Class Name" v-model="add.class.name">
-                <a-icon slot="prefix" type="team" />
-            </a-input>
-            <br /><br />
-            <a-textarea placeholder="Class Description" v-model="add.class.des" :rows="4" />
-        </a-modal>
-        <!-- 新建班级结束 -->
-        <!-- 班级信息修改 -->
-        <a-modal title="Edit Class" :visible="edit.class.visible" @ok="handle_edit_class_submit" :confirm-loading="edit.confirm_edit_class_loading" @cancel="handle_edit_class_cancel">
-            <div>
-                <template v-if="!!opened_class_info.img">
-                    <a-avatar size="large" :src="opened_class_info.img"></a-avatar>
-                </template>
-                <template v-else>
-                    <a-avatar size="large" :style="{backgroundColor: '#32a3bf', verticalAlign: 'middle'}">{{ opened_class_info.name }}</a-avatar>
-                </template>
-                <input type="file" name="class_img" id="class_img"/>
-                <a-button size="small" :style="{ marginLeft: 16, verticalAlign: 'middle' }" @click="upload_class_img('<?php echo $upToken; ?>')">Upload</a-button>
-            </div>
-            <div v-show="edit.class.display_percent">
-                <a-progress :percent="edit.class.percent" status="active"></a-progress>
-                <br/>
-            </div>
-            <br />
-            <a-input placeholder="Class Name" v-model="edit.class.name">
-                <a-icon slot="prefix" type="team" />
-            </a-input>
-            <br /><br />
-            <a-textarea placeholder="Class Description" v-model="edit.class.des" :rows="4" />
-        </a-modal>
-        <!-- 班级信息修改结束 -->
-    <?php } else { ?>
-        <!-- 加入班级 -->
-        <a-modal title="Join a new Class" :visible="add.visible" @ok="handle_join_submit" :confirm-loading="add.confirm_join_loading" @cancel="handle_create_cancel">
-            <a-input placeholder="Class ID" v-model="add.join.id">
-                <a-icon slot="prefix" type="team" />
-            </a-input>
-        </a-modal>
-        <!-- 加入班级结束 -->
-    <?php } ?>
 
     <div class="center class-center">
         <a-spin :spinning="spinning.center">
@@ -198,6 +153,11 @@
                                 <a-icon type="delete"></a-icon>
                             </a-button>
                         </template>
+                        <template v-if="(parseInt(opened_member_info.superid) !== parseInt(user.id)) && (parseInt(user.id) == parseInt(opened_member_info.info.id))">
+                        <a-button type="default" @click="edit.user.visible = true">
+                            <a-icon type="edit"></a-icon>
+                        </a-button>
+                        </template>
                         <template v-if="member_marked">
                             <a-button type="default" @click="demark_process(opened_member_info.info.id,'user')">
                                 <a-icon type="star" style="color:#FFC125"></a-icon>
@@ -213,7 +173,7 @@
                 <div class="class-member-content">
                     <a-button-group>
                         <a-button>
-                            <a-icon type="heat-map"></a-icon>ID: {{ opened_member_info.info.id }}
+                            <a-icon type="heat-map"></a-icon>ID: jinitaimei{{ opened_member_info.info.id }}
                         </a-button>
                         <a-button>
                             <a-icon type="flag"></a-icon> Joined on: {{ get_date(opened_member_info.info.date) }}
@@ -243,7 +203,103 @@
 
 
 
-
+<?php if ((int)$type == 2) { ?>
+        <!-- 新建班级 -->
+        <a-modal title="Create a new Class" :visible="add.visible" @ok="handle_create_submit" :confirm-loading="add.confirm_create_loading" @cancel="handle_create_cancel">
+            <a-input placeholder="Class Name" v-model="add.class.name">
+                <a-icon slot="prefix" type="team" />
+            </a-input>
+            <br /><br />
+            <a-textarea placeholder="Class Description" v-model="add.class.des" :rows="4" />
+        </a-modal>
+        <!-- 新建班级结束 -->
+        <!-- 班级信息修改 -->
+        <a-modal title="Edit Class" :visible="edit.class.visible" @ok="handle_edit_class_submit" :confirm-loading="edit.confirm_edit_class_loading" @cancel="handle_edit_class_cancel">
+            <div>
+                <template v-if="!!opened_class_info.img">
+                    <a-avatar size="large" :src="opened_class_info.img"></a-avatar>
+                </template>
+                <template v-else>
+                    <a-avatar size="large" :style="{backgroundColor: '#32a3bf', verticalAlign: 'middle'}">{{ opened_class_info.name }}</a-avatar>
+                </template>
+                <input type="file" name="class_img" id="class_img"/>
+                <a-button size="small" :style="{ marginLeft: 16, verticalAlign: 'middle' }" @click="upload_class_img('<?php echo $upToken; ?>')">Upload</a-button>
+            </div>
+            <div v-show="edit.class.display_percent">
+                <a-progress :percent="edit.class.percent" status="active"></a-progress>
+                <br/>
+            </div>
+            <br />
+            <a-input placeholder="Class Name" v-model="edit.class.name">
+                <a-icon slot="prefix" type="team" />
+            </a-input>
+            <br /><br />
+            <a-textarea placeholder="Class Description" v-model="edit.class.des" :rows="4" />
+        </a-modal>
+        <!-- 班级信息修改结束 -->
+        <!-- 用户信息修改 -->
+        <a-modal title="Edit Info" :visible="edit.user.visible" @ok="handle_edit_user_submit('teacher')" :confirm-loading="edit.confirm_edit_user_loading" @cancel="handle_edit_user_cancel">
+            <div>
+                <template v-if="!!edit.user.avatar">
+                    <a-avatar size="large" :src="edit.user.avatar"></a-avatar>
+                </template>
+                <template v-else>
+                    <a-avatar size="large" :style="{backgroundColor: '#32a3bf', verticalAlign: 'middle'}">{{ edit.user.name }}</a-avatar>
+                </template>
+                <input type="file" name="user_img" id="user_img"/>
+                <a-button size="small" :style="{ marginLeft: 16, verticalAlign: 'middle' }" @click="upload_user_img('<?php echo $upToken; ?>')">Upload</a-button>
+            </div>
+            <div v-show="edit.user.display_percent">
+                <a-progress :percent="edit.user.percent" status="active"></a-progress>
+                <br/>
+            </div>
+            <br />
+            <a-input placeholder="Nickname" v-model="edit.user.name">
+                <a-icon slot="prefix" type="user" />
+            </a-input>
+            <br /><br />
+            <a-input placeholder="Email" v-model="edit.user.email">
+        </a-modal>
+        <!-- 用户信息修改结束 -->
+    <?php } else { ?>
+        <!-- 加入班级 -->
+        <a-modal title="Join a new Class" :visible="add.visible" @ok="handle_join_submit" :confirm-loading="add.confirm_join_loading" @cancel="handle_create_cancel">
+            <a-input placeholder="Class ID" v-model="add.join.id">
+                <a-icon slot="prefix" type="team" />
+            </a-input>
+        </a-modal>
+        <!-- 加入班级结束 -->
+        <!-- 用户信息修改 -->
+        <a-modal title="Edit Info" :visible="edit.user.visible" @ok="handle_edit_user_submit('user')" :confirm-loading="edit.confirm_edit_user_loading" @cancel="handle_edit_user_cancel">
+            <div>
+                <template v-if="!!edit.user.avatar">
+                    <a-avatar size="large" :src="edit.user.avatar"></a-avatar>
+                </template>
+                <template v-else>
+                    <a-avatar size="large" :style="{backgroundColor: '#32a3bf', verticalAlign: 'middle'}">{{ edit.user.name }}</a-avatar>
+                </template>
+                <input type="file" name="user_img" id="user_img"/>
+                <a-button size="small" :style="{ marginLeft: 16, verticalAlign: 'middle' }" @click="upload_user_img('<?php echo $upToken; ?>')">Upload</a-button>
+            </div>
+            <div v-show="edit.user.display_percent">
+                <a-progress :percent="edit.user.percent" status="active"></a-progress>
+                <br/>
+            </div>
+            <br />
+            <a-input placeholder="Nickname" v-model="edit.user.name">
+                <a-icon slot="prefix" type="user" />
+            </a-input>
+            <br /><br />
+            <a-input placeholder="Email" v-model="edit.user.email">
+                <a-icon slot="prefix" type="mail" />
+            </a-input>
+            <br /><br />
+            <a-input placeholder="Password(stays the same if kept empty)" v-model="edit.user.pwd">
+                <a-icon slot="prefix" type="key" />
+            </a-input>
+        </a-modal>
+        <!-- 用户信息修改结束 -->
+    <?php } ?>
 
 
 

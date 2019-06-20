@@ -97,6 +97,12 @@ if (!empty($_POST['class_id']) && !empty($_POST['stu_id']) && !empty($_POST['fro
                             'class' => implode(',', $old_class)
                         ));
                         $array->save();
+                        
+                        //若退出者标记该班级则删除
+                        $mark = Lazer::table('marks')->limit(1)->where('marker', '=', (int)$stu)->andWhere('type','=','class')->andWhere('class','=',(int)$id)->find();
+                        if(!!$mark->id){
+                            $mark->delete();
+                        }
 
                         $status = 1;
                         $code = 110;

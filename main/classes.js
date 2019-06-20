@@ -55,6 +55,15 @@ var antd = new Vue({
                         percent: 0,
                         id: null,
                         display_percent: false
+                },
+                user: {
+                    visible: false,
+                        name: '',
+                        email: '',
+                        pwd:'',
+                        percent: 0,
+                        id: null,
+                        display_percent: false
                 }
             }
         }
@@ -221,6 +230,10 @@ var antd = new Vue({
                     this.opened_member_info.classid = this.opened_class_info.id;
                     this.check_mark(this.opened_member_info.info.id, 'user'); //判断是否收藏用户
                     this.spinning.right = false;
+                    this.edit.user.id = this.opened_member_info.info.id;
+                    this.edit.user.name = this.opened_member_info.info.name;
+                    this.edit.user.email = this.opened_member_info.info.email;
+                    this.edit.user.avatar = this.opened_member_info.info.avatar;
                 })
         },
         //转换时间戳为时间格式
@@ -458,7 +471,7 @@ var antd = new Vue({
             }
 
         },
-        //处理创建班级
+        //处理修改班级
         handle_edit_class_submit() {
             this.edit.confirm_edit_class_loading = true;
             var formData = new FormData();
@@ -560,6 +573,127 @@ var antd = new Vue({
                                 } else {
                                     antd.$message.error(data.mes);
                                     antd.edit.confirm_edit_class_loading = false;
+                                }
+                            }
+                        });
+                    }
+                }
+                var subscription = observable.subscribe(observer);
+            }else{
+                antd.$message.error('This img exceeded 2MB upload limit');
+            }
+            } else {
+                antd.$message.error('No img selected');
+            }
+        },
+        //处理修改用户信息
+        handle_edit_user_submit(type) {
+            this.edit.confirm_edit_user_loading = true;
+            var formData = new FormData();
+            formData.append('user_id', this.edit.user.id);
+            formData.append('name', this.edit.user.name);
+            formData.append('email', this.edit.user.email);
+            if(type == 'teacher'){
+                formData.append('super', antd.user.id);
+            }else{
+                formData.append('pwd', antd.edit.user.pwd);
+            }
+            formData.append('type', 'info');
+
+            $.ajax({
+                url: '../interact/edit_users.php',
+                type: "POST",
+                data: formData,
+                cache: false,
+                dataType: 'json',
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    if (data.status) {
+                        antd.$message.success(data.mes);
+                        antd.edit.confirm_edit_user_loading = false;
+                        antd.handle_edit_user_cancel();
+                        antd.edit.user.name = null; //清空编辑框
+                        antd.edit.user.email = null;
+                        antd.opened_member_info.status = 0; //关闭右栏
+                        antd.opened_class_info.status = 0; //关闭中栏
+                    } else {
+                        antd.$message.error(data.mes);
+                        antd.edit.confirm_edit_user_loading = false;
+                    }
+                }
+            });
+        },
+        //关闭 modal
+        handle_edit_user_cancel() {
+            this.edit.user.visible = false;
+        },
+        upload_user_img(token,type) {
+            if ($("#user_img")[0].files[0] !== undefined) {
+                if($("#user_img")[0].files[0].size <= 2000000){
+                this.edit.confirm_edit_user_loading = true;
+                this.edit.user.display_percent = true;
+                var get_suffix = function (name) {
+                    var index = name.lastIndexOf('.');
+                    return name.substring(index);
+                }
+                var pre_name = new Date().getTime();
+                var suffix = get_suffix($("#user_img")[0].files[0].name);
+                var name = pre_name + suffix;
+                var config = {
+                    useCdnDomain: true
+                };
+                var putExtra = {
+                    mimeType: ["image/png", "image/jpeg"]
+                  };
+
+                var file = $("#user_img")[0].files[0];
+                var observable = qiniu.upload(file, name, token, putExtra, config)
+                var observer = {
+                    next(res) {
+                        antd.edit.user.percent = res.total.percent;
+                    },
+                    error(err) {
+                        antd.$message.error(err.message);
+                        antd.edit.confirm_edit_user_loading = false;
+                        antd.edit.user.display_percent = false;
+                    },
+                    complete(res) {
+                        var formData = new FormData();
+                        formData.append('user_id', antd.edit.user.id);
+                        if(type == 'teacher'){
+                            formData.append('super', antd.user.id);
+                        }
+                        formData.append('type', 'img');
+                        formData.append('url', 'https://static.ouorz.com/' + name)
+
+                        $.ajax({
+                            url: '../interact/edit_users.php',
+                            type: "POST",
+                            data: formData,
+                            cache: false,
+                            dataType: 'json',
+                            processData: false,
+                            contentType: false,
+                            success: function (data) {
+                                if (data.status) {
+                                    antd.$message.success(data.mes);
+                                    antd.edit.confirm_edit_user_loading = false;
+                                    /* 清空编辑内容 */
+                                    antd.edit.user.display_percent = false;
+                                    antd.edit.user.name = null;
+                                    antd.edit.user.email = null;
+                                    antd.edit.user.id = null;
+                                    antd.edit.user.percent = 0;
+                                    antd.edit.user.display_percent = false;
+                                    $("#user_img").val('');
+                                    /* 结束清空编辑内容 */
+                                    antd.handle_edit_user_cancel();
+                                    antd.opened_member_info.status = 0; //关闭右栏
+                                    antd.opened_class_info.status = 0; //关闭中栏
+                                } else {
+                                    antd.$message.error(data.mes);
+                                    antd.edit.confirm_edit_user_loading = false;
                                 }
                             }
                         });

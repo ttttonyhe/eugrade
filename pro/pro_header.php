@@ -43,6 +43,7 @@
     <script type="text/javascript" src="../statics/js/jquery.min.js"></script>
     <script type="text/javascript" src="../statics/js/moment.min.js"></script>
     <link type="text/css" rel="stylesheet" href="../statics/css/main.css">
+    <script src="https://unpkg.com/qiniu-js@2.5.4/dist/qiniu.min.js"></script>
     <script>
     var cookie = {
     "set": function setCookie(name, value) {

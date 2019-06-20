@@ -112,6 +112,10 @@ html,body{
     margin: 0px;
     letter-spacing: .5px;
     color: #444;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    max-width: 160px;
+    white-space: nowrap;
 }
 
 .class-item em{
@@ -209,6 +213,7 @@ html,body{
     max-width: 150px;
     overflow: hidden;
     text-overflow: ellipsis;
+    letter-spacing: .5px;
 }
 
 .class-info-info p{
@@ -307,4 +312,24 @@ html,body{
 .class-member-img p{
     font-size: 39px;
     margin-top: 40px;
+}
+
+.mes-item p{
+    border-bottom: 1px solid #e9e9e9;
+    padding: 10px 23px;
+    font-size: 15px;
+    margin-bottom: 0px;
+    color:#777;
+}
+
+.mes-item p i{
+    font-size: 19px;
+    transform: translateY(2px);
+}
+
+.mes-item p button{
+    vertical-align: middle;
+    position: absolute;
+    right: 15px;
+    font-size: 11px;
 }
