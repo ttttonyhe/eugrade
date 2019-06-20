@@ -11,7 +11,7 @@
                 <h3>Classes</h3>
                 <p>All the classes you joined</p>
             </div>
-            <template v-if="!!user.joined_classes">
+            <template v-if="Object.keys(user.joined_classes).length">
                 <div v-for="(joined,index) in user.joined_classes" :class="'class-item ' + class_super(index)" @click="open_class_info(index)" :id="'class'+index">
                     <div style="margin-right: 10px;">
                         <template v-if="!!user.classes_info[index].img">

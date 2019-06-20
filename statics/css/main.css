@@ -333,3 +333,26 @@ html,body{
     right: 15px;
     font-size: 11px;
 }
+
+.mes-header{
+    padding: 10px 23px;
+    border-bottom: 1px solid #eee;
+}
+
+.mes-header p{
+    font-size: 17px;
+    margin: 0px;
+    letter-spacing: .5px;
+}
+
+.mes-column{
+    padding: 0px;
+}
+
+.mes-sub-header{
+    margin: 0px;
+    padding: 5px 23px;
+    background: #f9f9f9;
+    color: #999;
+    letter-spacing: .1px;
+}

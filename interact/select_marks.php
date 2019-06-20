@@ -32,11 +32,20 @@ if (!empty($_GET['form']) && !empty($_GET['marker'])) {
     $array = Lazer::table('users')->limit(1)->where('id', '=', (int)$marker)->find()->asArray();
     if (!!$array) {
         $array = array();
+        $array_string = array();
         if ($form == 'class') { //获取标记的班级
-            $array = Lazer::table('marks')->where('marker', '=', (int)$marker)->andWhere('type','=','class')->findAll()->asArray('class');
+            $array = Lazer::table('marks')->where('marker', '=', (int)$marker)->andWhere('type', '=', 'class')->findAll()->asArray('class');
+            foreach ($array as $temp) {
+                $array_string[] = $temp->class;
+            }
         } else { //获取标记用户
-            $array = Lazer::table('marks')->where('marker', '=', (int)$marker)->andWhere('type','=','user')->findAll()->asArray('user');
+            $array = Lazer::table('marks')->where('marker', '=', (int)$marker)->andWhere('type', '=', 'user')->findAll()->asArray('user');
+            foreach ($array as $temp) {
+                $array_string[] = $temp->user;
+            }
         }
+        //生成总字符串
+        $array['combine'] = implode(',', $array_string);
     } else {
         $array = array(
             'status' => 0,
