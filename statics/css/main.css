@@ -356,3 +356,153 @@ html,body{
     color: #999;
     letter-spacing: .1px;
 }
+
+.mes-stream-avatar{
+    margin-right: 15px;
+}
+
+.mes-stream-avatar .class-img-default p{
+    color: white !important;
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-top: 20px !important;
+}
+
+.mes-stream-avatar .class-img-default{
+    width: 38px !important;
+    height: 38px !important;
+    margin-top: 2px !important;
+}
+
+.mes-container{
+    padding-top: 10px;
+    height: calc(100vh - 225px);
+    overflow-y: auto;
+}
+
+.mes-stream{
+    padding: 10px 30px 15px 30px;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 5px;
+    display: flex;
+}
+
+.mes-stream-content{
+    width:100%;
+}
+
+.mes-stream-content h3{
+    margin: 0px;
+    font-size: 15px;
+    color: #333;
+    margin-bottom: 2px;
+}
+
+.mes-stream-content h3 em{
+    color: #999;
+    font-weight: 300;
+    font-style: normal;
+    font-size: 12px;
+    letter-spacing: -.5px;
+}
+
+.mes-stream-content p{
+    margin: 0px;
+    font-size: 14px;
+    letter-spacing: .3px;
+    font-weight: 300;
+    margin-left: 1px;
+}
+
+.mes-stream-image{
+    max-width: 90%;
+    margin-top: 10px;
+    border-radius: 4px;
+    border: 1px solid #eee;
+    height: auto;
+}
+
+.right .ant-spin-container{
+    height: calc(100vh - 35px) !important;
+}
+
+.mes-input{
+    position: absolute;
+    width: 81%;
+    left: 9.5%;
+    bottom: 40px;
+}
+
+.mes-input-op{
+    display: flex;
+    position: absolute;
+    bottom: -47px;
+    left: 0px;
+    width: 100%;
+    background: #fff;
+}
+
+.mes-input textarea.ant-input{
+    padding: 10px 13px;
+}
+
+.mes-input-normal textarea.ant-input{
+    padding: 6px 10px 5px 10px;
+}
+
+.mes-input-op div:nth-child(1){
+    width: 100%;
+    transform: translateY(4px);
+}
+
+.mes-input-op div:nth-child(2){
+    display: flex;
+}
+
+.mes-input-op div:nth-child(2) button:nth-child(2){
+    margin-left: 10px;
+}
+
+.mes-container-normal{
+    padding-top: 10px;
+    height: calc(100vh - 140px);
+    overflow-y: auto;
+}
+
+.mes-input-normal{
+    position: absolute;
+    width: 85%;
+    left: 7.5%;
+    bottom: 0px;
+}
+
+.mes-stream-file{
+    border: 1px solid #eee;
+    color: #555;
+    padding: 12px 20px;
+    margin-top: 10px;
+    border-radius: 4px;
+    box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.1);
+    display: flex;
+    max-width: 60%;
+}
+
+.mes-stream-file div:nth-child(2) p{
+    margin: 0px;
+    font-size: 14px;
+    letter-spacing: .3px;
+    font-weight: 300;
+    margin-left: 2px;
+    margin-top: -1px;
+}
+
+.mes-stream-file div:nth-child(2) h3{
+    font-size: 16px !important;
+}
+
+.mes-stream-file div:nth-child(1){
+    font-size: 31px;
+    color: #f5222d;
+    margin-top: -1px;
+    margin-right: 10px;
+}
