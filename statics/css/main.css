@@ -376,8 +376,9 @@ html,body{
 
 .mes-container{
     padding-top: 10px;
-    height: calc(100vh - 225px);
+    height: calc(100vh - 245px);
     overflow-y: auto;
+    border-bottom: 1px solid #eee;
 }
 
 .mes-stream{
@@ -388,7 +389,7 @@ html,body{
 }
 
 .mes-stream-content{
-    width:100%;
+    width:80%;
 }
 
 .mes-stream-content h3{
@@ -414,6 +415,14 @@ html,body{
     margin-left: 1px;
 }
 
+.mes-stream-content .mes-content{
+    margin: 0px;
+    font-size: 14px;
+    letter-spacing: .3px;
+    font-weight: 300;
+    margin-left: 1px;
+}
+
 .mes-stream-image{
     max-width: 90%;
     margin-top: 10px;
@@ -429,16 +438,17 @@ html,body{
 .mes-input{
     position: absolute;
     width: 81%;
-    left: 9.5%;
+    left: 9%;
     bottom: 40px;
+    display: flex;
 }
 
 .mes-input-op{
     display: flex;
     position: absolute;
     bottom: -47px;
-    left: 0px;
-    width: 100%;
+    left: 45px;
+    width: calc(100% - 45px);
     background: #fff;
 }
 
@@ -452,7 +462,6 @@ html,body{
 
 .mes-input-op div:nth-child(1){
     width: 100%;
-    transform: translateY(4px);
 }
 
 .mes-input-op div:nth-child(2){
@@ -465,15 +474,17 @@ html,body{
 
 .mes-container-normal{
     padding-top: 10px;
-    height: calc(100vh - 140px);
+    height: calc(100vh - 150px);
     overflow-y: auto;
+    border-bottom: 1px solid #eee;
 }
 
 .mes-input-normal{
     position: absolute;
-    width: 85%;
-    left: 7.5%;
-    bottom: 0px;
+    width: 81%;
+    left: 9%;
+    bottom: -12px;
+    display: flex;
 }
 
 .mes-stream-file{
@@ -505,4 +516,55 @@ html,body{
     color: #f5222d;
     margin-top: -1px;
     margin-right: 10px;
+}
+
+#mes-inner{
+    padding-bottom: 90px;
+}
+
+.ant-skeleton-with-avatar .ant-skeleton-content .ant-skeleton-title + .ant-skeleton-paragraph{
+    padding-left: 0px;
+    margin-top: 0px;
+}
+
+.ant-skeleton-header{
+    padding-top: 13px;
+}
+
+.mes-list{
+    border-top: 2px solid rgb(50, 164, 255);
+    box-shadow: 0px 2px 12px rgba(0, 0, 0, 0.05);
+    display: flex;
+}
+
+.mes-list div:nth-child(1){
+    width: 100%;
+}
+
+.mes-list div:nth-child(2){
+    padding-top: 7px;
+    display: flex;
+}
+
+.mes-list p:nth-child(1){
+    color: #333;
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: -2px;
+}
+
+.mes-list p:nth-child(2){
+    color: #999;
+    font-size: 13px;
+    font-weight: 300;
+}
+
+.mes-end{
+    margin-top: 45px;
+    margin-bottom: -25px;
+    text-align: center;
+    font-size: 16px;
+    color: #999;
+    letter-spacing: 1px;
+    font-weight: 300;
 }

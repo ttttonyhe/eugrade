@@ -49,20 +49,28 @@ if (!empty($_POST['creator']) && !empty($_POST['name']) && !empty($_POST['belong
         $array = Lazer::table('users')->limit(1)->where('id', '=', (int)$id)->find()->asArray();
         if (!!$array) {
             if ($array[0]['type'] == 2) {
-                //建立 thread
-                $this_id = Lazer::table('threads')->findAll()->count() + 1;
-                $row = Lazer::table('threads');
-                $row->id = $this_id;
-                $row->name = $name;
-                $row->belong_class = (int)$class;
-                $row->creator = (int)$id;
-                $row->date = time();
-                $row->message_count = 0;
-                $row->save();
 
-                $status = 1;
-                $code = 102;
-                $mes = 'Successfully created a thread';
+                $array = Lazer::table('threads')->limit(1)->where('name', '=', $name)->andWhere('belong_class', '=', (int)$class)->find()->asArray();
+                if (empty($array)) {
+                    //建立 thread
+                    $this_id = Lazer::table('threads')->findAll()->count() + 1;
+                    $row = Lazer::table('threads');
+                    $row->id = $this_id;
+                    $row->name = $name;
+                    $row->belong_class = (int)$class;
+                    $row->creator = (int)$id;
+                    $row->date = time();
+                    $row->message_count = 0;
+                    $row->save();
+
+                    $status = 1;
+                    $code = 102;
+                    $mes = 'Successfully created a thread';
+                } else {
+                    $status = 0;
+                    $code = 105;
+                    $mes = 'Thread name has been used in this class';
+                }
             } else {
                 $status = 0;
                 $code = 105;

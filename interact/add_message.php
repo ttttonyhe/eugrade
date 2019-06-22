@@ -45,7 +45,7 @@ if (!empty($_POST['speaker_name']) && !empty($_POST['thread']) && !empty($_POST[
     $speaker = input($_POST['speaker']);
     $speaker_name = input($_POST['speaker_name']);
     $class = input($_POST['belong_class']);
-    $content = input($_POST['content']);
+    $content = $_POST['content'];
     $thread = input($_POST['thread']);
     $type = input($_POST['type']);
 
@@ -116,6 +116,12 @@ if (!empty($_POST['speaker_name']) && !empty($_POST['thread']) && !empty($_POST[
                         $row->type = 'text';
                         $row->save();
 
+                        $t = Lazer::table('threads')->limit(1)->where('id', '=', (int)$thread)->find();
+                        $t->set(array(
+                            'message_count' => $t->message_count + 1
+                        ));
+                        $t->save();
+
                         $status = 1;
                         $code = 131;
                         $mes = 'Successfully sent an image + text message';
@@ -135,6 +141,12 @@ if (!empty($_POST['speaker_name']) && !empty($_POST['thread']) && !empty($_POST[
                             $row->date = time();
                             $row->type = 'file';
                             $row->save();
+
+                            $t = Lazer::table('threads')->limit(1)->where('id', '=', (int)$thread)->find();
+                            $t->set(array(
+                                'message_count' => $t->message_count + 1
+                            ));
+                            $t->save();
 
                             $status = 1;
                             $code = 132;
@@ -159,6 +171,12 @@ if (!empty($_POST['speaker_name']) && !empty($_POST['thread']) && !empty($_POST[
                             $row->date = time();
                             $row->type = 'text';
                             $row->save();
+
+                            $t = Lazer::table('threads')->limit(1)->where('id', '=', (int)$thread)->find();
+                            $t->set(array(
+                                'message_count' => $t->message_count + 1
+                            ));
+                            $t->save();
 
                             $status = 1;
                             $code = 133;

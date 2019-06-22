@@ -2,6 +2,7 @@ var antd = new Vue({
     el: '#app',
     data() {
         return {
+            md: null,
             user: {
                 id: cookie.get('logged_in_id'),
                 joined_classes: [],
@@ -11,7 +12,9 @@ var antd = new Vue({
             spinning: {
                 left: true,
                 center: false,
-                right: false
+                right: false,
+                loading: true,
+                drawer: false
             },
             display_classes: true,
             display_classes_text: 'Hide All',
@@ -19,7 +22,8 @@ var antd = new Vue({
                 mark: false,
                 chat: false,
                 user: false,
-                thread: false
+                thread: false,
+                info: false
             },
             opened_mark_info: {
                 user: null,
@@ -32,7 +36,9 @@ var antd = new Vue({
                 info: null
             },
             opened_class_info: {
-                id: null
+                id: null,
+                superid: null,
+                index : null
             },
             opened_thread_info: [],
             member_marked: false,
@@ -52,39 +58,56 @@ var antd = new Vue({
                     name: null
                 }
             },
-            opened_mes_info: {
+            opened_mes_info: { //打开内容列表
                 thread_id: null,
                 thread_info: [],
                 class_id: null,
                 meses: [],
-                speakers: [],
-                index: null
+                speakers: [], //每段内容对应的发送者头像
+                unique_speakers: [], //去重后的总参与人数
+                index: null,
+                last: null //最后一段内容的唯一 id
             },
-            mes_input: {
+            mes_input: { //发送内容框
                 rows: 1,
-                op_display: false,
-                container: 'mes-container-normal',
+                op_display: false, //选项
+                container: 'mes-container-normal', //聚焦和失焦时展示不同 class
                 input: 'mes-input-normal',
-                content: null,
-                disable: false,
+                content: null, //内容框内容
+                disable: false, //屏蔽内容框修改
                 type: 'text',
-                visible: {
+                visible: { //上传图片、文件的 tooltip
                     picture: false,
                     upload: false,
                     text: true
                 },
-                token: null,
-                file_progress: false,
+                token: null, //上传文件的 token
+                file_progress: false, //上传进度条展示
                 img_progress: false,
                 progress_file: 0, //进度
                 progress_img: 0,
-                img: {
+                img: { //图片上传内容
                     url: null
                 },
-                file: {
+                file: { //文件上传内容
                     url: null,
                     name: null
+                },
+                send_text: 'Send', //在图片上传时会改变 send 按钮文字
+                markdown: { //支持 markdown 格式的发送
+                    status: false,
+                    html: null,
+                    btn: 'default'
                 }
+            },
+            view: {
+                visible: false,
+                info: null
+            },
+            edit: {
+                visible: false,
+                name: null,
+                confirm_edit_loading: false
             },
         }
     },
@@ -108,6 +131,12 @@ var antd = new Vue({
                     this.spinning.left = false;
                 }
             });
+        this.md = window.markdownit({
+            html: true,
+            xhtmlOut: false,
+            breaks: true,
+            linkify: true
+        });
     },
     methods: {
         //创建/加入新班级后重新加载列表
@@ -232,7 +261,7 @@ var antd = new Vue({
                 })
         },
         //点击班级获取主题在 center 列展示
-        open_class(id) {
+        open_class(id, index) {
             //选中增加 class，删除其余选中
             $('.left .class-item').each(function () {
                 $(this).removeClass('clicked');
@@ -241,6 +270,11 @@ var antd = new Vue({
             $('#class_sub' + id).addClass('clicked');
 
             this.opened_class_info.id = id;
+            if(!!index || index == 0){
+                this.opened_class_info.index = index;
+            }
+            this.opened_class_info.superid = this.user.classes_info[this.opened_class_info.index].super;
+
             this.spinning.center = true;
             axios.get('../interact/select_thread.php?class_id=' + id)
                 .then(resp => {
@@ -256,7 +290,9 @@ var antd = new Vue({
         //点击主题获取消息在 right 列展示
         open_mes(index, id, belong_class) {
 
-            this.spinning.right = true;
+            this.spinning.loading = true;
+            this.status.user = false;
+            this.status.chat = true;
             //选中增加 class，删除其余选中
             $('.center .class-item').each(function () {
                 $(this).removeClass('clicked');
@@ -267,18 +303,24 @@ var antd = new Vue({
             this.opened_mes_info.thread_id = id;
             this.opened_mes_info.class_id = belong_class;
             this.opened_mes_info.thread_info = this.opened_thread_info[index];
+            this.edit.name = this.opened_mes_info.thread_info.name;
 
             axios.get('../interact/select_messages.php?thread_id=' + this.opened_mes_info.thread_id + '&class_id=' + this.opened_mes_info.class_id)
                 .then(response => {
                     this.opened_mes_info.meses = response.data.mes;
-                    axios.get('../interact/select_users.php?form=all&type=name&id=' + response.data.speakers)
+                    this.opened_mes_info.unique_speakers = response.data.speakers_unique.split(',');
+                    axios.get('../interact/select_users.php?type=avatar&id=' + response.data.speakers + '&mes=1')
                         .then(res => {
                             this.opened_mes_info.speakers = res.data;
+                            this.spinning.loading = false;
                         })
-                    this.status.user = false;
-                    this.status.chat = true;
-                    this.spinning.right = false;
                 })
+
+            antd.update_mes();
+            var func = function () {
+                antd.update_mes();
+            }
+            window.get_mes_interval = setInterval(func, 4000);
         },
 
 
@@ -511,6 +553,7 @@ var antd = new Vue({
                 }
             });
         },
+        //获取输入框焦点回调函数
         handle_input_up() {
             this.mes_input.rows = 3;
             this.mes_input.op_display = true;
@@ -518,69 +561,110 @@ var antd = new Vue({
             this.mes_input.input = 'mes-input';
             this.bottom_mes();
         },
+        //discard 按钮
         handle_input_down() {
             this.mes_input.rows = 1;
             this.mes_input.op_display = false;
             this.mes_input.container = 'mes-container-normal';
             this.mes_input.input = 'mes-input-normal';
         },
+        //发送内容
         handle_input_send(type) {
             this.mes_input.disable = true;
             var formData = new FormData();
 
-            if (type == 'img') {
-                formData.append('img_url', this.mes_input.img.url);
-                formData.append('content', this.mes_input.content);
-                this.mes_input.type = 'text';
-            } else if (type == 'file') {
-                formData.append('file_url', this.mes_input.file.url);
-                formData.append('file_name', this.mes_input.file.name);
-                this.mes_input.type = 'file';
+            if (this.mes_input.markdown.status) {
+                var content = this.md.render(this.mes_input.content);
             } else {
-                formData.append('content', this.mes_input.content);
-                this.mes_input.type = 'text';
+                var content = this.mes_input.content;
             }
 
-            formData.append('speaker', this.user.id);
-            formData.append('speaker_name', this.user.info.name);
-            formData.append('belong_class', this.opened_mes_info.class_id);
-            formData.append('thread', this.opened_mes_info.thread_id);
-            formData.append('type', this.mes_input.type);
-
-            $.ajax({
-                url: '../interact/add_message.php',
-                type: "POST",
-                data: formData,
-                cache: false,
-                dataType: 'json',
-                processData: false,
-                contentType: false,
-                success: function (data) {
-                    if (data.status) {
-                        antd.update_mes();
-                        antd.mes_input.content = null;
-                        antd.mes_input.disable = false;
-                    } else {
-                        antd.$message.error(data.mes);
-                        antd.mes_input.disable = false;
-                    }
+            if (type == 'img') {
+                if (!!this.mes_input.img.url) {
+                    formData.append('img_url', this.mes_input.img.url);
+                    formData.append('content', content);
+                    this.mes_input.type = 'text';
+                    status = 1;
+                } else {
+                    status = 0;
                 }
-            });
-        },
-        update_mes() {
-            axios.get('../interact/select_messages.php?thread_id=' + this.opened_mes_info.thread_id + '&class_id=' + this.opened_mes_info.class_id)
-                .then(response => {
-                    this.opened_mes_info.meses = response.data.mes;
-                    axios.get('../interact/select_users.php?form=all&type=name&id=' + response.data.speakers)
-                        .then(res => {
-                            this.opened_mes_info.speakers = res.data;
+            } else if (type == 'file') {
+                if (!!this.mes_input.file.url && !!this.mes_input.file.name) {
+                    formData.append('file_url', this.mes_input.file.url);
+                    formData.append('file_name', this.mes_input.file.name);
+                    this.mes_input.type = 'file';
+                    status = 1;
+                } else {
+                    status = 0;
+                }
+            } else {
+                if (!!this.mes_input.content) {
+                    formData.append('content', content);
+                    this.mes_input.type = 'text';
+                    status = 1;
+                } else {
+                    status = 0;
+                }
+            }
+
+            if (status) {
+
+                formData.append('speaker', this.user.id);
+                formData.append('speaker_name', this.user.info.name);
+                formData.append('belong_class', this.opened_mes_info.class_id);
+                formData.append('thread', this.opened_mes_info.thread_id);
+                formData.append('type', this.mes_input.type);
+
+                $.ajax({
+                    url: '../interact/add_message.php',
+                    type: "POST",
+                    data: formData,
+                    cache: false,
+                    dataType: 'json',
+                    processData: false,
+                    contentType: false,
+                    success: function (data) {
+                        if (data.status) {
+                            antd.update_mes();
+                            antd.mes_input.content = null;
+                            antd.mes_input.disable = false;
+                            antd.handle_cancel_upload();
+                            antd.opened_thread_info[antd.opened_mes_info.index].message_count++;
                             antd.bottom_mes();
-                        })
+                        } else {
+                            antd.$message.error(data.mes);
+                            antd.mes_input.disable = false;
+                            antd.handle_cancel_upload();
+                        }
+                    }
+                });
+            } else {
+                this.$message.error('Illegal request');
+            }
+        },
+        //更新内容列表(按照最后一段内容唯一 id 判断是否需要更新并滑动到底部)
+        update_mes() {
+            axios.get('../interact/select_messages.php?thread_id=' + this.opened_mes_info.thread_id + '&class_id=' + this.opened_mes_info.class_id + '&last=' + this.opened_mes_info.last)
+                .then(response => {
+                    if (response.data.update.status == 1) {
+                        this.opened_mes_info.last = response.data.update.last;
+                        this.opened_mes_info.meses = response.data.mes;
+                        this.opened_mes_info.unique_speakers = response.data.speakers_unique.split(',');
+                        axios.get('../interact/select_users.php?type=avatar&id=' + response.data.speakers + '&mes=1')
+                            .then(res => {
+                                this.opened_mes_info.speakers = res.data;
+                                this.bottom_mes();
+                            })
+                    } else {
+                        this.opened_mes_info.last = response.data.update.last;
+                    }
                 })
         },
+        //滑动到内容列表底部
         bottom_mes() {
             $("#mes-container").scrollTop($("#mes-inner")[0].scrollHeight);
         },
+        //上传文件(不可存在内容，上传后自动发送)
         upload_file() {
             if ($("#upload_file")[0].files[0] !== undefined) {
                 if ($("#upload_file")[0].files[0].size <= 50000000) {
@@ -588,12 +672,13 @@ var antd = new Vue({
                     this.mes_input.visible.text = false;
                     this.mes_input.file_progress = true;
                     this.mes_input.disable = true;
+                    this.mes_input.type = 'file';
 
                     var pre_name = new Date().getTime();
                     var suffix = this.get_suffix($("#upload_file")[0].files[0].name);
                     var name = pre_name + suffix;
 
-                    this.mes_input.file.name = name;
+                    this.mes_input.file.name = $("#upload_file")[0].files[0].name;
                     this.mes_input.file.url = 'https://static.ouorz.com/' + name;
 
                     var config = {
@@ -606,7 +691,7 @@ var antd = new Vue({
                     var observable = qiniu.upload(file, name, token, config)
                     var observer = {
                         next(res) {
-                            antd.mes_input.progress_file = res.total.percent;
+                            antd.mes_input.progress_file = Math.round(res.total.percent);
                         },
                         error(err) {
                             antd.$message.error(err.message);
@@ -616,7 +701,7 @@ var antd = new Vue({
                             antd.handle_input_send('file');
                             antd.handle_cancel_upload();
                             $("#upload_file").val(''); //清空文件选择
-                            this.mes_input.visible.text = true;
+                            antd.mes_input.visible.text = true;
                         }
                     }
                     var subscription = observable.subscribe(observer);
@@ -627,37 +712,44 @@ var antd = new Vue({
                 antd.$message.error('No file selected');
             }
         },
+        //上传图片(可继续增加内容，上传后不直接发送)
         upload_img() {
             if ($("#upload_img")[0].files[0] !== undefined) {
                 if ($("#upload_img")[0].files[0].size <= 20000000) {
 
                     this.mes_input.img_progress = true;
+                    this.mes_input.type = 'img';
 
                     var pre_name = new Date().getTime();
                     var suffix = this.get_suffix($("#upload_img")[0].files[0].name);
                     var name = pre_name + suffix;
 
-                    this.mes_input.file.name = name;
-                    this.mes_input.file.url = 'https://static.ouorz.com/' + name;
+                    this.mes_input.img.url = 'https://static.ouorz.com/' + name;
 
                     var config = {
                         useCdnDomain: true
                     };
 
+                    var putExtra = {
+                        mimeType: ["image/png", "image/jpeg", "image/gif"]
+                    };
+
                     var token = this.mes_input.token;
 
                     var file = $("#upload_img")[0].files[0];
-                    var observable = qiniu.upload(file, name, token, config)
+                    var observable = qiniu.upload(file, name, token, putExtra, config)
                     var observer = {
                         next(res) {
-                            antd.mes_input.progress_file = res.total.percent;
+                            antd.mes_input.progress_img = Math.round(res.total.percent);
                         },
                         error(err) {
                             antd.$message.error(err.message);
-                            antd.mes_input.file_progress = false;
+                            antd.mes_input.img_progress = false;
                         },
                         complete(res) {
                             antd.$message.success('Successfully uploaded an image');
+                            antd.mes_input.img_progress = false;
+                            antd.mes_input.send_text = 'Send(with an image)'
                         }
                     }
                     var subscription = observable.subscribe(observer);
@@ -668,10 +760,12 @@ var antd = new Vue({
                 antd.$message.error('No file selected');
             }
         },
+        //获取文件后缀
         get_suffix(name) {
             var index = name.lastIndexOf('.');
             return name.substring(index);
         },
+        //取消上传文件
         handle_cancel_upload() {
             this.mes_input.type = 'text';
             this.mes_input.disable = false;
@@ -682,6 +776,158 @@ var antd = new Vue({
             this.mes_input.file.name = null;
             this.mes_input.file.url = null;
             this.mes_input.img.url = null;
+            this.mes_input.send_text = 'Send'
+        },
+        //获取文件格式的内容段图标、颜色
+        get_file_icon(name) {
+            switch (name) {
+                case 'pdf':
+                    return new Array('pdf', 'rgb(233, 30, 99)');
+                    break;
+                case 'md':
+                    return new Array('markdown', 'rgb(0, 150, 136)');
+                    break;
+                case 'jpeg':
+                    return new Array('jpg', 'rgb(233, 30, 99)');
+                    break;
+                case 'jpg':
+                    return new Array('jpg', 'rgb(233, 30, 99)');
+                    break;
+                case 'ppt':
+                    return new Array('ppt', 'rgb(244, 67, 54)');
+                    break;
+                case 'pptx':
+                    return new Array('ppt', 'rgb(244, 67, 54)');
+                    break;
+                case 'key':
+                    return new Array('ppt', 'rgb(244, 67, 54)');
+                    break;
+                case 'doc':
+                    return new Array('word', 'rgb(3, 169, 244)');
+                    break;
+                case 'docx':
+                    return new Array('word', 'rgb(3, 169, 244)');
+                    break;
+                case 'xlsx':
+                    return new Array('excel', 'rgb(76, 175, 80)');
+                    break;
+                case 'xls':
+                    return new Array('excel', 'rgb(76, 175, 80)');
+                    break;
+                case 'png':
+                    return new Array('jpg', 'rgb(233, 30, 99)');
+                    break;
+                case 'zip':
+                    return new Array('text', 'rgb(96, 125, 139)');
+                    break;
+                case 'rar':
+                    return new Array('text', 'rgb(96, 125, 139)');
+                    break;
+                default:
+                    return new Array('unknown', 'rgb(158, 158, 158)');
+                    break;
+            }
+        },
+        //开启 markdown，提交时将内容渲染为 html
+        handle_markdown() {
+            if (this.mes_input.markdown.status) {
+                this.mes_input.markdown.status = false;
+                this.mes_input.markdown.btn = 'default';
+            } else {
+                this.mes_input.markdown.status = true;
+                this.mes_input.markdown.btn = 'primary';
+            }
+        },
+        //处理内容段(markdown 内容最后会误增加一个 \n 回车，在此与 \n 换行一起处理)
+        process_content(content) {
+            if (content.charAt(content.length - 1) == '\n') {
+                return content.substr(0, content.length - 2).replace(/\n/g, '<br/>');
+            } else {
+                return content.replace(/\n/g, '<br/>');
+            }
+        },
+        view_user_info(id) {
+            this.view.visible = true;
+            this.spinning.drawer = true;
+            axios.get('../interact/select_users.php?type=name&form=all&id=' + id)
+                .then(resp => {
+                    this.opened_member_info.info = resp.data[0];
+                    this.check_mark(id, 'user'); //判断是否收藏用户
+                    this.status.info = true;
+                    this.spinning.drawer = false;
+                })
+        },
+        view_close() {
+            this.view.visible = false;
+        },
+        //处理修改用户信息
+        handle_edit_submit() {
+            this.edit.confirm_edit_loading = true;
+            var formData = new FormData();
+            formData.append('user', this.user.id);
+            formData.append('name', this.edit.name);
+            formData.append('class_id', this.opened_mes_info.class_id);
+            formData.append('thread_id', this.opened_mes_info.thread_id);
+
+            $.ajax({
+                url: '../interact/edit_thread.php',
+                type: "POST",
+                data: formData,
+                cache: false,
+                dataType: 'json',
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    if (data.status) {
+                        antd.$message.success(data.mes);
+                        antd.edit.confirm_edit_loading = false;
+                        antd.handle_edit_cancel();
+                        antd.opened_mes_info.thread_info.name = antd.edit.name;
+                        antd.opened_thread_info[antd.opened_mes_info.index].name = antd.edit.name;
+                    } else {
+                        antd.$message.error(data.mes);
+                        antd.edit.confirm_edit_loading = false;
+                    }
+                }
+            });
+        },
+        //关闭 modal
+        handle_edit_cancel() {
+            this.edit.visible = false;
+        },
+        //删除标记
+        delete_thread() {
+            this.$confirm({
+                title: 'Do you want to delete this thread?',
+                content: 'the process can not be redone',
+                onOk() {
+                    var formData = new FormData();
+                    formData.append('super', antd.user.id);
+                    formData.append('class_id', antd.opened_mes_info.class_id);
+                    formData.append('thread_id', antd.opened_mes_info.thread_id);
+
+                    $.ajax({
+                        url: '../interact/delete_thread.php',
+                        type: "POST",
+                        data: formData,
+                        cache: false,
+                        dataType: 'json',
+                        processData: false,
+                        contentType: false,
+                        success: function (data) {
+                            if (data.status) {
+                                antd.$message.success(data.mes);
+                                antd.status.mark = false;
+                                antd.status.chat = false;
+                                antd.status.thread = false;
+                            } else {
+                                antd.$message.error(data.mes);
+                            }
+                        }
+                    });
+                }
+            })
+
         },
     }
 });
