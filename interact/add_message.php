@@ -18,7 +18,9 @@ try {
         'belong_class' => 'integer', //主题对应班级
         'content' => 'string', //内容
         'thread' => 'integer', //班级下的主题 id
-        'emoji' => 'string', //添加 emoji
+        'emoji_1' => 'integer', //添加 emoji1
+        'emoji_2' => 'integer', //添加 emoji2
+        'emoji_3' => 'integer', //添加 emoji3
         'img_url' => 'string', //类型为文本，但有图片附件
         'date' => 'integer', //发送时间
         'type' => 'string', //类型：文件 or 文本(+图片)

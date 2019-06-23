@@ -38,7 +38,7 @@ var antd = new Vue({
             opened_class_info: {
                 id: null,
                 superid: null,
-                index : null
+                index: null
             },
             opened_thread_info: [],
             member_marked: false,
@@ -107,8 +107,16 @@ var antd = new Vue({
             edit: {
                 visible: false,
                 name: null,
-                confirm_edit_loading: false
+                confirm_edit_loading: false,
+                mes: {
+                    mes_id: null,
+                    visible: false,
+                    content: null,
+                    confirm_edit_mes_loading: false,
+                }
             },
+            emoji_added_count: 0,
+            emoji_removed_count: 0,
         }
     },
     mounted() {
@@ -130,6 +138,7 @@ var antd = new Vue({
                     //若不存在班级信息
                     this.spinning.left = false;
                 }
+                $('#main-container').attr('style',''); //避免爆代码
             });
         this.md = window.markdownit({
             html: true,
@@ -270,10 +279,10 @@ var antd = new Vue({
             $('#class_sub' + id).addClass('clicked');
 
             this.opened_class_info.id = id;
-            if(!!index || index == 0){
+            if (!!index || index == 0) {
                 this.opened_class_info.index = index;
             }
-            this.opened_class_info.superid = this.user.classes_info[this.opened_class_info.index].super;
+            this.opened_class_info.superid = this.user.classes_info[index].super;
 
             this.spinning.center = true;
             axios.get('../interact/select_thread.php?class_id=' + id)
@@ -308,14 +317,19 @@ var antd = new Vue({
             axios.get('../interact/select_messages.php?thread_id=' + this.opened_mes_info.thread_id + '&class_id=' + this.opened_mes_info.class_id)
                 .then(response => {
                     this.opened_mes_info.meses = response.data.mes;
-                    this.opened_mes_info.unique_speakers = response.data.speakers_unique.split(',');
+                    if (!!response.data.speakers_unique) {
+                        this.opened_mes_info.unique_speakers = response.data.speakers_unique.split(',');
+                    } else {
+                        this.opened_mes_info.unique_speakers = [];
+                    }
                     axios.get('../interact/select_users.php?type=avatar&id=' + response.data.speakers + '&mes=1')
                         .then(res => {
                             this.opened_mes_info.speakers = res.data;
-                            this.spinning.loading = false;
+                            setTimeout('antd.spinning.loading = false', 600);
                         })
                 })
 
+            //数据更新
             antd.update_mes();
             var func = function () {
                 antd.update_mes();
@@ -567,21 +581,25 @@ var antd = new Vue({
             this.mes_input.op_display = false;
             this.mes_input.container = 'mes-container-normal';
             this.mes_input.input = 'mes-input-normal';
+            this.handle_cancel_upload();
         },
         //发送内容
         handle_input_send(type) {
             this.mes_input.disable = true;
             var formData = new FormData();
 
-            if (this.mes_input.markdown.status) {
-                var content = this.md.render(this.mes_input.content);
-            } else {
-                var content = this.mes_input.content;
-            }
-
             if (type == 'img') {
                 if (!!this.mes_input.img.url) {
                     formData.append('img_url', this.mes_input.img.url);
+                    if (this.mes_input.markdown.status) {
+                        if (!!this.mes_input.content) {
+                            var content = this.md.render(this.mes_input.content);
+                        }else{
+                            var content = '';
+                        }
+                    } else {
+                        var content = this.mes_input.content;
+                    }
                     formData.append('content', content);
                     this.mes_input.type = 'text';
                     status = 1;
@@ -599,6 +617,11 @@ var antd = new Vue({
                 }
             } else {
                 if (!!this.mes_input.content) {
+                    if (this.mes_input.markdown.status) {
+                        var content = this.md.render(this.mes_input.content);
+                    } else {
+                        var content = this.mes_input.content;
+                    }
                     formData.append('content', content);
                     this.mes_input.type = 'text';
                     status = 1;
@@ -646,18 +669,26 @@ var antd = new Vue({
         update_mes() {
             axios.get('../interact/select_messages.php?thread_id=' + this.opened_mes_info.thread_id + '&class_id=' + this.opened_mes_info.class_id + '&last=' + this.opened_mes_info.last)
                 .then(response => {
-                    if (response.data.update.status == 1) {
-                        this.opened_mes_info.last = response.data.update.last;
-                        this.opened_mes_info.meses = response.data.mes;
-                        this.opened_mes_info.unique_speakers = response.data.speakers_unique.split(',');
-                        axios.get('../interact/select_users.php?type=avatar&id=' + response.data.speakers + '&mes=1')
-                            .then(res => {
-                                this.opened_mes_info.speakers = res.data;
-                                this.bottom_mes();
-                            })
-                    } else {
-                        this.opened_mes_info.last = response.data.update.last;
+                    if (!!response.data.update) {
+                        if (response.data.update.status == 1) {
+                            this.opened_mes_info.last = response.data.update.last;
+                            this.opened_mes_info.meses = response.data.mes;
+                            this.opened_mes_info.unique_speakers = response.data.speakers_unique.split(',');
+                            axios.get('../interact/select_users.php?type=avatar&id=' + response.data.speakers + '&mes=1')
+                                .then(res => {
+                                    this.opened_mes_info.speakers = res.data;
+                                    this.bottom_mes();
+                                })
+                        } else {
+                            this.opened_mes_info.last = response.data.update.last;
+                        }
                     }
+                })
+        },
+        load_mes() {
+            axios.get('../interact/select_messages.php?thread_id=' + this.opened_mes_info.thread_id + '&class_id=' + this.opened_mes_info.class_id)
+                .then(response => {
+                    this.opened_mes_info.meses = response.data.mes;
                 })
         },
         //滑动到内容列表底部
@@ -749,7 +780,8 @@ var antd = new Vue({
                         complete(res) {
                             antd.$message.success('Successfully uploaded an image');
                             antd.mes_input.img_progress = false;
-                            antd.mes_input.send_text = 'Send(with an image)'
+                            $("#upload_img").val('');
+                            antd.mes_input.send_text = 'Send(with an image)';
                         }
                     }
                     var subscription = observable.subscribe(observer);
@@ -776,7 +808,11 @@ var antd = new Vue({
             this.mes_input.file.name = null;
             this.mes_input.file.url = null;
             this.mes_input.img.url = null;
-            this.mes_input.send_text = 'Send'
+            this.mes_input.send_text = 'Send';
+            $("#upload_img").val('');
+            $("#upload_file").val('');
+            this.mes_input.markdown.status = false;
+            this.mes_input.markdown.btn = 'default';
         },
         //获取文件格式的内容段图标、颜色
         get_file_icon(name) {
@@ -929,5 +965,128 @@ var antd = new Vue({
             })
 
         },
+        comment_action: function (event) {
+            event.currentTarget.className += ' mes-display';
+        },
+        comment_action_leave(event) {
+            event.currentTarget.className = 'mes-stream';
+        },
+        add_emoji(type, mes_id) {
+            if (this.emoji_added_count < 20) {
+                this.emoji_added_count += 1;
+                var formData = new FormData();
+                formData.append('emoji_id', type);
+                formData.append('class_id', antd.opened_mes_info.class_id);
+                formData.append('mes_id', mes_id);
+                formData.append('thread_id', antd.opened_mes_info.thread_id);
+
+                $.ajax({
+                    url: '../interact/add_emoji.php',
+                    type: "POST",
+                    data: formData,
+                    cache: false,
+                    dataType: 'json',
+                    processData: false,
+                    contentType: false,
+                    success: function (data) {
+                        if (data.status) {
+                            antd.load_mes();
+                        } else {
+                            antd.$message.error(data.mes);
+                        }
+                    }
+                });
+            } else {
+                antd.$message.error('You are too emotional!');
+            }
+        },
+        remove_emoji(type, mes_id) {
+            if (this.emoji_removed_count < 30) {
+                this.emoji_removed_count += 1;
+                var formData = new FormData();
+                formData.append('emoji_id', type);
+                formData.append('class_id', antd.opened_mes_info.class_id);
+                formData.append('mes_id', mes_id);
+                formData.append('thread_id', antd.opened_mes_info.thread_id);
+
+                $.ajax({
+                    url: '../interact/delete_emoji.php',
+                    type: "POST",
+                    data: formData,
+                    cache: false,
+                    dataType: 'json',
+                    processData: false,
+                    contentType: false,
+                    success: function (data) {
+                        if (data.status) {
+                            antd.load_mes();
+                        } else {
+                            antd.$message.error(data.mes);
+                        }
+                    }
+                });
+            } else {
+                antd.$message.error('You are too emotional!');
+            }
+        },
+        remove_mes(mes_id) {
+                var formData = new FormData();
+                formData.append('user', antd.user.id);
+            formData.append('mes_id', mes_id);
+            formData.append('class_id', antd.opened_mes_info.class_id);
+            formData.append('thread_id', antd.opened_mes_info.thread_id);
+
+                $.ajax({
+                    url: '../interact/delete_message.php',
+                    type: "POST",
+                    data: formData,
+                    cache: false,
+                    dataType: 'json',
+                    processData: false,
+                    contentType: false,
+                    success: function (data) {
+                        if (data.status) {
+                            antd.load_mes();
+                        } else {
+                            antd.$message.error(data.mes);
+                        }
+                    }
+                });
+        },
+        handle_edit_mes_submit(){
+            this.emoji_removed_count += 1;
+            var formData = new FormData();
+            formData.append('user', antd.user.id);
+            formData.append('mes_id', antd.edit.mes.id);
+            formData.append('class_id', antd.opened_mes_info.class_id);
+            formData.append('content', antd.edit.mes.content);
+            formData.append('thread_id', antd.opened_mes_info.thread_id);
+
+            $.ajax({
+                url: '../interact/edit_message.php',
+                type: "POST",
+                data: formData,
+                cache: false,
+                dataType: 'json',
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    if (data.status) {
+                        antd.load_mes();
+                        antd.handle_edit_mes_cancel();
+                    } else {
+                        antd.$message.error(data.mes);
+                    }
+                }
+            });
+        },
+        handle_edit_mes_cancel(){
+            this.edit.mes.visible = false;
+        },
+        open_mes_edit(id,content){
+            this.edit.mes.id = id;
+            this.edit.mes.content = content;
+            this.edit.mes.visible = true;
+        }
     }
 });

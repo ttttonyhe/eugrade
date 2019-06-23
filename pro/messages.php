@@ -3,18 +3,13 @@
 
 
 
-<div class="main-container">
+<div class="main-container" id="main-container" style="opacity:0">
 
     <div class="left">
         <a-spin :spinning="spinning.left">
             <div class="main-header">
                 <h3>Messages</h3>
-                <p>All threads you involved</p>
-            </div>
-            <div class="mes-item">
-                <p style="color:rgb(90, 148, 241)">
-                    <a-icon type="inbox"></a-icon>&nbsp;&nbsp;Inbox
-                </p>
+                <p>All threads in classes you joined</p>
             </div>
             <div class="mes-item" @click="open_marks">
                 <p style="color:rgb(255, 193, 37)">
@@ -23,7 +18,7 @@
             </div>
             <template v-if="!!user.joined_classes">
                 <div class="mes-item">
-                    <p>
+                    <p style="color:rgb(90, 148, 241)">
                         <a-icon type="team"></a-icon>&nbsp;&nbsp;Classes
                         <a-button size="small" @click="display_class" v-html="display_classes_text"></a-button>
                     </p>
@@ -143,6 +138,13 @@
         </a-input>
     </a-modal>
     <!-- 主题信息修改结束 -->
+    <!-- 内容段修改 -->
+    <a-modal title="Edit Message" :visible="edit.mes.visible" @ok="handle_edit_mes_submit" :confirm-loading="edit.mes.confirm_edit_mes_loading" @cancel="handle_edit_mes_cancel">
+        <a-input placeholder="Content" v-model="edit.mes.content">
+            <a-icon slot="prefix" type="align-center" />
+        </a-input>
+    </a-modal>
+    <!-- 内容段修改结束 -->
 
     <div class="center class-center mes-column">
         <a-spin :spinning="spinning.center">
@@ -206,6 +208,13 @@
                 </div>
             </template>
         </a-spin>
+        <!-- 占位 -->
+        <template v-if="!spinning.center && !status.thread && !status.mark">
+            <div style="padding:20px 30px">
+                <a-skeleton :paragraph="{rows: 2}" v-for="i in 6"></a-skeleton>
+            </div>
+        </template>
+        <!-- 占位 -->
     </div>
 
     <div class="right">
@@ -296,7 +305,7 @@
                             </div>
                         </template>
                         <template v-else>
-                            <div v-for="(mes,index) in opened_mes_info.meses" class="mes-stream">
+                            <div v-for="(mes,index) in opened_mes_info.meses" class="mes-stream" @mouseenter="comment_action($event)" @mouseleave="comment_action_leave($event)">
                                 <div class="mes-stream-avatar" @click="view_user_info(mes.speaker)">
                                     <template v-if="opened_mes_info.speakers[0][index] !== null">
                                         <img :src="opened_mes_info.speakers[0][index]" class="class-item-img" />
@@ -328,14 +337,46 @@
                                                 </div>
                                                 <div>
                                                     <h3>{{ mes.file_name }}</h3>
-                                                    <p><a :href="mes.file_url">Download</a></p>
+                                                    <p><a :href="mes.file_url" target="_blank">Download</a></p>
                                                 </div>
                                             </div>
                                         </p>
                                     </template>
+                                    <template v-if="mes.emoji_1 || mes.emoji_2 || mes.emoji_3">
+                                        <div class="mes-stream-emoji-display">
+                                            <a-tag color="pink" v-if="mes.emoji_1" @click="remove_emoji(1,mes.id)">
+                                                <a-icon type="smile"></a-icon> x{{ parseInt(mes.emoji_1) }}
+                                            </a-tag>
+                                            <a-tag color="orange" v-if="mes.emoji_2" @click="remove_emoji(2,mes.id)">
+                                                <a-icon type="meh"></a-icon> x{{ parseInt(mes.emoji_2) }}
+                                            </a-tag>
+                                            <a-tag color="blue" v-if="mes.emoji_3" @click="remove_emoji(3,mes.id)">
+                                                <a-icon type="frown"></a-icon> x{{ parseInt(mes.emoji_3) }}
+                                            </a-tag>
+                                        </div>
+                                    </template>
+                                </div>
+                                <div class="mes-stream-emoji">
+                                    <template v-if="mes.speaker == user.id || opened_class_info.superid == user.id">
+                                    <a class="a-d" @click="remove_mes(mes.id)">
+                                            <a-icon type="delete"></a-icon>
+                                        </a>
+                                        <a class="a-e" @click="open_mes_edit(mes.id,mes.content)">
+                                            <a-icon type="edit"></a-icon>
+                                        </a>
+                                    </template>
+                                    <a class="a-1">
+                                        <a-icon type="smile" @click="add_emoji(1,mes.id)"></a-icon>
+                                    </a>
+                                    <a class="a-2">
+                                        <a-icon type="meh" @click="add_emoji(2,mes.id)"></a-icon>
+                                    </a>
+                                    <a class="a-3">
+                                        <a-icon type="frown" @click="add_emoji(3,mes.id)"></a-icon>
+                                    </a>
                                 </div>
                             </div>
-                            <p class="mes-end">- That's All -</p>
+                            <p class="mes-end">- EOF -</p>
                         </template>
                     </div>
                 </div>
@@ -417,6 +458,13 @@
 
 
         </a-spin>
+        <!-- 占位 -->
+        <template v-if="!spinning.right && !status.chat && !status.user">
+            <div style="padding:20px 30px">
+                <a-skeleton avatar :paragraph="{rows: 1}" v-for="i in 9"></a-skeleton>
+            </div>
+        </template>
+        <!-- 占位 -->
     </div>
 
 
@@ -428,7 +476,7 @@
 
 
 </div>
-<script src="https://cdn.bootcss.com/markdown-it/8.4.2/markdown-it.min.js"></script>
+<script src="../statics/js/md.js"></script>
 <script type="text/javascript" src="../main/messages.js"></script>
 
 

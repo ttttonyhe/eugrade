@@ -87,6 +87,7 @@ if (!empty($_POST['email']) && !empty($_POST['password']) && !empty($_POST['name
                     }else{
                         $row->type = 1;
                     }
+                    $row->avatar = 'https://static.ouorz.com/default_avatar.png';
                     $row->date = time();
                     $row->save();
                 $status = 1;

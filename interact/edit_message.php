@@ -16,7 +16,7 @@ try {
 session_start();
 
 //判断发送参数是否齐全，请求创建班级的用户是否为当前登录用户
-if (!empty($_POST['user']) && !empty($_POST['mes_id']) && !empty($_POST['thread_id']) && !empty($_POST['class_id']) && !empty($_SESSION['logged_in_id'])) {
+if (!empty($_POST['user']) && !empty($_POST['mes_id']) && !empty($_POST['thread_id']) && !empty($_POST['class_id']) && !empty($_POST['content']) && !empty($_SESSION['logged_in_id'])) {
 
     //输入处理
     function input($data)
@@ -31,6 +31,7 @@ if (!empty($_POST['user']) && !empty($_POST['mes_id']) && !empty($_POST['thread_
     $super = input($_POST['user']);
     $mes_id = input($_POST['mes_id']);
     $class = input($_POST['class_id']);
+    $content = $_POST['content'];
     $thread = input($_POST['thread_id']);
 
 
@@ -41,12 +42,12 @@ if (!empty($_POST['user']) && !empty($_POST['mes_id']) && !empty($_POST['thread_
             $code = 101;
             $mes = 'Class does not exist';
         } else {
-            $array = Lazer::table('users')->limit(1)->where('id', '=', (int)$_SESSION['logged_in_id'])->find()->asArray();
+            $array = Lazer::table('users')->limit(1)->where('id', '=', (int)$super)->find()->asArray();
             if (!!$array) { //判断操作的用户存在
 
 
                 if ($array[0]['type'] == 2) { //教师操作
-                    $array = Lazer::table('classes')->limit(1)->where('id', '=', (int)$class)->andWhere('super', '=', (int)$_SESSION['logged_in_id'])->find();
+                    $array = Lazer::table('classes')->limit(1)->where('id', '=', (int)$class)->andWhere('super', '=', (int)$super)->find();
                     if(!!$array->id){ //必须为班级管理员才可操作
                         $status = 1;
                     }else{
@@ -69,13 +70,16 @@ if (!empty($_POST['user']) && !empty($_POST['mes_id']) && !empty($_POST['thread_
                 if (!!$array->name) { //判断主题存在
 
                     $array = Lazer::table('messages')->limit(1)->where('id', '=', (int)$mes_id)->andWhere('thread', '=', (int)$thread)->find();
-                        if (!empty($array->speaker)) {
+                        if (!empty($array->content)) {
 
-                            $array->delete();
+                            $array->set(array(
+                                'content' => $content
+                            ));
+                            $array->save();
 
                             $status = 1;
                             $code = 133;
-                            $mes = 'Successfully deleted a message';
+                            $mes = 'Successfully edited a message';
                         } else {
                             $status = 0;
                             $code = 120;

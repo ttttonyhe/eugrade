@@ -3,7 +3,7 @@
 
 
 
-<div class="main-container">
+<div class="main-container" id="main-container" style="opacity:0">
 
     <div class="left">
         <a-spin :spinning="spinning.left">
@@ -126,6 +126,13 @@
                 </div>
             </template>
         </a-spin>
+        <!-- 占位 -->
+        <template v-if="!spinning.center && !opened_class_info.status">
+            <div style="margin-top:-10px">
+                <a-skeleton :paragraph="{rows: 2}" v-for="i in 6"></a-skeleton>
+            </div>
+        </template>
+        <!-- 占位 -->
     </div>
 
     <div class="right">
@@ -195,6 +202,13 @@
                 </div>
             </template>
         </a-spin>
+        <!-- 占位 -->
+        <template v-if="!spinning.right && !opened_member_info.status">
+            <div style="padding:20px 30px">
+                <a-skeleton avatar :paragraph="{rows: 1}" v-for="i in 9"></a-skeleton>
+            </div>
+        </template>
+        <!-- 占位 -->
     </div>
 
 

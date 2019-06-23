@@ -83,6 +83,7 @@ var antd = new Vue({
                     //若不存在班级信息
                     this.spinning.left = false;
                 }
+                $('#main-container').attr('style',''); //避免爆代码
             });
     },
     methods: {
