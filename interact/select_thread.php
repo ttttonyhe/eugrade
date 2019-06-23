@@ -10,7 +10,14 @@ use Lazer\Classes\Database as Lazer;
 try {
     \Lazer\Classes\Helpers\Validate::table('threads')->exists();
 } catch (\Lazer\Classes\LazerException $e) { //不存在则创建
-    die();
+    Lazer::create('threads', array(
+        'id' => 'integer',
+        'creator' => 'integer',
+        'belong_class' => 'integer',
+        'date' => 'integer',
+        'name' => 'string',
+        'message_count' => 'integer'
+    ));
 }
 
 if (!empty($_GET['class_id'])) {

@@ -10,7 +10,13 @@ use Lazer\Classes\Database as Lazer;
 try {
     \Lazer\Classes\Helpers\Validate::table('marks')->exists();
 } catch (\Lazer\Classes\LazerException $e) { //不存在则创建
-    die();
+    Lazer::create('marks', array(
+        'id' => 'integer',
+        'class' => 'integer',
+        'user' => 'integer',
+        'type' => 'string',
+        'marker' => 'integer'
+    ));
 }
 
 session_start();

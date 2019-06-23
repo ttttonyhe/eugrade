@@ -652,7 +652,7 @@ var antd = new Vue({
                 var observable = qiniu.upload(file, name, token, putExtra, config)
                 var observer = {
                     next(res) {
-                        antd.edit.user.percent = res.total.percent;
+                        antd.edit.user.percent = Math.round(res.total.percent);
                     },
                     error(err) {
                         antd.$message.error(err.message);

@@ -11,7 +11,16 @@ use Qiniu\Auth;
 try {
     \Lazer\Classes\Helpers\Validate::table('users')->exists();
 } catch (\Lazer\Classes\LazerException $e) { //不存在则创建
-    die();
+    Lazer::create('users', array(
+        'id' => 'integer',
+        'name' => 'string',
+        'email' => 'string',
+        'avatar' => 'string',
+        'type' => 'integer',
+        'pwd' => 'string',
+        'class' => 'string',
+        'date' => 'integer'
+    ));
 }
 
 if (!empty($_GET['user']) && !empty($_GET['email'])) {
