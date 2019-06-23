@@ -52,8 +52,8 @@ if (!empty($_GET['type']) && !empty($_GET['id'])) {
         $all_id = explode(',',$id);
         foreach ($all_id as $temp_id) {
             $temp_array = Lazer::table('users')->limit(1)->where('id', '=', (int)$temp_id)->find()->asArray();
-            $array[0][] = $temp_array[0]['avatar'];
-            $array[1][] = $temp_array[0]['name'];
+            $array[0][$temp_array[0]['id']] = $temp_array[0]['avatar'];
+            $array[1][$temp_array[0]['id']] = $temp_array[0]['name'];
         }
     }else{
         $array = Lazer::table('users')->limit(1)->where('id', '=', (int)$id)->find()->asArray();

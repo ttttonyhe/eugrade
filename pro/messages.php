@@ -42,17 +42,13 @@
                     </div>
                 </template>
             </template>
+            <?php if ($type == 1) { ?>
             <div class="class-item" @click="add_class()">
-                <?php if ($type == 1) { ?>
                     <p>
                         <a-icon type="plus-square"></a-icon>&nbsp;&nbsp;Join a new Class
                     </p>
-                <?php } else { ?>
-                    <p>
-                        <a-icon type="plus-square"></a-icon>&nbsp;&nbsp;Create a new Class
-                    </p>
-                <?php } ?>
             </div>
+            <?php } ?>
         </a-spin>
     </div>
 
@@ -200,12 +196,17 @@
                         <a-button size="small" @click="add.visible_thread = true" style="right:20px;position:absolute">+ Add</a-button>
                     </p>
                 </div>
+                <template v-if="opened_thread_info.length">
                 <div v-for="(thread_c,index) in opened_thread_info" class="class-item" :id="'thread_sub'+thread_c.id" @click="open_mes(index,thread_c.id,thread_c.belong_class)">
                     <div>
                         <h3 v-html="thread_c.name"></h3>
                         <p>{{ thread_c.message_count }} messages</p>
                     </div>
                 </div>
+                </template>
+                <template v-else>
+                    <p class="mes-end">- EOF -</p>
+                </template>
             </template>
         </a-spin>
         <!-- 占位 -->
@@ -307,17 +308,17 @@
                         <template v-else>
                             <div v-for="(mes,index) in opened_mes_info.meses" class="mes-stream" @mouseenter="comment_action($event)" @mouseleave="comment_action_leave($event)">
                                 <div class="mes-stream-avatar" @click="view_user_info(mes.speaker)">
-                                    <template v-if="opened_mes_info.speakers[0][index] !== null">
-                                        <img :src="opened_mes_info.speakers[0][index]" class="class-item-img" />
+                                    <template v-if="opened_mes_info.speakers[0][mes.speaker.toString()] !== null">
+                                        <img :src="opened_mes_info.speakers[0][mes.speaker.toString()]" class="class-item-img" />
                                     </template>
                                     <template v-else>
                                         <div class="class-img-default">
-                                            <p>{{ opened_mes_info.speakers[1][index].substring(0,1) }}</p>
+                                            <p>{{ opened_mes_info.speakers[1][mes.speaker.toString()].substring(0,1) }}</p>
                                         </div>
                                     </template>
                                 </div>
                                 <div class="mes-stream-content">
-                                    <h3 v-html="opened_mes_info.speakers[1][index] + '&nbsp;<em>' + get_mes_date(mes.date) + '</em>'"></h3>
+                                    <h3 v-html="opened_mes_info.speakers[1][mes.speaker.toString()] + '&nbsp;<em>' + get_mes_date(mes.date) + '</em>'"></h3>
                                     <template v-if="!!mes.content && !mes.img_url && mes.content !== 'null'">
                                         <div class="mes-content" v-html="process_content(mes.content)"></div>
                                     </template>
@@ -361,9 +362,11 @@
                                     <a class="a-d" @click="remove_mes(mes.id)">
                                             <a-icon type="delete"></a-icon>
                                         </a>
+                                        <template v-if="mes.type !== 'file'">
                                         <a class="a-e" @click="open_mes_edit(mes.id,mes.content)">
                                             <a-icon type="edit"></a-icon>
                                         </a>
+                                        </template>
                                     </template>
                                     <a class="a-1">
                                         <a-icon type="smile" @click="add_emoji(1,mes.id)"></a-icon>

@@ -49,7 +49,7 @@
     <script type="text/javascript" src="../statics/js/antd.js"></script>
     <link type="text/css" rel="stylesheet" href="../statics/css/main.css">
     <script type="text/javascript" src="../statics/js/jquery.min.js"></script>
-    <script src="https://unpkg.com/qiniu-js@2.5.4/dist/qiniu.min.js"></script>
+    <script type="text/javascript" src="../statics/js/qiniu.js"></script>
 </head>
 
 <body>

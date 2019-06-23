@@ -65,6 +65,10 @@ var antd = new Vue({
                         id: null,
                         display_percent: false
                 }
+            },
+            invite:{
+                id:null,
+                visible:false
             }
         }
     },
@@ -707,6 +711,13 @@ var antd = new Vue({
             } else {
                 antd.$message.error('No img selected');
             }
-        }
+        },
+        handle_invite(id){
+            this.invite.id = 'cxk'+id;
+            this.invite.visible = true;
+        },
+        handle_invite_close(){
+            this.invite.visible = false;
+        },
     }
 });

@@ -70,7 +70,7 @@ if (!empty($_GET['class_id']) && !empty($_GET['thread_id'])) {
                     foreach ($array['mes'] as $a) {
                         $temp_array[] = $a['speaker'];
                     }
-                    $array['speakers'] = implode(',',$temp_array);
+
                     $temp_array = array_flip($temp_array);
                     $temp_array = array_flip($temp_array);
                     $array['speakers_unique'] = implode(',',$temp_array);
@@ -112,7 +112,7 @@ if (!empty($_GET['class_id']) && !empty($_GET['thread_id'])) {
                     foreach ($array['mes'] as $a) {
                         $temp_array[] = $a['speaker'];
                     }
-                    $array['speakers'] = implode(',',$temp_array);
+
                     $temp_array = array_flip($temp_array);
                     $temp_array = array_flip($temp_array);
                     $array['speakers_unique'] = implode(',',$temp_array);

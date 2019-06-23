@@ -93,17 +93,17 @@
 
                                 <div class="mes-stream-file-profile" style="margin:0px">
                                     <div style="margin-right: 10px;">
-                                        <template v-if="opened_mes_info.speakers[0][index] !== null">
-                                            <img :src="opened_mes_info.speakers[0][index]" class="class-item-img" />
+                                        <template v-if="opened_mes_info.speakers[0][file.speaker.toString()] !== null">
+                                            <img :src="opened_mes_info.speakers[0][file.speaker.toString()]" class="class-item-img" />
                                         </template>
                                         <template v-else>
                                             <div class="class-img-default">
-                                                <p>{{ opened_mes_info.speakers[1][index].substring(0,1) }}</p>
+                                                <p>{{ opened_mes_info.speakers[1][file.speaker.toString()].substring(0,1) }}</p>
                                             </div>
                                         </template>
                                     </div>
                                     <div>
-                                        <h3 v-html="opened_mes_info.speakers[1][index]"></h3>
+                                        <h3 v-html="opened_mes_info.speakers[1][file.speaker.toString()]"></h3>
                                         <p style="color:#999" v-html="get_mes_date(file.date)"></p>
                                     </div>
                                 </div>

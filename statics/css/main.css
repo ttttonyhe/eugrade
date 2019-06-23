@@ -672,3 +672,50 @@ html,body{
 .files-folder p{
     max-width: 100% !important;
 }
+
+.class-invite{
+    width: 100%;
+    text-align: center;
+    padding: 6px 10px;
+    margin-bottom: 10px;
+    background: #02a9f4;
+    color: #fff;
+    margin-top: 10px;
+    border-radius: 3px;
+}
+
+.class-invite a{
+    color: #fff;
+    font-size: 15px;
+}
+
+.class-invite-code {
+    text-align: center;
+}
+
+.class-invite-code div{
+    background-color: rgb(45, 183, 245);
+    padding: 6px 18px;
+    height: auto;
+    letter-spacing: 1px;
+    font-size: 20px;
+    margin-top: 10px;
+}
+
+.class-invite-div{
+    text-align: center;
+}
+
+.class-invite-div h2{
+    margin-bottom: 0px;
+}
+
+.class-invite-div p:nth-child(1){
+    color: #999;
+    font-size: 15px;
+    font-weight: 300;
+}
+
+.mes-new-notify{
+    border-bottom: 2px solid #fec126 !important;
+}
