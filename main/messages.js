@@ -119,7 +119,17 @@ var antd = new Vue({
             emoji_removed_count: 0,
             unread: {
                 visible: false
-            }
+            },
+            office: {
+                visible: false,
+                title: null,
+                url: null
+            },
+            guide: {
+                visible : false,
+                step: 1,
+                title: 'Terms of Service'
+            },
         }
     },
     mounted() {
@@ -143,12 +153,19 @@ var antd = new Vue({
                 }
                 $('#main-container').attr('style', ''); //避免爆代码
             });
+            //md 函数初始化
         this.md = window.markdownit({
             html: true,
             xhtmlOut: false,
             breaks: true,
             linkify: true
         });
+
+        //新用户引导信息
+        if(cookie.get('pokers_intro') !== 'done'){
+            this.guide.visible = true;
+            cookie.set('pokers_intro','done');
+        }
     },
     methods: {
         //创建/加入新班级后重新加载列表
@@ -278,8 +295,7 @@ var antd = new Vue({
             $('.left .class-item').each(function () {
                 $(this).removeClass('clicked');
             });
-            $('#class' + id).addClass('clicked');
-            $('#class_sub' + id).addClass('clicked');
+            $('#class_left' + id).addClass('clicked');
 
             this.opened_class_info.id = id;
             if (!!index || index == 0) {
@@ -1104,8 +1120,58 @@ var antd = new Vue({
         },
         open_mes_edit(id, content) {
             this.edit.mes.id = id;
-            this.edit.mes.content = content;
+            if (content == '') {
+                this.edit.mes.content = 'Empty Content';
+            } else {
+                this.edit.mes.content = content;
+            }
             this.edit.mes.visible = true;
-        }
+        },
+        open_office_preview(url, name) {
+            this.office.url = url;
+            this.office.title = name;
+            this.office.visible = true;
+        },
+        handle_office_close() {
+            this.office.visible = false;
+        },
+        if_office(name) {
+            switch (name) {
+                case 'pptx':
+                    return true;
+                    break;
+                case 'ppt':
+                    return true;
+                    break;
+                case 'doc':
+                    return true;
+                    break;
+                case 'docx':
+                    return true;
+                    break;
+                case 'xls':
+                    return true;
+                    break;
+                case 'xlsx':
+                    return true;
+                    break;
+            }
+        },
+        doneGuide(key){
+            if(key == 1){
+                this.guide.step = 2;
+                this.guide.title = 'Introducing Threads';
+            }else if(key == 2){
+                this.guide.step = 3;
+                this.guide.title = 'Introducing Classes';
+            }else{
+                this.guide.visible = false;
+            }
+        },
+        same_speaker(id,index){
+            if(index !== 0 && (id == this.opened_mes_info.meses[index - 1].speaker)){
+                return 'border-left:2px solid #eee';
+            }
+        },
     }
 });

@@ -50,7 +50,6 @@ if (!empty($_POST['class_id']) && !empty($_POST['stu_id'])) {
     } else {
         $array = Lazer::table('users')->limit(1)->where('id', '=', (int)$stu)->findAll()->asArray();
         if (!!$array) {
-            if ($array[0]['type'] == 1) {
                 //更改 class
                 $class = Lazer::table('classes')->limit(1)->where('id', '=', (int)$id)->find();
                 if (!in_array($stu, explode(',', $class->member))) {
@@ -79,11 +78,6 @@ if (!empty($_POST['class_id']) && !empty($_POST['stu_id'])) {
                 $status = 1;
                 $code = 102;
                 $mes = 'Successfully joined a class';
-            } else {
-                $status = 0;
-                $code = 105;
-                $mes = 'Current user cannot be a teacher';
-            }
         } else {
             $status = 0;
             $code = 104;

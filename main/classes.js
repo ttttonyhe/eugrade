@@ -25,14 +25,15 @@ var antd = new Vue({
             add: {
                 visible: false,
                 confirm_create_loading: false,
-                confirm_join_loading: false,
                 class: {
                     name: null,
-                        des: null
+                    des: null
                 },
-                join: {
-                    id: null
-                }
+            },
+            join: {
+                visible: false,
+                confirm_join_loading: false,
+                id: null
             },
             opened_member_info: {
                 status: 0,
@@ -116,6 +117,9 @@ var antd = new Vue({
         add_class() {
             this.add.visible = true;
         },
+        join_class() {
+            this.join.visible = true;
+        },
         //处理创建班级
         handle_create_submit() {
             this.add.confirm_create_loading = true;
@@ -151,11 +155,15 @@ var antd = new Vue({
         handle_create_cancel() {
             this.add.visible = false
         },
+        //关闭 modal
+        handle_join_cancel() {
+            this.join.visible = false
+        },
         //处理加入班级
         handle_join_submit() {
-            this.add.confirm_join_loading = true;
+            this.join.confirm_join_loading = true;
             var formData = new FormData();
-            formData.append('class_id', this.add.join.id);
+            formData.append('class_id', this.join.id);
             formData.append('stu_id', this.user.id);
 
             $.ajax({
@@ -169,13 +177,13 @@ var antd = new Vue({
                 success: function (data) {
                     if (data.status) {
                         antd.$message.success(data.mes);
-                        antd.add.confirm_join_loading = false;
-                        antd.handle_create_cancel();
+                        antd.join.confirm_join_loading = false;
+                        antd.handle_join_cancel();
                         antd.get_all_classes();
-                        antd.add.join.id = null;
+                        antd.join.id = null;
                     } else {
                         antd.$message.error(data.mes);
-                        antd.add.confirm_join_loading = false;
+                        antd.join.confirm_join_loading = false;
                     }
                 }
             });

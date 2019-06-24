@@ -24,7 +24,7 @@
                     </p>
                 </div>
                 <template v-if="display_classes">
-                    <div v-for="(joined,index) in user.joined_classes" class="class-item" @click="open_class(user.classes_info[index].id,index)">
+                    <div v-for="(joined,index) in user.joined_classes" class="class-item" @click="open_class(user.classes_info[index].id,index)" :id="'class_left'+user.classes_info[index].id">
                         <div style="margin-right: 10px;">
                             <template v-if="!!user.classes_info[index].img">
                                 <img :src="user.classes_info[index].img" class="class-item-img" />
@@ -42,13 +42,11 @@
                     </div>
                 </template>
             </template>
-            <?php if ($type == 1) { ?>
             <div class="class-item" @click="add_class()">
-                    <p>
-                        <a-icon type="plus-square"></a-icon>&nbsp;&nbsp;Join a new Class
-                    </p>
+                <p>
+                    <a-icon type="plus-square"></a-icon>&nbsp;&nbsp;Join a new Class
+                </p>
             </div>
-            <?php } ?>
         </a-spin>
     </div>
 
@@ -66,7 +64,43 @@
             <a-icon slot="prefix" type="appstore" />
         </a-input>
     </a-modal>
-    <!-- 加入增加主题 -->
+    <!-- 增加主题结束 -->
+
+    <!-- 新用户提示 -->
+    <a-modal :title="guide.title" v-model="guide.visible" @ok="doneGuide(guide.step)" okText="Next" cancelText="Skip">
+        <template v-if="guide.step == 1">
+            <p>To give you more control and transparency around the data we collect, we’ve updated our Terms of Service and Privacy Policy. Here’s a brief summary of the changes:</p>
+            <h3>Transparency</h3>
+            <p>You can see what type of data we collect from you, where we store it, how long we keep it, and how it’s safeguarded.</p>
+            <h3>Control</h3>
+            <p>We own Pokers, but everything you put in it is (and has always been) 100% property of you. You have the ability to opt-in and out of emails and correct inaccurate data whenever you’d like, and teacher accounts have the ability to delete the team account and data. If you agree with the changes, click below.</p>
+            <br />
+            <p>By clicking 「OK」, you’re saying that you understand and agree to Pokers’s <a href="https://www.ouorz.com/pokers-privacy-policy.html" target="_blank">Privacy Policy</a> and <a href="https://www.ouorz.com/pokers-terms-of-service.html" target="_blank">Terms of Service</a>.</p>
+        </template>
+        <template v-if="guide.step == 2">
+            <h2 style="letter-spacing:.5px">Collaborate in Threads</h2>
+            <div class="intro-p">
+                <p>
+                    <a-icon type="appstore"></a-icon> Threads keep conversations organized by topic.
+                </p>
+                <p>
+                    <a-icon type="form"></a-icon> Anyone can add a comment to give feedback or discuss an idea.
+                </p>
+                <p>
+                    <a-icon type="file"></a-icon> All files in a class/thread can be found within 「Files」 Section
+                </p>
+            </div>
+        </template>
+        <template v-if="guide.step == 3">
+            <h2 style="letter-spacing:.5px">Create / Join a class now</h2>
+            <div class="intro-p">
+                <p>Only teacher account can create / manage classes</p>
+                <p>Students can join a class by clicking 「Join a new Class」 in the first column and enter the class ID code within 「Classes」 section</p>
+            </div>
+        </template>
+    </a-modal>
+    <!-- 新用户提示结束 -->
+
 
     <!-- 消息列表用户信息 -->
     <a-drawer width=640 placement="right" :closable="false" @close="view_close" :visible="view.visible">
@@ -141,6 +175,11 @@
         </a-input>
     </a-modal>
     <!-- 内容段修改结束 -->
+    <!-- office 内容预览 -->
+    <a-modal :footer="null" :title="office.title" centered v-model="office.visible" @cancel="handle_office_close" width="80%">
+        <iframe :src="'https://view.officeapps.live.com/op/embed.aspx?src=' + office.url" width="100%" height="600px" frameborder="0"></iframe>
+    </a-modal>
+    <!-- office 内容预览结束 -->
 
     <div class="center class-center mes-column">
         <a-spin :spinning="spinning.center">
@@ -188,6 +227,9 @@
                         </div>
                     </div>
                 </template>
+                <template v-if="!Object.keys(opened_mark_info.class_c).length - 1 && !Object.keys(opened_mark_info.user).length - 1">
+                    <p class="mes-end">- EOF -</p>
+                </template>
             </template>
             <template v-else-if="status.thread">
                 <div class="mes-header">
@@ -197,12 +239,12 @@
                     </p>
                 </div>
                 <template v-if="opened_thread_info.length">
-                <div v-for="(thread_c,index) in opened_thread_info" class="class-item" :id="'thread_sub'+thread_c.id" @click="open_mes(index,thread_c.id,thread_c.belong_class)">
-                    <div>
-                        <h3 v-html="thread_c.name"></h3>
-                        <p>{{ thread_c.message_count }} messages</p>
+                    <div v-for="(thread_c,index) in opened_thread_info" class="class-item" :id="'thread_sub'+thread_c.id" @click="open_mes(index,thread_c.id,thread_c.belong_class)">
+                        <div>
+                            <h3 v-html="thread_c.name"></h3>
+                            <p>{{ thread_c.message_count }} messages</p>
+                        </div>
                     </div>
-                </div>
                 </template>
                 <template v-else>
                     <p class="mes-end">- EOF -</p>
@@ -306,7 +348,7 @@
                             </div>
                         </template>
                         <template v-else>
-                            <div v-for="(mes,index) in opened_mes_info.meses" class="mes-stream" @mouseenter="comment_action($event)" @mouseleave="comment_action_leave($event)">
+                            <div v-for="(mes,index) in opened_mes_info.meses" class="mes-stream" @mouseenter="comment_action($event)" @mouseleave="comment_action_leave($event)" :style="same_speaker(mes.speaker,index)">
                                 <div class="mes-stream-avatar" @click="view_user_info(mes.speaker)">
                                     <template v-if="opened_mes_info.speakers[0][mes.speaker.toString()] !== null">
                                         <img :src="opened_mes_info.speakers[0][mes.speaker.toString()]" class="class-item-img" />
@@ -338,7 +380,14 @@
                                                 </div>
                                                 <div>
                                                     <h3>{{ mes.file_name }}</h3>
-                                                    <p><a :href="mes.file_url" target="_blank">Download</a></p>
+                                                    <p><a :href="'../extension/download.php?filename='+mes.file_url" target="_blank">Download</a>
+                                                        <template v-if="get_suffix(mes.file_name).substr(1) == 'pdf'">
+                                                            <a-divider type="vertical"></a-divider><a :href="mes.file_url" target="_blank">Preview</a>
+                                                        </template>
+                                                        <template v-else-if="if_office(get_suffix(mes.file_name).substr(1))">
+                                                            <a-divider type="vertical"></a-divider><a @click="open_office_preview(mes.file_url,mes.file_name)">Preview</a>
+                                                        </template>
+                                                    </p>
                                                 </div>
                                             </div>
                                         </p>
@@ -359,13 +408,13 @@
                                 </div>
                                 <div class="mes-stream-emoji">
                                     <template v-if="mes.speaker == user.id || opened_class_info.superid == user.id">
-                                    <a class="a-d" @click="remove_mes(mes.id)">
+                                        <a class="a-d" @click="remove_mes(mes.id)">
                                             <a-icon type="delete"></a-icon>
                                         </a>
                                         <template v-if="mes.type !== 'file'">
-                                        <a class="a-e" @click="open_mes_edit(mes.id,mes.content)">
-                                            <a-icon type="edit"></a-icon>
-                                        </a>
+                                            <a class="a-e" @click="open_mes_edit(mes.id,mes.content)">
+                                                <a-icon type="edit"></a-icon>
+                                            </a>
                                         </template>
                                     </template>
                                     <a class="a-1">
@@ -391,7 +440,7 @@
                         </template>
                         <template v-else>
                             <div class="class-img-default" style="width: 30px !important;height: 30px !important;">
-                                <p style="margin-top: 18px !important;">{{ user.info.name.substring(0,1) }}</>
+                                <p style="margin-top: 18px !important;">{{ user.info.name.substring(0,1) }}</a>
                             </div>
                         </template>
                     </div>
@@ -482,6 +531,5 @@
 </div>
 <script src="../statics/js/md.js"></script>
 <script type="text/javascript" src="../main/messages.js"></script>
-
 
 <?php require 'pro_footer.php'; ?>

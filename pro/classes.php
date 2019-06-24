@@ -29,17 +29,18 @@
                     </div>
                 </div>
             </template>
-            <div class="class-item" @click="add_class()">
-                <?php if ($type == 1) { ?>
-                    <p>
-                        <a-icon type="plus-square"></a-icon>&nbsp;&nbsp;Join a new Class
-                    </p>
-                <?php } else { ?>
+            <div class="class-item" @click="join_class()">
+                <p>
+                    <a-icon type="plus-square"></a-icon>&nbsp;&nbsp;Join a new Class
+                </p>
+            </div>
+            <?php if ($type == 2) { ?>
+                <div class="class-item" @click="add_class()">
                     <p>
                         <a-icon type="plus-square"></a-icon>&nbsp;&nbsp;Create a new Class
                     </p>
-                <?php } ?>
-            </div>
+                </div>
+            <?php } ?>
         </a-spin>
     </div>
 
@@ -101,7 +102,9 @@
                     <p v-html="opened_class_info.des"></p>
                 </div>
                 <div class="class-invite" @click="handle_invite(opened_class_info.id)">
-                    <a><a-icon type="plus-circle"></a-icon>&nbsp;&nbsp;Invite People</a>
+                    <a>
+                        <a-icon type="plus-circle"></a-icon>&nbsp;&nbsp;Invite People
+                    </a>
                 </div>
                 <div class="class-info-admin">
                     <p>{{ opened_class_info.supername }} is the admin</p>
@@ -279,13 +282,6 @@
     </a-modal>
     <!-- 用户信息修改结束 -->
 <?php } else { ?>
-    <!-- 加入班级 -->
-    <a-modal title="Join a new Class" :visible="add.visible" @ok="handle_join_submit" :confirm-loading="add.confirm_join_loading" @cancel="handle_create_cancel">
-        <a-input placeholder="Class ID" v-model="add.join.id">
-            <a-icon slot="prefix" type="team" />
-        </a-input>
-    </a-modal>
-    <!-- 加入班级结束 -->
     <!-- 用户信息修改 -->
     <a-modal title="Edit Info" :visible="edit.user.visible" @ok="handle_edit_user_submit('user')" :confirm-loading="edit.confirm_edit_user_loading" @cancel="handle_edit_user_cancel">
         <div>
@@ -318,12 +314,22 @@
     <!-- 用户信息修改结束 -->
 <?php } ?>
 
+<!-- 加入班级 -->
+<a-modal title="Join a new Class" :visible="join.visible" @ok="handle_join_submit" :confirm-loading="join.confirm_join_loading" @cancel="handle_join_cancel">
+        <a-input placeholder="Class ID" v-model="join.id">
+            <a-icon slot="prefix" type="team" />
+        </a-input>
+    </a-modal>
+    <!-- 加入班级结束 -->
+
 <a-modal :footer="null" title="Invite Code" centered v-model="invite.visible" @cancel="handle_invite_close">
     <div class="class-invite-div">
         <h2>Share your class’s invite ID code</h2>
         <p>People can use this code to join your Pokers class. Copy and share!</p>
     </div>
-    <p class="class-invite-code"><a-tag color="#2db7f5">{{ invite.id }}</a-tag></p>
+    <p class="class-invite-code">
+        <a-tag color="#2db7f5">{{ invite.id }}</a-tag>
+    </p>
 </a-modal>
 
 

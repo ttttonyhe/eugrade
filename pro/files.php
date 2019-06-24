@@ -12,7 +12,7 @@
                 <p>All files in classes you joined</p>
             </div>
             <template v-if="!!user.joined_classes">
-                <div v-for="(joined,index) in user.joined_classes" class="class-item" @click="open_class(user.classes_info[index].id,index)">
+                <div v-for="(joined,index) in user.joined_classes" class="class-item" @click="open_class(user.classes_info[index].id,index)" :id="'class_left'+user.classes_info[index].id">
                     <div style="margin-right: 10px;">
                         <template v-if="!!user.classes_info[index].img">
                             <img :src="user.classes_info[index].img" class="class-item-img" />
@@ -27,6 +27,13 @@
                         <h3 v-html="user.classes_info[index].name"></h3>
                         <p v-html="user.classes_info[index].des"></p>
                     </div>
+                </div>
+            </template>
+            <template v-else>
+                <div class="class-item">
+                    <p>
+                        No joined class yet
+                    </p>
                 </div>
             </template>
         </a-spin>
@@ -86,7 +93,13 @@
                                     <div style="margin-left: 10px;">
                                         <h3>{{ file.file_name }}</h3>
                                         <p style="margin: 0px;">
-                                            <a :href="file.file_url" target="_blank">Download</a>
+                                            <a :href="'../extension/download.php?filename='+file.file_url" target="_blank">Download</a>
+                                            <template v-if="get_suffix(file.file_name).substr(1) == 'pdf'">
+                                            <a-divider type="vertical"></a-divider><a :href="file.file_url" target="_blank">Preview</a>
+                                            </template>
+                                            <template v-else-if="if_office(get_suffix(file.file_name).substr(1))">
+                                            <a-divider type="vertical"></a-divider><a @click="open_office_preview(file.file_url,file.file_name)">Preview</a>
+                                            </template>
                                         </p>
                                     </div>
                                 </div>
@@ -135,7 +148,11 @@
 </div>
 
 
-
+<!-- office 内容预览 -->
+<a-modal :footer="null" :title="office.title" centered v-model="office.visible" @cancel="handle_office_close" width="80%">
+    <iframe :src="'https://view.officeapps.live.com/op/embed.aspx?src=' + office.url" width="100%" height="600px" frameborder="0"></iframe>
+</a-modal>
+<!-- office 内容预览结束 -->
 
 
 </div>

@@ -63,10 +63,15 @@ if (!empty($_POST['user']) && !empty($_POST['mes_id']) && !empty($_POST['thread_
 
                 if ($array[0]['type'] == 2) { //教师操作
                     $array = Lazer::table('classes')->limit(1)->where('id', '=', (int)$class)->andWhere('super', '=', (int)$_SESSION['logged_in_id'])->find();
-                    if(!!$array->id){ //必须为班级管理员才可操作
+                    $speak = Lazer::table('messages')->limit(1)->where('id', '=', (int)$mes_id)->andWhere('thread', '=', (int)$thread)->find();
+                    if(!!$array->id){ //必须为班级管理员或当前用户才可操作
                         $status = 1;
                     }else{
-                        $status = 0;
+                        if((int)$speak->speaker !== (int)$super){
+                            $status = 0;
+                        }else{
+                            $status = 1;
+                        }
                     }
                 } else { //学生操作
                     $array = Lazer::table('messages')->limit(1)->where('id', '=', (int)$mes_id)->andWhere('thread', '=', (int)$thread)->find();

@@ -16,7 +16,7 @@ var antd = new Vue({
                 drawer: false
             },
             status: {
-                files : false
+                files: false
             },
             opened_class_info: {
                 id: null,
@@ -31,6 +31,11 @@ var antd = new Vue({
                 thread_info: [],
                 speakers: [], //每段内容对应的发送者头像
                 index: null
+            },
+            office: {
+                visible: false,
+                title: null,
+                url: null
             },
         }
     },
@@ -49,7 +54,7 @@ var antd = new Vue({
                     //若不存在班级信息
                     this.spinning.left = false;
                 }
-                $('#main-container').attr('style',''); //避免爆代码
+                $('#main-container').attr('style', ''); //避免爆代码
             });
     },
     methods: {
@@ -120,8 +125,7 @@ var antd = new Vue({
             $('.left .class-item').each(function () {
                 $(this).removeClass('clicked');
             });
-            $('#class' + id).addClass('clicked');
-            $('#class_sub' + id).addClass('clicked');
+            $('#class_left' + id).addClass('clicked');
 
             this.opened_class_info.id = id;
             if (!!index || index == 0) {
@@ -222,6 +226,36 @@ var antd = new Vue({
                     break;
                 default:
                     return new Array('unknown', 'rgb(158, 158, 158)');
+                    break;
+            }
+        },
+        open_office_preview(url, name) {
+            this.office.url = url;
+            this.office.title = name;
+            this.office.visible = true;
+        },
+        handle_office_close() {
+            this.office.visible = false;
+        },
+        if_office(name) {
+            switch (name) {
+                case 'pptx':
+                    return true;
+                    break;
+                case 'ppt':
+                    return true;
+                    break;
+                case 'doc':
+                    return true;
+                    break;
+                case 'docx':
+                    return true;
+                    break;
+                case 'xls':
+                    return true;
+                    break;
+                case 'xlsx':
+                    return true;
                     break;
             }
         },

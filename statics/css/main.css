@@ -382,9 +382,8 @@ html,body{
 }
 
 .mes-stream{
-    padding: 10px 30px 15px 30px;
+    padding: 20px 30px;
     border-bottom: 1px solid #eee;
-    margin-bottom: 5px;
     display: flex;
 }
 
@@ -503,7 +502,7 @@ html,body{
     font-size: 14px;
     letter-spacing: .3px;
     font-weight: 300;
-    margin-left: 2px;
+    margin-left: 1px;
     margin-top: -1px;
 }
 
@@ -575,7 +574,7 @@ html,body{
 
 .mes-display .mes-stream-emoji{
     display: flex !important;
-    padding-top: 13px;
+    padding-top: 10px;
 }
 
 .mes-display .mes-stream-emoji .a-1{
@@ -726,4 +725,9 @@ html,body{
     text-align: center;
     padding: 3px 0px;
     transform: translateY(-25px);
+}
+
+.intro-p p{
+    font-size: 15px;
+    margin-bottom:5px
 }

@@ -32,7 +32,7 @@ try {
 session_start();
 
 //判断发送参数是否齐全，请求创建班级的用户是否为当前登录用户
-if (!empty($_POST['user']) && !empty($_POST['mes_id']) && !empty($_POST['thread_id']) && !empty($_POST['class_id']) && !empty($_POST['content']) && !empty($_SESSION['logged_in_id'])) {
+if (!empty($_POST['user']) && !empty($_POST['mes_id']) && !empty($_POST['thread_id']) && !empty($_POST['class_id']) && !empty($_SESSION['logged_in_id'])) {
 
     //输入处理
     function input($data)
@@ -64,10 +64,15 @@ if (!empty($_POST['user']) && !empty($_POST['mes_id']) && !empty($_POST['thread_
 
                 if ($array[0]['type'] == 2) { //教师操作
                     $array = Lazer::table('classes')->limit(1)->where('id', '=', (int)$class)->andWhere('super', '=', (int)$super)->find();
-                    if(!!$array->id){ //必须为班级管理员才可操作
+                    $speak = Lazer::table('messages')->limit(1)->where('id', '=', (int)$mes_id)->andWhere('thread', '=', (int)$thread)->find();
+                    if(!!$array->id){ //必须为班级管理员或当前用户才可操作
                         $status = 1;
                     }else{
-                        $status = 0;
+                        if((int)$speak->speaker !== (int)$super){
+                            $status = 0;
+                        }else{
+                            $status = 1;
+                        }
                     }
                 } else { //学生操作
                     $array = Lazer::table('messages')->limit(1)->where('id', '=', (int)$mes_id)->andWhere('thread', '=', (int)$thread)->find();
@@ -86,7 +91,7 @@ if (!empty($_POST['user']) && !empty($_POST['mes_id']) && !empty($_POST['thread_
                 if (!!$array->name) { //判断主题存在
 
                     $array = Lazer::table('messages')->limit(1)->where('id', '=', (int)$mes_id)->andWhere('thread', '=', (int)$thread)->find();
-                        if (!empty($array->content)) {
+                        if ((!empty($content) && $array->type == 'text') || (empty($content) && !empty($array->img_url))) {
 
                             $array->set(array(
                                 'content' => $content
