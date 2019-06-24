@@ -159,7 +159,7 @@ var antd = new Vue({
             axios.get('../interact/select_files.php?thread_id=' + this.opened_mes_info.thread_id + '&class_id=' + this.opened_mes_info.class_id)
                 .then(response => {
                     this.opened_mes_info.files = response.data.files;
-                    axios.get('../interact/select_users.php?type=avatar&id=' + response.data.speakers_unique + '&mes=1')
+                    axios.get('../interact/select_users.php?type=avatar&id=' + response.data.speakers + '&mes=1')
                         .then(res => {
                             this.opened_mes_info.speakers = res.data;
                             setTimeout('antd.spinning.loading = false', 600);

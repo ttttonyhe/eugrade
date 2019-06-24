@@ -104,7 +104,7 @@
                                     </div>
                                     <div>
                                         <h3 v-html="opened_mes_info.speakers[1][file.speaker.toString()]"></h3>
-                                        <p style="color:#999" v-html="get_mes_date(file.date)"></p>
+                                        <p style="color:#999;white-space: nowrap;" v-html="get_mes_date(file.date)"></p>
                                     </div>
                                 </div>
 

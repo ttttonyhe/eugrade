@@ -51,9 +51,13 @@ if (!empty($_GET['class_id']) && !empty($_GET['thread_id'])) {
             $array = array();
             $array['files'] = array_reverse(Lazer::table('messages')->where('thread', '=', (int)$thread)->andWhere('belong_class', '=', (int)$class)->andWhere('type', '=', 'file')->findAll()->asArray());
 
+            $last_speaker = 0;
             $temp_array = array();
             foreach ($array['files'] as $a) {
-                $temp_array[] = $a['speaker'];
+                if ($a['speaker'] !== $last_speaker) {
+                    $temp_array[] = $a['speaker'];
+                }
+                $last_speaker = $a['speaker'];
             }
             $array['speakers'] = implode(',', $temp_array);
         } else {
