@@ -66,9 +66,13 @@ if (!empty($_GET['class_id']) && !empty($_GET['thread_id'])) {
                     $array['update']['status'] = 1;
                     $array['update']['last'] = $last_id;
 
+                    $last_speaker = 0;
                     $temp_array = array();
                     foreach ($array['mes'] as $a) {
-                        $temp_array[] = $a['speaker'];
+                        if($a['speaker'] !== $last_speaker){
+                            $temp_array[] = $a['speaker'];
+                        }
+                        $last_speaker = $a['speaker'];
                     }
 
                     $temp_array = array_flip($temp_array);

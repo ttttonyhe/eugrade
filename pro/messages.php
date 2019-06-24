@@ -383,6 +383,7 @@
                         </template>
                     </div>
                 </div>
+                <div class="mes-unread-notify" v-show="unread.visible">New Messages</div>
                 <div :class="mes_input.input">
                     <div class="mes-stream-avatar" @click="view_user_info(user.id)">
                         <template v-if="user.info.avatar !== null">

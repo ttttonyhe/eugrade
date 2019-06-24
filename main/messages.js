@@ -117,6 +117,9 @@ var antd = new Vue({
             },
             emoji_added_count: 0,
             emoji_removed_count: 0,
+            unread: {
+                visible: false
+            }
         }
     },
     mounted() {
@@ -680,11 +683,17 @@ var antd = new Vue({
                             axios.get('../interact/select_users.php?type=avatar&id=' + response.data.speakers_unique + '&mes=1')
                                 .then(res => {
                                     this.opened_mes_info.speakers = res.data;
-                                    this.bottom_mes();
-                                    if(!!type){
-                                    //新消息闪烁
-                                    $('#mes-inner div.mes-stream:last').eq(0).addClass('mes-new-notify');
-                                    setTimeout("$('#mes-inner div.mes-stream:last').eq(0).removeClass('mes-new-notify')",500);
+                                    if (!!type) {
+                                        if ($(window).height() + $('#mes-container').scrollTop() >= $('#mes-inner').height()) {
+                                            //当前窗口可视区域+滑动距离大于总可滑动高度,有更新直接到底部
+                                            this.bottom_mes();
+                                        } else {
+                                            this.unread.visible = true;
+                                            setTimeout("antd.unread.visible = false", 2000);
+                                        }
+                                        //新消息闪烁
+                                        $('#mes-inner div.mes-stream:last').eq(0).addClass('mes-new-notify');
+                                        setTimeout("$('#mes-inner div.mes-stream:last').eq(0).removeClass('mes-new-notify')", 500);
                                     }
                                 })
                         } else {
@@ -702,6 +711,8 @@ var antd = new Vue({
         //滑动到内容列表底部
         bottom_mes() {
             $("#mes-container").scrollTop($("#mes-inner")[0].scrollHeight);
+            this.unread.visible = false;
+            this.unread.count += 0;
         },
         //上传文件(不可存在内容，上传后自动发送)
         upload_file() {
