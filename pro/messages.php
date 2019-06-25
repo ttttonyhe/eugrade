@@ -24,7 +24,7 @@
                     </p>
                 </div>
                 <template v-if="display_classes">
-                    <div v-for="(joined,index) in user.joined_classes" class="class-item" @click="open_class(user.classes_info[index].id,index)" :id="'class_left'+user.classes_info[index].id">
+                    <div v-for="(joined,index) in user.joined_classes" :class="'class-item ' + class_super(index)" @click="open_class(user.classes_info[index].id,index)" :id="'class_left'+user.classes_info[index].id">
                         <div style="margin-right: 10px;">
                             <template v-if="!!user.classes_info[index].img">
                                 <img :src="user.classes_info[index].img" class="class-item-img" />

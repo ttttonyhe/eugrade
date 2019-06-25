@@ -37,6 +37,14 @@ var antd = new Vue({
                 title: null,
                 url: null
             },
+            edit: {
+                file: {
+                    mes_id: null,
+                    visible: false,
+                    content: null,
+                    confirm_edit_file_loading: false,
+                }
+            },
         }
     },
     mounted() {
@@ -58,6 +66,14 @@ var antd = new Vue({
             });
     },
     methods: {
+        //判断是否为班级管理员，输出特殊样式
+        class_super(index) {
+            if (parseInt(this.user.classes_info[index].super) == this.user.id) {
+                return 'super';
+            } else {
+                return '';
+            }
+        },
         //创建/加入新班级后重新加载列表
         get_all_classes() {
             axios.get('../interact/select_users.php?type=class&id=' + cookie.get('logged_in_id') + '&form=single')
@@ -119,6 +135,76 @@ var antd = new Vue({
                 return this.get_date(timeStamp);
             }
         },
+
+        load_file() {
+            axios.get('../interact/select_files.php?thread_id=' + this.opened_mes_info.thread_id + '&class_id=' + this.opened_mes_info.class_id)
+                .then(response => {
+                    this.opened_mes_info.files = response.data.files;
+                })
+        },
+        remove_file(file_id) {
+            var formData = new FormData();
+            formData.append('user', antd.user.id);
+            formData.append('mes_id', file_id);
+            formData.append('class_id', antd.opened_mes_info.class_id);
+            formData.append('thread_id', antd.opened_mes_info.thread_id);
+
+            $.ajax({
+                url: '../interact/delete_message.php',
+                type: "POST",
+                data: formData,
+                cache: false,
+                dataType: 'json',
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    if (data.status) {
+                        antd.load_file();
+                    } else {
+                        antd.$message.error(data.mes);
+                    }
+                }
+            });
+        },
+        handle_edit_file_submit() {
+            var formData = new FormData();
+            formData.append('user', antd.user.id);
+            formData.append('mes_id', antd.edit.file.id);
+            formData.append('class_id', antd.opened_mes_info.class_id);
+            formData.append('file_name', antd.edit.file.content);
+            formData.append('thread_id', antd.opened_mes_info.thread_id);
+
+            $.ajax({
+                url: '../interact/edit_file.php',
+                type: "POST",
+                data: formData,
+                cache: false,
+                dataType: 'json',
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    if (data.status) {
+                        antd.load_file();
+                        antd.handle_edit_file_cancel();
+                    } else {
+                        antd.$message.error(data.mes);
+                    }
+                }
+            });
+        },
+        handle_edit_file_cancel() {
+            this.edit.file.visible = false;
+        },
+        open_file_edit(id, content) {
+            this.edit.file.id = id;
+            if (content == '') {
+                this.edit.file.content = 'No Name';
+            } else {
+                this.edit.file.content = content;
+            }
+            this.edit.file.visible = true;
+        },
+
         //点击班级获取主题在 center 列展示
         open_class(id, index) {
             //选中增加 class，删除其余选中
@@ -131,7 +217,7 @@ var antd = new Vue({
             if (!!index || index == 0) {
                 this.opened_class_info.index = index;
             }
-            this.opened_class_info.superid = this.user.classes_info[this.opened_class_info.index].super;
+            this.opened_class_info.superid = this.user.classes_info[index].super;
 
             this.spinning.center = true;
             axios.get('../interact/select_thread.php?class_id=' + id)

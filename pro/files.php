@@ -12,7 +12,7 @@
                 <p>All files in classes you joined</p>
             </div>
             <template v-if="!!user.joined_classes">
-                <div v-for="(joined,index) in user.joined_classes" class="class-item" @click="open_class(user.classes_info[index].id,index)" :id="'class_left'+user.classes_info[index].id">
+                <div v-for="(joined,index) in user.joined_classes" :class="'class-item ' + class_super(index)" @click="open_class(user.classes_info[index].id,index)" :id="'class_left'+user.classes_info[index].id">
                     <div style="margin-right: 10px;">
                         <template v-if="!!user.classes_info[index].img">
                             <img :src="user.classes_info[index].img" class="class-item-img" />
@@ -64,6 +64,14 @@
         <!-- 占位 -->
     </div>
 
+        <!-- 文件名修改 -->
+        <a-modal title="Edit FileName" :visible="edit.file.visible" @ok="handle_edit_file_submit" :confirm-loading="edit.file.confirm_edit_file_loading" @cancel="handle_edit_file_cancel">
+        <a-input defaultValue="edit.file.content" v-model="edit.file.content" addonAfter="edit.file.type">
+            <a-icon slot="prefix" type="align-center" />
+        </a-input>
+    </a-modal>
+    <!-- 文件名修改结束 -->
+
     <div class="right">
         <a-spin :spinning="spinning.right">
             <!-- 消息框开始 -->
@@ -99,6 +107,9 @@
                                             </template>
                                             <template v-else-if="if_office(get_suffix(file.file_name).substr(1))">
                                             <a-divider type="vertical"></a-divider><a @click="open_office_preview(file.file_url,file.file_name)">Preview</a>
+                                            </template>
+                                            <template v-if="file.speaker == user.id || opened_class_info.superid == user.id">
+                                            <a-divider type="vertical"></a-divider><a style="color: rgb(233, 30, 99);" @click="remove_file(file.id)">Delete</a><a-divider type="vertical"></a-divider><a style="color:#333" @click="open_file_edit(file.id,file.file_name)">Edit</a>
                                             </template>
                                         </p>
                                     </div>

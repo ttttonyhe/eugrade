@@ -33,8 +33,8 @@ if (!empty($_POST['class_id']) && !empty($_POST['stu_id'])) {
         $data = trim($data);
         $data = stripslashes($data);
         $data = htmlspecialchars($data);
-        $data = str_replace("'","&#39;",$data);
-        $data = str_replace('"',"&#34;",$data);
+        $data = str_replace("'", "&#39;", $data);
+        $data = str_replace('"', "&#34;", $data);
         return $data;
     }
 
@@ -52,14 +52,13 @@ if (!empty($_POST['class_id']) && !empty($_POST['stu_id'])) {
     } else {
         $array = Lazer::table('users')->limit(1)->where('id', '=', (int)$stu)->findAll()->asArray();
         if (!!$array) {
-                //更改 class
-                $class = Lazer::table('classes')->limit(1)->where('id', '=', (int)$id)->find();
-                if (!in_array($stu, explode(',', $class->member))) {
-                    $class->set(array(
-                        'member' => $class->member . ',' . (string)$stu
-                    ));
-                    $class->save();
-                }
+            //更改 class
+            $class = Lazer::table('classes')->limit(1)->where('id', '=', (int)$id)->find();
+            if (!in_array($stu, explode(',', $class->member))) {
+                $class->set(array(
+                    'member' => $class->member . ',' . (string)$stu
+                ));
+                $class->save();
 
                 //更改管理员的 class 字段
                 $array = Lazer::table('users')->limit(1)->where('id', '=', (int)$stu)->find();
@@ -80,6 +79,11 @@ if (!empty($_POST['class_id']) && !empty($_POST['stu_id'])) {
                 $status = 1;
                 $code = 102;
                 $mes = 'Successfully joined a class';
+            } else {
+                $status = 0;
+                $code = 112;
+                $mes = 'You are already in the class';
+            }
         } else {
             $status = 0;
             $code = 104;

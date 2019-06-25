@@ -89,6 +89,10 @@
                         <a-menu-item key="2">
                             <a href="logout.php">Logout</a>
                         </a-menu-item>
+                        <a-menu-divider></a-menu-divider>
+                        <a-menu-item>
+                        <a href="" style="color:#999;font-size:11px;font-weight:300;letter-spacing:.5px">Version | Beta v0.15</a>
+                        </a-menu-item>
                     </a-menu>
                 </a-dropdown>
             </div>

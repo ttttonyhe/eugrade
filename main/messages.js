@@ -168,6 +168,14 @@ var antd = new Vue({
         }
     },
     methods: {
+        //判断是否为班级管理员，输出特殊样式
+        class_super(index) {
+            if (parseInt(this.user.classes_info[index].super) == this.user.id) {
+                return 'super';
+            } else {
+                return '';
+            }
+        },
         //创建/加入新班级后重新加载列表
         get_all_classes() {
             axios.get('../interact/select_users.php?type=class&id=' + cookie.get('logged_in_id') + '&form=single')
@@ -989,6 +997,10 @@ var antd = new Vue({
                             if (data.status) {
                                 antd.$message.success(data.mes);
                                 antd.status.chat = false;
+                                //移除当前加深
+                                $('.center .class-item').each(function () {
+                                    $(this).removeClass('clicked');
+                                });
                                 //重新获取 threads 列表
                                 antd.spinning.center = true;
                                 axios.get('../interact/select_thread.php?class_id=' + antd.opened_mes_info.class_id)
@@ -1095,7 +1107,6 @@ var antd = new Vue({
             });
         },
         handle_edit_mes_submit() {
-            this.emoji_removed_count += 1;
             var formData = new FormData();
             formData.append('user', antd.user.id);
             formData.append('mes_id', antd.edit.mes.id);
