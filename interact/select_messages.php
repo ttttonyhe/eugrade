@@ -37,6 +37,8 @@ if (!empty($_GET['class_id']) && !empty($_GET['thread_id'])) {
         $data = trim($data);
         $data = stripslashes($data);
         $data = htmlspecialchars($data);
+        $data = str_replace("'","&#39;",$data);
+        $data = str_replace('"',"&#34;",$data);
         return $data;
     }
 

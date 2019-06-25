@@ -40,6 +40,8 @@ if (!empty($_POST['user']) && !empty($_POST['mes_id']) && !empty($_POST['thread_
         $data = trim($data);
         $data = stripslashes($data);
         $data = htmlspecialchars($data);
+        $data = str_replace("'","&#39;",$data);
+        $data = str_replace('"',"&#34;",$data);
         return $data;
     }
 

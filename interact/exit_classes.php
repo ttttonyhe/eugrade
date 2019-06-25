@@ -33,6 +33,8 @@ if (!empty($_POST['class_id']) && !empty($_POST['stu_id']) && !empty($_POST['fro
         $data = trim($data);
         $data = stripslashes($data);
         $data = htmlspecialchars($data);
+        $data = str_replace("'","&#39;",$data);
+        $data = str_replace('"',"&#34;",$data);
         return $data;
     }
 

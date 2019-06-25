@@ -31,6 +31,8 @@ if (!empty($_POST['creator']) && !empty($_POST['name']) && !empty($_POST['belong
         $data = trim($data);
         $data = stripslashes($data);
         $data = htmlspecialchars($data);
+        $data = str_replace("'","&#39;",$data);
+        $data = str_replace('"',"&#34;",$data);
         return $data;
     }
 
@@ -48,13 +50,13 @@ if (!empty($_POST['creator']) && !empty($_POST['name']) && !empty($_POST['belong
     } else {
         $array = Lazer::table('users')->limit(1)->where('id', '=', (int)$id)->find()->asArray();
         if (!!$array) {
-            $array = Lazer::table('threads')->limit(1)->where('name', '=', $name)->andWhere('belong_class', '=', (int)$class)->find()->asArray();
+            $array = Lazer::table('threads')->limit(1)->where('name', '=', (string)$name)->andWhere('belong_class', '=', (int)$class)->find()->asArray();
             if (empty($array)) {
                 //建立 thread
                 $this_id = Lazer::table('threads')->findAll()->count() + 1;
                 $row = Lazer::table('threads');
                 $row->id = $this_id;
-                $row->name = $name;
+                $row->name = (string)$name;
                 $row->belong_class = (int)$class;
                 $row->creator = (int)$id;
                 $row->date = time();
@@ -72,7 +74,7 @@ if (!empty($_POST['creator']) && !empty($_POST['name']) && !empty($_POST['belong
         } else {
             $status = 0;
             $code = 104;
-            $mes = 'The speaker does not exist';
+            $mes = 'The creator does not exist';
         }
     }
 } else {

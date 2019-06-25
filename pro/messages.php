@@ -328,7 +328,7 @@
                     <div>
                         <template v-if="parseInt(opened_class_info.superid) == parseInt(user.id)">
                             <a-button type="default" @click="delete_thread(opened_mes_info.thread_id)" style="margin-right:10px">
-                                <a-icon type="delete"></a-icon>
+                                <a-icon style="color:#FF4040" type="delete"></a-icon>
                             </a-button>
                         </template>
                         <a-button type="default" @click="edit.visible = true">

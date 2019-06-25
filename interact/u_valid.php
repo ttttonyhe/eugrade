@@ -31,6 +31,8 @@ if (!empty($_GET['type']) && !empty($_GET['value'])) {
         $data = trim($data);
         $data = stripslashes($data);
         $data = htmlspecialchars($data);
+        $data = str_replace("'","&#39;",$data);
+        $data = str_replace('"',"&#34;",$data);
         return $data;
     }
 

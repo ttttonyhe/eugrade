@@ -126,7 +126,7 @@ var antd = new Vue({
                 url: null
             },
             guide: {
-                visible : false,
+                visible: false,
                 step: 1,
                 title: 'Terms of Service'
             },
@@ -153,7 +153,7 @@ var antd = new Vue({
                 }
                 $('#main-container').attr('style', ''); //避免爆代码
             });
-            //md 函数初始化
+        //md 函数初始化
         this.md = window.markdownit({
             html: true,
             xhtmlOut: false,
@@ -162,9 +162,9 @@ var antd = new Vue({
         });
 
         //新用户引导信息
-        if(cookie.get('pokers_intro') !== 'done'){
+        if (cookie.get('pokers_intro') !== 'done') {
             this.guide.visible = true;
-            cookie.set('pokers_intro','done');
+            cookie.set('pokers_intro', 'done');
         }
     },
     methods: {
@@ -988,9 +988,15 @@ var antd = new Vue({
                         success: function (data) {
                             if (data.status) {
                                 antd.$message.success(data.mes);
-                                antd.status.mark = false;
                                 antd.status.chat = false;
-                                antd.status.thread = false;
+                                //重新获取 threads 列表
+                                antd.spinning.center = true;
+                                axios.get('../interact/select_thread.php?class_id=' + antd.opened_mes_info.class_id)
+                                    .then(resp => {
+                                        antd.status.mark = false;
+                                        antd.opened_thread_info = resp.data;
+                                        antd.spinning.center = false;
+                                    })
                             } else {
                                 antd.$message.error(data.mes);
                             }
@@ -1157,19 +1163,19 @@ var antd = new Vue({
                     break;
             }
         },
-        doneGuide(key){
-            if(key == 1){
+        doneGuide(key) {
+            if (key == 1) {
                 this.guide.step = 2;
                 this.guide.title = 'Introducing Threads';
-            }else if(key == 2){
+            } else if (key == 2) {
                 this.guide.step = 3;
                 this.guide.title = 'Introducing Classes';
-            }else{
+            } else {
                 this.guide.visible = false;
             }
         },
-        same_speaker(id,index){
-            if(index !== 0 && (id == this.opened_mes_info.meses[index - 1].speaker)){
+        same_speaker(id, index) {
+            if (index !== 0 && (id == this.opened_mes_info.meses[index - 1].speaker)) {
                 return 'border-left:2px solid #eee';
             }
         },

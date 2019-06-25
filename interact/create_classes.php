@@ -33,6 +33,8 @@ if (!empty($_POST['name']) && !empty($_POST['des']) && !empty($_POST['super']) &
         $data = trim($data);
         $data = stripslashes($data);
         $data = htmlspecialchars($data);
+        $data = str_replace("'","&#39;",$data);
+        $data = str_replace('"',"&#34;",$data);
         return $data;
     }
 

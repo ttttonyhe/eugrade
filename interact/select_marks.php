@@ -27,6 +27,8 @@ if (!empty($_GET['form']) && !empty($_GET['marker'])) {
         $data = trim($data);
         $data = stripslashes($data);
         $data = htmlspecialchars($data);
+        $data = str_replace("'","&#39;",$data);
+        $data = str_replace('"',"&#34;",$data);
         return $data;
     }
 

@@ -40,6 +40,8 @@ if (!empty($_POST['speaker_name']) && !empty($_POST['thread']) && !empty($_POST[
         $data = trim($data);
         $data = stripslashes($data);
         $data = htmlspecialchars($data);
+        $data = str_replace("'","&#39;",$data);
+        $data = str_replace('"',"&#34;",$data);
         return $data;
     }
 
