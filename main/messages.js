@@ -301,7 +301,7 @@ var antd = new Vue({
             if (!!index || index == 0) {
                 this.opened_class_info.index = index;
             }
-            this.opened_class_info.superid = this.user.classes_info[index].super;
+            this.opened_class_info.superid = this.user.classes_info[parseInt(index)].super;
 
             this.spinning.center = true;
             axios.get('../interact/select_thread.php?class_id=' + id)

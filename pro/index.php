@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="Shortcut Icon" href="../statics/img/pokers_icon.ico" type="image/x-icon">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <?php
     //引入composer

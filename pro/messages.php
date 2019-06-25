@@ -191,7 +191,7 @@
                 </div>
                 <template v-if="Object.keys(opened_mark_info.class_c).length - 1">
                     <p class="mes-sub-header">Classes</p>
-                    <div v-for="class_c in opened_mark_info.class_info" class="class-item" :id="'class_sub'+class_c.id" @click="open_class(class_c.id,opened_class_info.superid)">
+                    <div v-for="(class_c,index) in opened_mark_info.class_info" class="class-item" :id="'class_sub'+class_c.id" @click="open_class(class_c.id,index)">
                         <div style="margin-right: 10px;">
                             <template v-if="!!class_c.img">
                                 <img :src="class_c.img" class="class-item-img" />
