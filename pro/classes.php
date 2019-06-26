@@ -12,6 +12,12 @@
                 <p>All the classes you joined</p>
             </div>
             <template v-if="Object.keys(user.joined_classes).length">
+            <div class="mes-item">
+                    <p>
+                        <a-icon type="team"></a-icon>&nbsp;&nbsp;Classes
+                        <a-button size="small" @click="reverse_order('classes')" style="font-size:14px;"><a-icon type="sort-descending" /></a-button>
+                    </p>
+                </div>
                 <div v-for="(joined,index) in user.joined_classes" :class="'class-item ' + class_super(index)" @click="open_class_info(index)" :id="'class'+index">
                     <div style="margin-right: 10px;">
                         <template v-if="!!user.classes_info[index].img">

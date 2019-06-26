@@ -40,8 +40,8 @@ if (!empty($_POST['user']) && !empty($_POST['mes_id']) && !empty($_POST['thread_
         $data = trim($data);
         $data = stripslashes($data);
         $data = htmlspecialchars($data);
-        $data = str_replace("'","&#39;",$data);
-        $data = str_replace('"',"&#34;",$data);
+        $data = str_replace("'", "&#39;", $data);
+        $data = str_replace('"', "&#34;", $data);
         return $data;
     }
 
@@ -52,76 +52,80 @@ if (!empty($_POST['user']) && !empty($_POST['mes_id']) && !empty($_POST['thread_
     $thread = input($_POST['thread_id']);
 
 
-        //业务逻辑
-        $array = Lazer::table('classes')->findAll()->asArray('id');
-        if (!array_key_exists($class, $array)) {
-            $status = 0;
-            $code = 101;
-            $mes = 'Class does not exist';
-        } else {
-            $array = Lazer::table('users')->limit(1)->where('id', '=', (int)$_SESSION['logged_in_id'])->find()->asArray();
-            if (!!$array) { //判断操作的用户存在
+    //业务逻辑
+    $array = Lazer::table('classes')->findAll()->asArray('id');
+    if (!array_key_exists($class, $array)) {
+        $status = 0;
+        $code = 101;
+        $mes = 'Class does not exist';
+    } else {
+        $array = Lazer::table('users')->limit(1)->where('id', '=', (int)$_SESSION['logged_in_id'])->find()->asArray();
+        if (!!$array) { //判断操作的用户存在
 
 
-                if ($array[0]['type'] == 2) { //教师操作
-                    $array = Lazer::table('classes')->limit(1)->where('id', '=', (int)$class)->andWhere('super', '=', (int)$_SESSION['logged_in_id'])->find();
-                    $speak = Lazer::table('messages')->limit(1)->where('id', '=', (int)$mes_id)->andWhere('thread', '=', (int)$thread)->find();
-                    if(!!$array->id){ //必须为班级管理员或当前用户才可操作
-                        $status = 1;
-                    }else{
-                        if((int)$speak->speaker !== (int)$super){
-                            $status = 0;
-                        }else{
-                            $status = 1;
-                        }
-                    }
-                } else { //学生操作
-                    $array = Lazer::table('messages')->limit(1)->where('id', '=', (int)$mes_id)->andWhere('thread', '=', (int)$thread)->find();
-                    if((int)$array->speaker !== (int)$super){ //必须为发送者才可操作
+            if ($array[0]['type'] == 2) { //教师操作
+                $array = Lazer::table('classes')->limit(1)->where('id', '=', (int)$class)->andWhere('super', '=', (int)$_SESSION['logged_in_id'])->find();
+                $speak = Lazer::table('messages')->limit(1)->where('id', '=', (int)$mes_id)->andWhere('thread', '=', (int)$thread)->find();
+                if (!!$array->id) { //必须为班级管理员或当前用户才可操作
+                    $status = 1;
+                } else {
+                    if ((int)$speak->speaker !== (int)$super) {
                         $status = 0;
-                    }elseif($_SESSION['logged_in_id'] == (int)$super){
+                    } else {
                         $status = 1;
-                    }else{
-                        $status = 0;
                     }
                 }
+            } else { //学生操作
+                $array = Lazer::table('messages')->limit(1)->where('id', '=', (int)$mes_id)->andWhere('thread', '=', (int)$thread)->find();
+                if ((int)$array->speaker !== (int)$super) { //必须为发送者才可操作
+                    $status = 0;
+                } elseif ($_SESSION['logged_in_id'] == (int)$super) {
+                    $status = 1;
+                } else {
+                    $status = 0;
+                }
+            }
 
-                if($status){
+            if ($status) {
 
                 $array = Lazer::table('threads')->limit(1)->where('id', '=', (int)$thread)->andWhere('belong_class', '=', (int)$class)->find();
                 if (!!$array->name) { //判断主题存在
 
                     $array = Lazer::table('messages')->limit(1)->where('id', '=', (int)$mes_id)->andWhere('thread', '=', (int)$thread)->find();
-                        if (!empty($array->speaker)) {
+                    if (!empty($array->speaker)) {
 
-                            $array->delete();
+                        $array->delete();
 
-                            $status = 1;
-                            $code = 133;
-                            $mes = 'Successfully deleted a message';
-                        } else {
-                            $status = 0;
-                            $code = 120;
-                            $mes = 'The content can not be empty';
-                        }
+                        $t = Lazer::table('threads')->limit(1)->where('id', '=', (int)$thread)->find();
+                        $t->set(array(
+                            'message_count' => $t->message_count - 1
+                        ));
+                        $t->save();
 
+                        $status = 1;
+                        $code = 133;
+                        $mes = 'Successfully deleted a message';
+                    } else {
+                        $status = 0;
+                        $code = 120;
+                        $mes = 'The content can not be empty';
+                    }
                 } else {
                     $status = 0;
                     $code = 122;
                     $mes = 'The thread does not exist';
                 }
-
-            }else{
+            } else {
                 $status = 0;
                 $code = 114;
                 $mes = 'The editor does not match the speaker';
             }
-            } else {
-                $status = 0;
-                $code = 104;
-                $mes = 'The speaker does not exist';
-            }
+        } else {
+            $status = 0;
+            $code = 104;
+            $mes = 'The speaker does not exist';
         }
+    }
 } else {
     $status = 0;
     $code = 103;

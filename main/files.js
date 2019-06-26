@@ -207,7 +207,10 @@ var antd = new Vue({
 
         //点击班级获取主题在 center 列展示
         open_class(id, index) {
-            //选中增加 class，删除其余选中
+            //选中增加 class，删除其余选中 class 与 thread
+            $('.center .class-item').each(function () {
+                $(this).removeClass('clicked');
+            });
             $('.left .class-item').each(function () {
                 $(this).removeClass('clicked');
             });
@@ -342,6 +345,26 @@ var antd = new Vue({
                     break;
                 case 'xlsx':
                     return true;
+                    break;
+            }
+        },
+        reverse_order(key){
+            switch(key){
+                case 'threads':
+                    this.opened_thread_info = this.opened_thread_info.reverse();
+                    $('.center .class-item').each(function () {
+                        $(this).removeClass('clicked');
+                    });
+                    break;
+                case 'classes':
+                    this.user.joined_classes = this.user.joined_classes.reverse();
+                    this.user.classes_info = this.user.classes_info.reverse();
+                    $('.left .class-item').each(function () {
+                        $(this).removeClass('clicked');
+                    });
+                    break;
+                case 'files':
+                    this.opened_mes_info.files = this.opened_mes_info.files.reverse();
                     break;
             }
         },

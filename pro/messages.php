@@ -20,6 +20,7 @@
                 <div class="mes-item">
                     <p style="color:rgb(90, 148, 241)">
                         <a-icon type="team"></a-icon>&nbsp;&nbsp;Classes
+                        <a-button size="small" @click="reverse_order('classes')" style="font-size:14px;right:80px"><a-icon type="sort-descending"></a-icon></a-button>
                         <a-button size="small" @click="display_class" v-html="display_classes_text"></a-button>
                     </p>
                 </div>
@@ -235,6 +236,7 @@
                 <div class="mes-header">
                     <p style="color:#666;">
                         <a-icon type="appstore"></a-icon>&nbsp;&nbsp;Thread
+                        <a-button size="small" @click="reverse_order('threads')" style="right:85px;position:absolute"><a-icon type="sort-descending" /></a-button>
                         <a-button size="small" @click="add.visible_thread = true" style="right:20px;position:absolute">+ Add</a-button>
                     </p>
                 </div>
@@ -326,6 +328,9 @@
                         <p>{{ opened_mes_info.thread_info.message_count }} Messages | {{ opened_mes_info.unique_speakers.length }} Followers</p>
                     </div>
                     <div>
+                        <a-button type="default" @click="reverse_order('meses')" style="margin-right:10px;font-size:16px">
+                            <a-icon type="sort-descending"></a-icon>
+                        </a-button>
                         <template v-if="parseInt(opened_class_info.superid) == parseInt(user.id)">
                             <a-button type="default" @click="delete_thread(opened_mes_info.thread_id)" style="margin-right:10px">
                                 <a-icon style="color:#FF4040" type="delete"></a-icon>
@@ -445,16 +450,16 @@
                         </template>
                     </div>
                     <template v-if="mes_input.disable">
-                        <a-textarea placeholder="Add a comment..." :rows="mes_input.rows" @focus="handle_input_up" v-model="mes_input.content" disabled></a-textarea>
+                        <a-textarea :placeholder="mes_input.text" :rows="mes_input.rows" @focus="handle_input_up" v-model="mes_input.content" disabled></a-textarea>
                     </template>
                     <template v-else>
-                        <a-textarea placeholder="Add a comment..." :rows="mes_input.rows" @focus="handle_input_up" v-model="mes_input.content"></a-textarea>
+                        <a-textarea :placeholder="mes_input.text" :rows="mes_input.rows" @focus="handle_input_up" v-model="mes_input.content" id="message_input"></a-textarea>
                     </template>
                     <div class="mes-input-op" v-show="mes_input.op_display">
                         <div>
                             <a-tooltip placement="top">
                                 <template slot="title">
-                                    <span>MarkDown</span>
+                                    <span>MarkDown <a href="https://www.markdownguide.org/basic-syntax" target="_blank" style="color:#fff"><a-icon type="info-circle"></a-icon></a></span>
                                 </template>
                                 <a-button :type="mes_input.markdown.btn" @click="handle_markdown">
                                     <a-icon type="down-square"></a-icon>
@@ -463,11 +468,13 @@
                             </a-tooltip>
                             <a-popover title="Upload a image" trigger="click" v-model="mes_input.visible.picture">
                                 <template slot="content">
-                                    <input type="file" name="upload_img" id="upload_img" />
+                                    <input type="file" name="upload_img" id="upload_img" @click="check_image_selected()" />
                                     <a-progress :percent="mes_input.progress_img" size="small" v-show="mes_input.img_progress"></a-progress>
                                     <br /><br />
+                                    <template v-if="check.img.status">
                                     <a-button @click="mes_input.visible.picture = false;">Discard</a-button>
                                     <a-button type="primary" @click="upload_img">Upload</a-button>
+                                    </template>
                                 </template>
                                 <a-tooltip placement="top">
                                     <template slot="title">
@@ -481,11 +488,13 @@
 
                             <a-popover title="Upload a file" trigger="click" v-model="mes_input.visible.upload" @blur="handle_cancel_upload">
                                 <template slot="content">
-                                    <input type="file" name="upload_file" id="upload_file" />
+                                    <input type="file" name="upload_file" id="upload_file" @click="check_file_selected()" />
                                     <a-progress :percent="mes_input.progress_file" status="active" v-show="mes_input.file_progress" size="small"></a-progress>
                                     <br /><br />
+                                    <template v-if="check.file.status">
                                     <a-button @click="handle_cancel_upload();mes_input.visible.upload = false;">Discard</a-button>
                                     <a-button type="primary" @click="upload_file">Upload</a-button>
+                                    </template>
                                 </template>
                                 <a-tooltip placement="top">
                                     <template slot="title">
@@ -499,7 +508,13 @@
 
                         </div>
                         <div v-show="mes_input.visible.text">
-                            <a-button @click="handle_input_down">Discard</a-button>
+                            <a-tooltip placement="top">
+                                    <template slot="title">
+                                        <span>Sending Method</span>
+                                    </template>
+                                    <a-button @click="enter_send()" style="margin-right:0px">{{ enter.text }}</a-button>
+                                </a-tooltip>
+                            <a-button @click="handle_input_down" style="margin-right:10px">Discard</a-button>
                             <a-button type="primary" @click="handle_input_send(mes_input.type)">{{ mes_input.send_text }}</a-button>
                         </div>
                     </div>

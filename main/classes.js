@@ -727,5 +727,16 @@ var antd = new Vue({
         handle_invite_close(){
             this.invite.visible = false;
         },
+        reverse_order(key){
+            switch(key){
+                case 'classes':
+                    this.user.joined_classes = this.user.joined_classes.reverse();
+                    this.user.classes_info = this.user.classes_info.reverse();
+                    $('.left .class-item').each(function () {
+                        $(this).removeClass('clicked');
+                    });
+                    break;
+            }
+        },
     }
 });

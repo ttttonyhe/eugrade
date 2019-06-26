@@ -69,6 +69,7 @@ var antd = new Vue({
                 last: null //最后一段内容的唯一 id
             },
             mes_input: { //发送内容框
+                text: 'Add a comment...',
                 rows: 1,
                 op_display: false, //选项
                 container: 'mes-container-normal', //聚焦和失焦时展示不同 class
@@ -130,6 +131,18 @@ var antd = new Vue({
                 step: 1,
                 title: 'Terms of Service'
             },
+            enter: {
+                status: false,
+                text: 'Click'
+            },
+            check: {
+                file: {
+                    status: false
+                },
+                img: {
+                    status: false
+                }
+            }
         }
     },
     mounted() {
@@ -301,6 +314,9 @@ var antd = new Vue({
         open_class(id, index) {
             //选中增加 class，删除其余选中
             $('.left .class-item').each(function () {
+                $(this).removeClass('clicked');
+            });
+            $('.center .class-item').each(function () {
                 $(this).removeClass('clicked');
             });
             $('#class_left' + id).addClass('clicked');
@@ -615,6 +631,7 @@ var antd = new Vue({
         },
         //发送内容
         handle_input_send(type) {
+            this.mes_input.text = 'Sending...';
             this.mes_input.disable = true;
             var formData = new FormData();
 
@@ -684,6 +701,7 @@ var antd = new Vue({
                             antd.handle_cancel_upload();
                             antd.opened_thread_info[antd.opened_mes_info.index].message_count++;
                             antd.bottom_mes();
+                            antd.mes_input.text = 'Add a comment...';
                         } else {
                             antd.$message.error(data.mes);
                             antd.mes_input.disable = false;
@@ -856,6 +874,8 @@ var antd = new Vue({
             $("#upload_file").val('');
             this.mes_input.markdown.status = false;
             this.mes_input.markdown.btn = 'default';
+            this.check.file.status = false;
+            this.check.img.status = false;
         },
         //获取文件格式的内容段图标、颜色
         get_file_icon(name) {
@@ -1100,6 +1120,7 @@ var antd = new Vue({
                 success: function (data) {
                     if (data.status) {
                         antd.load_mes();
+                        antd.opened_thread_info[antd.opened_mes_info.index].message_count--;
                     } else {
                         antd.$message.error(data.mes);
                     }
@@ -1188,6 +1209,60 @@ var antd = new Vue({
         same_speaker(id, index) {
             if (index !== 0 && (id == this.opened_mes_info.meses[index - 1].speaker)) {
                 return 'border-left:2px solid #eee';
+            }
+        },
+        reverse_order(key) {
+            switch (key) {
+                case 'threads':
+                    this.opened_thread_info = this.opened_thread_info.reverse();
+                    $('.center .class-item').each(function () {
+                        $(this).removeClass('clicked');
+                    });
+                    break;
+                case 'classes':
+                    this.user.joined_classes = this.user.joined_classes.reverse();
+                    this.user.classes_info = this.user.classes_info.reverse();
+                    $('.left .class-item').each(function () {
+                        $(this).removeClass('clicked');
+                    });
+                    break;
+                case 'meses':
+                    this.opened_mes_info.meses = this.opened_mes_info.meses.reverse();
+                    break;
+            }
+        },
+        enter_send() {
+            if (this.enter.status) {
+                $("#message_input").unbind();
+                this.enter.status = false;
+                this.enter.text = 'Click';
+            } else {
+                this.enter.status = true;
+                this.enter.text = 'Enter';
+                //输入框监听回车发送
+                $("#message_input").bind("keydown", function (e) {
+                    // 兼容FF和IE和Opera    
+                    var theEvent = e || window.event;
+                    var code = theEvent.keyCode || theEvent.which || theEvent.charCode;
+                    if (code == 13) {
+                        antd.handle_input_send('text');
+                    }
+                });
+            }
+
+        },
+        check_file_selected() {
+            if (!!$("#upload_file")[0]) {
+                this.check.file.status = true;
+            } else {
+                this.check.file.status = false;
+            }
+        },
+        check_image_selected() {
+            if (!!$("#upload_img")[0]) {
+                this.check.img.status = true;
+            } else {
+                this.check.img.status = false;
             }
         },
     }

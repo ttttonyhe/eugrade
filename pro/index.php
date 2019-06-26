@@ -58,13 +58,32 @@
         <title v-html="current.title">Pokers | Clear & Organized Team Communication Solution</title>
         <div>
             <a-menu mode="horizontal" v-model="current.nav">
-                <a-menu-item key="messages" @click="switch_section('messages')">
+                <a-sub-menu style="border-right: 1px solid #eee;">
+                    <span slot="title" class="submenu-title-wrapper">
+                        <img src="../statics/img/pokers_logo.png" class="header-logo" />
+                    </span>
+                    <a-menu-item-group title="Application">
+                        <a-menu-item><a href="https://www.snapaper.com"><a-icon type="solution"></a-icon>Snapaper</a></a-menu-item>
+                        <a-menu-item><a href="https://www.zeo.im"><a-icon type="compass"></a-icon>ZEO.IM</a></a-menu-item>
+                    </a-menu-item-group>
+                    <a-menu-item-group title="Terms">
+                        <a-menu-item><a href="https://www.ouorz.com/pokers-terms-of-service.html"><a-icon type="file-done"></a-icon>Terms of Service</a></a-menu-item>
+                        <a-menu-item><a href="https://www.ouorz.com/pokers-privacy-policy.html"><a-icon type="file-protect"></a-icon>Privacy Policy</a></a-menu-item>
+                    </a-menu-item-group>
+                    <a-menu-item-group title="Donation">
+                        <a-menu-item><a href="https://www.snapaper.com/donate" style="color:hotpink"><a-icon type="pay-circle"></a-icon>Dnoate to Me</a></a-menu-item>
+                    </a-menu-item-group>
+                    <a-menu-item-group title="Version">
+                        <a-menu-item><a-icon type="robot"></a-icon>Beta v0.16</a-menu-item>
+                    </a-menu-item-group>
+                </a-sub-menu>
+                <a-menu-item key="messages" @click="switch_section('messages')" style="border-right: 1px solid #eee;">
                     <a-icon type="project"></a-icon>Messages
                 </a-menu-item>
-                <a-menu-item key="files" @click="switch_section('files')">
+                <a-menu-item key="files" @click="switch_section('files')" style="border-right: 1px solid #eee;">
                     <a-icon type="save"></a-icon>Files
                 </a-menu-item>
-                <a-menu-item key="Classes" @click="switch_section('classes')">
+                <a-menu-item key="Classes" @click="switch_section('classes')" style="border-right: 1px solid #eee;">
                     <a-icon type="bank"></a-icon>Classes
                 </a-menu-item>
             </a-menu>
@@ -85,13 +104,9 @@
                             <span style="color:#999">{{ edit.user.email }}</span>
                         </a-menu-item>
                         <a-menu-divider></a-menu-divider>
-                        <a-menu-item key="1" @click="edit.user.visible = true">Edit Profile</a-menu-item>
+                        <a-menu-item key="1" @click="edit.user.visible = true"><a-icon type="form"></a-icon>Edit Profile</a-menu-item>
                         <a-menu-item key="2">
-                            <a href="logout.php">Logout</a>
-                        </a-menu-item>
-                        <a-menu-divider></a-menu-divider>
-                        <a-menu-item>
-                        <a href="" style="color:#999;font-size:11px;font-weight:300;letter-spacing:.5px">Version | Beta v0.15</a>
+                            <a href="logout.php"><a-icon type="logout"></a-icon>&nbsp;&nbsp;Logout</a>
                         </a-menu-item>
                     </a-menu>
                 </a-dropdown>
@@ -202,20 +217,20 @@
                 setTimeout('antd.spinning = false;', 1000);
             },
             capital(str) {
-                    //将字符串转化为消协，并拆分成单词
-                    str = str.toLowerCase().split(" ");
-                    //循环将每个单词的首字母大写
-                    for (var i = 0; i < str.length; i++) {
-                        //选取首个字符
-                        var char = str[i].charAt(0);
-                        //将单子首字符替换为大写
-                        str[i] = str[i].replace(char, function(s) {
-                            return s.toUpperCase();
-                        });
-                    }
-                    //拼合数组
-                    str = str.join(" ");
-                    return str;
+                //将字符串转化为消协，并拆分成单词
+                str = str.toLowerCase().split(" ");
+                //循环将每个单词的首字母大写
+                for (var i = 0; i < str.length; i++) {
+                    //选取首个字符
+                    var char = str[i].charAt(0);
+                    //将单子首字符替换为大写
+                    str[i] = str[i].replace(char, function(s) {
+                        return s.toUpperCase();
+                    });
+                }
+                //拼合数组
+                str = str.join(" ");
+                return str;
             },
             //处理修改用户信息
             handle_edit_submit(type) {
