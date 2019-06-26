@@ -706,11 +706,13 @@ var antd = new Vue({
                             antd.$message.error(data.mes);
                             antd.mes_input.disable = false;
                             antd.handle_cancel_upload();
+                            antd.mes_input.text = 'Add a comment...';
                         }
                     }
                 });
             } else {
                 this.$message.error('Illegal request');
+                antd.mes_input.text = 'Add a comment...';
             }
         },
         //更新内容列表(按照最后一段内容唯一 id 判断是否需要更新并滑动到底部)
