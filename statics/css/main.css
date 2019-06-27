@@ -740,3 +740,17 @@ html,body{
     width: 19px;
     height: 20px;
 }
+
+.header-notice{
+    text-align: center;
+    padding: 10px 0px;
+    border-bottom: 1px solid #eee;
+}
+
+.header-notice p{
+    margin: 0px;
+}
+
+.header-notice p b{
+    margin-right: 10px;
+}

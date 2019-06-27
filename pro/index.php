@@ -63,18 +63,30 @@
                         <img src="../statics/img/pokers_logo.png" class="header-logo" />
                     </span>
                     <a-menu-item-group title="Application">
-                        <a-menu-item><a href="https://www.snapaper.com"><a-icon type="solution"></a-icon>Snapaper</a></a-menu-item>
-                        <a-menu-item><a href="https://www.zeo.im"><a-icon type="compass"></a-icon>ZEO.IM</a></a-menu-item>
+                        <a-menu-item><a href="https://www.snapaper.com">
+                                <a-icon type="solution"></a-icon>Snapaper
+                            </a></a-menu-item>
+                        <a-menu-item><a href="https://www.zeo.im">
+                                <a-icon type="compass"></a-icon>ZEO.IM
+                            </a></a-menu-item>
                     </a-menu-item-group>
                     <a-menu-item-group title="Terms">
-                        <a-menu-item><a href="https://www.ouorz.com/pokers-terms-of-service.html"><a-icon type="file-done"></a-icon>Terms of Service</a></a-menu-item>
-                        <a-menu-item><a href="https://www.ouorz.com/pokers-privacy-policy.html"><a-icon type="file-protect"></a-icon>Privacy Policy</a></a-menu-item>
+                        <a-menu-item><a href="https://www.ouorz.com/pokers-terms-of-service.html">
+                                <a-icon type="file-done"></a-icon>Terms of Service
+                            </a></a-menu-item>
+                        <a-menu-item><a href="https://www.ouorz.com/pokers-privacy-policy.html">
+                                <a-icon type="file-protect"></a-icon>Privacy Policy
+                            </a></a-menu-item>
                     </a-menu-item-group>
                     <a-menu-item-group title="Donation">
-                        <a-menu-item><a href="https://www.snapaper.com/donate" style="color:hotpink"><a-icon type="pay-circle"></a-icon>Dnoate to Me</a></a-menu-item>
+                        <a-menu-item><a href="https://www.snapaper.com/donate" style="color:hotpink">
+                                <a-icon type="pay-circle"></a-icon>Dnoate to Me
+                            </a></a-menu-item>
                     </a-menu-item-group>
                     <a-menu-item-group title="Version">
-                        <a-menu-item><a-icon type="robot"></a-icon>Beta v0.16</a-menu-item>
+                        <a-menu-item>
+                            <a-icon type="robot"></a-icon>Beta v0.16
+                        </a-menu-item>
                     </a-menu-item-group>
                 </a-sub-menu>
                 <a-menu-item key="messages" @click="switch_section('messages')" style="border-right: 1px solid #eee;">
@@ -104,13 +116,20 @@
                             <span style="color:#999">{{ edit.user.email }}</span>
                         </a-menu-item>
                         <a-menu-divider></a-menu-divider>
-                        <a-menu-item key="1" @click="edit.user.visible = true"><a-icon type="form"></a-icon>Edit Profile</a-menu-item>
+                        <a-menu-item key="1" @click="edit.user.visible = true">
+                            <a-icon type="form"></a-icon>Edit Profile
+                        </a-menu-item>
                         <a-menu-item key="2">
-                            <a href="logout.php"><a-icon type="logout"></a-icon>&nbsp;&nbsp;Logout</a>
+                            <a href="logout.php">
+                                <a-icon type="logout"></a-icon>&nbsp;&nbsp;Logout
+                            </a>
                         </a-menu-item>
                     </a-menu>
                 </a-dropdown>
             </div>
+        </div>
+        <div class="header-notice" v-if="notice.status">
+            <p><b>Notice</b>{{ notice.content }}</p>
         </div>
 
         <!-- 用户信息修改 -->
@@ -201,6 +220,10 @@
                         avatar: '<?php echo $avatar; ?>',
                         display_percent: false
                     }
+                },
+                notice:{
+                    status : false,
+                    content : null
                 }
             }
         },
