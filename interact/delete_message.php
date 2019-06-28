@@ -29,6 +29,20 @@ try {
     ));
 }
 
+//数据库创建与判断
+try {
+    \Lazer\Classes\Helpers\Validate::table('logs')->exists();
+} catch (\Lazer\Classes\LazerException $e) { //不存在则创建
+    Lazer::create('logs', array(
+        'speaker' => 'string', //发送者
+        'operator' => 'string', //操作者
+        'thread' => 'integer', //主题
+        'content' => 'string', //内容
+        'operation' => 'string', //操作
+        'date' => 'integer' //时间
+    ));
+}
+
 session_start();
 
 //判断发送参数是否齐全，请求创建班级的用户是否为当前登录用户
@@ -62,16 +76,18 @@ if (!empty($_POST['user']) && !empty($_POST['mes_id']) && !empty($_POST['thread_
         $array = Lazer::table('users')->limit(1)->where('id', '=', (int)$_SESSION['logged_in_id'])->find()->asArray();
         if (!!$array) { //判断操作的用户存在
 
-
+            $operator = $array[0]['name'];
             if ($array[0]['type'] == 2) { //教师操作
                 $array = Lazer::table('classes')->limit(1)->where('id', '=', (int)$class)->andWhere('super', '=', (int)$_SESSION['logged_in_id'])->find();
                 $speak = Lazer::table('messages')->limit(1)->where('id', '=', (int)$mes_id)->andWhere('thread', '=', (int)$thread)->find();
                 if (!!$array->id) { //必须为班级管理员或当前用户才可操作
                     $status = 1;
+                    $speaker_name = $speak->speaker_name;
                 } else {
                     if ((int)$speak->speaker !== (int)$super) {
                         $status = 0;
                     } else {
+                        $speaker_name = $speak->speaker_name;
                         $status = 1;
                     }
                 }
@@ -81,6 +97,7 @@ if (!empty($_POST['user']) && !empty($_POST['mes_id']) && !empty($_POST['thread_
                     $status = 0;
                 } elseif ($_SESSION['logged_in_id'] == (int)$super) {
                     $status = 1;
+                    $speaker_name = $array->speaker_name;
                 } else {
                     $status = 0;
                 }
@@ -101,6 +118,23 @@ if (!empty($_POST['user']) && !empty($_POST['mes_id']) && !empty($_POST['thread_
                             'message_count' => $t->message_count - 1
                         ));
                         $t->save();
+
+                        //保存记录
+                        $row = Lazer::table('logs');
+                        $row->speaker = $speaker_name;
+                        $row->operator = $operator;
+                        $row->thread = (int)$thread;
+                        //判断删除段类型
+                        if($array->content !== 'null' && $array->content !== null){
+                            $row->content = $array->content;
+                        }elseif($array->img_url !== null){
+                            $row->content = '[Image]'.$array->img_url;
+                        }elseif($array->file_url !== null){
+                            $row->content = '[File]'.$array->file_url;
+                        }
+                        $row->date = (int)time();
+                        $row->operation = 'delete';
+                        $row->save();
 
                         $status = 1;
                         $code = 133;

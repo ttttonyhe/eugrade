@@ -1,0 +1,1 @@
+{"last_id":3,"schema":{"id":"integer","speaker":"string","operator":"string","thread":"integer","content":"string","operation":"string","date":"integer"},"relations":{}}

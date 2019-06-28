@@ -142,6 +142,11 @@ var antd = new Vue({
                 img: {
                     status: false
                 }
+            },
+            push: {
+                info: [],
+                classid: null,
+                thread: null
             }
         }
     },
@@ -179,6 +184,12 @@ var antd = new Vue({
             this.guide.visible = true;
             cookie.set('pokers_intro', 'done');
         }
+
+        //新消息推送
+        var func_push = function () {
+            antd.check_push();
+        }
+        window.get_push_interval = setInterval(func_push, 10000);
     },
     methods: {
         //判断是否为班级管理员，输出特殊样式
@@ -311,7 +322,7 @@ var antd = new Vue({
                 })
         },
         //点击班级获取主题在 center 列展示
-        open_class(id, index) {
+        open_class(id, index, push) {
             //选中增加 class，删除其余选中
             $('.left .class-item').each(function () {
                 $(this).removeClass('clicked');
@@ -322,11 +333,12 @@ var antd = new Vue({
             $('#class_left' + id).addClass('clicked');
 
             this.opened_class_info.id = id;
-            if (!!index || index == 0) {
-                this.opened_class_info.index = index;
+            if (!push) {
+                if (!!index || index == 0) {
+                    this.opened_class_info.index = index;
+                }
+                this.opened_class_info.superid = this.user.classes_info[parseInt(index)].super;
             }
-            this.opened_class_info.superid = this.user.classes_info[parseInt(index)].super;
-
             this.spinning.center = true;
             axios.get('../interact/select_thread.php?class_id=' + id)
                 .then(resp => {
@@ -340,7 +352,7 @@ var antd = new Vue({
 
 
         //点击主题获取消息在 right 列展示
-        open_mes(index, id, belong_class) {
+        open_mes(index, id, belong_class, push) {
 
             this.spinning.loading = true;
             this.status.user = false;
@@ -351,10 +363,12 @@ var antd = new Vue({
             });
             $('#thread_sub' + id).addClass('clicked');
 
-            this.opened_mes_info.index = index;
             this.opened_mes_info.thread_id = id;
             this.opened_mes_info.class_id = belong_class;
-            this.opened_mes_info.thread_info = this.opened_thread_info[index];
+            if (!push) {
+                this.opened_mes_info.index = index;
+                this.opened_mes_info.thread_info = this.opened_thread_info[index];
+            }
             this.edit.name = this.opened_mes_info.thread_info.name;
 
             axios.get('../interact/select_messages.php?thread_id=' + this.opened_mes_info.thread_id + '&class_id=' + this.opened_mes_info.class_id)
@@ -368,7 +382,23 @@ var antd = new Vue({
                     axios.get('../interact/select_users.php?type=avatar&id=' + response.data.speakers_unique + '&mes=1')
                         .then(res => {
                             this.opened_mes_info.speakers = res.data;
-                            setTimeout('antd.spinning.loading = false', 600);
+                            if (!push) {
+                                //新消息推送 cookie 设置
+                                if (!!cookie.get('pokers_push') && !!cookie.get('pokers_thread_count')) {
+                                    if (cookie.get('pokers_push').split('a').indexOf(id.toString()) < 0) {
+                                        var push = cookie.get('pokers_push') + 'a' + id;
+                                        var count = cookie.get('pokers_thread_count') + 'a' + this.opened_mes_info.thread_info.message_count;
+                                        cookie.set('pokers_push', push);
+                                        cookie.set('pokers_thread_count', count);
+                                    }
+                                } else {
+                                    cookie.set('pokers_push', id);
+                                    cookie.set('pokers_thread_count', this.opened_mes_info.thread_info.message_count);
+                                }
+                                setTimeout('antd.spinning.loading = false', 600);
+                            } else {
+                                setTimeout('antd.spinning.loading = false;', 600);
+                            }
                         })
                 })
 
@@ -1265,6 +1295,78 @@ var antd = new Vue({
                 this.check.img.status = true;
             } else {
                 this.check.img.status = false;
+            }
+        },
+        //展示消息
+        notify_open(type, mes, content) {
+            this.$notification[type]({
+                message: mes,
+                description: content,
+            });
+        },
+        //检查通知
+        check_push() {
+            if (!!cookie.get('pokers_push') && !!cookie.get('pokers_thread_count')) {
+                axios.get('../interact/check_push.php?thread_id=' + cookie.get('pokers_push') + '&thread_count=' + cookie.get('pokers_thread_count'))
+                    .then(res => {
+                        this.push.info = res.data;
+                        if (this.push.info !== null) {
+                            for (var i = 0; i < this.push.info.length; i++) {
+                                this.notify_push(this.push.info[i].classid, this.push.info[i].thread, this.push.info[i].name, this.push.info[i].diff + ' new messages');
+                                var push = cookie.get('pokers_thread_count').split('a');
+                                push[this.push.info[i].index] = this.push.info[i].count;
+                                cookie.set('pokers_thread_count', push.join('a'));
+                            }
+                        }
+                    })
+            }
+        },
+        //处理通知
+        notify_push(classid, thread, title, content) {
+            this.push.classid = classid;
+            this.push.thread = thread;
+            if (parseInt(this.opened_mes_info.thread_id) !== parseInt(this.push.thread)) {
+                if (Notification.permission !== 'granted') {
+                    Notification.requestPermission().then(function (per) {
+
+                        if (per == 'granted') {
+                            var noti = new Notification(title, {
+                                body: content,
+                                icon: '../statics/img/pokers_logo.png'
+                            });
+                            noti.onclick = function () {
+                                axios.get('../interact/select_classes.php?type=super&form=single&id=' + antd.push.classid)
+                                    .then(res => {
+                                        antd.open_class(antd.push.classid, 0, 1);
+                                        antd.opened_class_info.superid = res.data.super;
+                                        axios.get('../interact/select_thread.php?type=1&class_id=' + antd.push.thread)
+                                            .then(res => {
+                                                antd.open_mes(0, antd.push.thread, antd.push.classid, 1);
+                                                antd.opened_mes_info.thread_info = res.data[0];
+                                            })
+                                    })
+                            };
+                        }
+
+                    });
+                } else {
+                    var noti = new Notification(title, {
+                        body: content,
+                        icon: '../statics/img/pokers_logo.png'
+                    });
+                    noti.onclick = function () {
+                        axios.get('../interact/select_classes.php?type=super&form=single&id=' + antd.push.classid)
+                            .then(res => {
+                                antd.open_class(antd.push.classid, 0, 1);
+                                antd.opened_class_info.superid = res.data.super;
+                                axios.get('../interact/select_thread.php?type=1&class_id=' + antd.push.thread)
+                                    .then(res => {
+                                        antd.open_mes(0, antd.push.thread, antd.push.classid, 1);
+                                        antd.opened_mes_info.thread_info = res.data[0];
+                                    })
+                            })
+                    };
+                }
             }
         },
     }
