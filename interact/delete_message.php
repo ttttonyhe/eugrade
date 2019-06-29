@@ -38,6 +38,7 @@ try {
         'operator' => 'string', //操作者
         'thread' => 'integer', //主题
         'content' => 'string', //内容
+        'after_content' => 'string', //修改类型的修改后文字
         'operation' => 'string', //操作
         'date' => 'integer' //时间
     ));
@@ -126,14 +127,18 @@ if (!empty($_POST['user']) && !empty($_POST['mes_id']) && !empty($_POST['thread_
                         $row->thread = (int)$thread;
                         //判断删除段类型
                         if($array->content !== 'null' && $array->content !== null){
-                            $row->content = $array->content;
+                            if($array->img_url !== null){
+                                $row->content = $array->content.' [Image]'.$array->img_url;
+                            }else{
+                                $row->content = $array->content;
+                            }
                         }elseif($array->img_url !== null){
                             $row->content = '[Image]'.$array->img_url;
                         }elseif($array->file_url !== null){
                             $row->content = '[File]'.$array->file_url;
                         }
                         $row->date = (int)time();
-                        $row->operation = 'delete';
+                        $row->operation = 'deletion';
                         $row->save();
 
                         $status = 1;

@@ -66,7 +66,8 @@ var antd = new Vue({
                 speakers: [], //每段内容对应的发送者头像
                 unique_speakers: [], //去重后的总参与人数
                 index: null,
-                last: null //最后一段内容的唯一 id
+                last: null, //最后一段内容的唯一 id，
+                logs: []
             },
             mes_input: { //发送内容框
                 text: 'Add a comment...',
@@ -147,7 +148,10 @@ var antd = new Vue({
                 info: [],
                 classid: null,
                 thread: null
-            }
+            },
+            log : {
+                visible : false
+            },
         }
     },
     mounted() {
@@ -1367,6 +1371,17 @@ var antd = new Vue({
                             })
                     };
                 }
+            }
+        },
+        view_logs(){
+            if(this.user.info.type == 2){
+                axios.get('../interact/select_logs.php?thread_id='+this.opened_mes_info.thread_id)
+                .then(res => {
+                    this.opened_mes_info.logs = res.data;
+                    this.log.visible = true;
+                })
+            }else{
+                antd.$message.error('You are not allow to view logs');
             }
         },
     }

@@ -16,6 +16,7 @@ try {
         'operator' => 'string', //操作者
         'thread' => 'integer', //主题
         'content' => 'string', //内容
+        'after_content' => 'string', //修改类型的修改后文字
         'operation' => 'string', //操作
         'date' => 'integer' //时间
     ));

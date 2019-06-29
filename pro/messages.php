@@ -20,7 +20,9 @@
                 <div class="mes-item">
                     <p style="color:rgb(90, 148, 241)">
                         <a-icon type="team"></a-icon>&nbsp;&nbsp;Classes
-                        <a-button size="small" @click="reverse_order('classes')" style="font-size:14px;right:80px"><a-icon type="sort-descending"></a-icon></a-button>
+                        <a-button size="small" @click="reverse_order('classes')" style="font-size:14px;right:80px">
+                            <a-icon type="sort-descending"></a-icon>
+                        </a-button>
                         <a-button size="small" @click="display_class" v-html="display_classes_text"></a-button>
                     </p>
                 </div>
@@ -176,6 +178,29 @@
         </a-input>
     </a-modal>
     <!-- 内容段修改结束 -->
+    <!-- 日志查看 -->
+    <a-modal title="Logs" :visible="log.visible" :footer="null" @cancel="log.visible = false">
+        <template v-if="!!opened_mes_info.logs.length">
+            <div v-for="log in opened_mes_info.logs" class="logs-info">
+                <div>
+                    <h3>{{ log.operator }} <em>{{ get_mes_date(log.date) }}</em> <em>{{ log.operation }}</em></h3>
+                </div>
+                <div>
+                    <template v-if="log.operation == 'deletion'">
+                        <p>{{ log.speaker }} : {{ log.content }}</p>
+                    </template>
+                    <template v-if="log.operation == 'modification'">
+                        <p>{{ log.speaker }} : {{ log.content }}</p>
+                        <p>{{ log.operator }} : {{ log.after_content }}</p>
+                    </template>
+                </div>
+            </div>
+        </template>
+        <template v-else>
+            <p class="mes-end" style="margin-bottom: 0px;margin-top: 0px;">- EOF -</p>
+        </template>
+    </a-modal>
+    <!-- 内容段修改结束 -->
     <!-- office 内容预览 -->
     <a-modal :footer="null" :title="office.title" centered v-model="office.visible" @cancel="handle_office_close" width="80%">
         <iframe :src="'https://view.officeapps.live.com/op/embed.aspx?src=' + office.url" width="100%" height="600px" frameborder="0"></iframe>
@@ -236,7 +261,9 @@
                 <div class="mes-header">
                     <p style="color:#666;">
                         <a-icon type="appstore"></a-icon>&nbsp;&nbsp;Thread
-                        <a-button size="small" @click="reverse_order('threads')" style="right:85px;position:absolute"><a-icon type="sort-descending" /></a-button>
+                        <a-button size="small" @click="reverse_order('threads')" style="right:85px;position:absolute">
+                            <a-icon type="sort-descending" />
+                        </a-button>
                         <a-button size="small" @click="add.visible_thread = true" style="right:20px;position:absolute">+ Add</a-button>
                     </p>
                 </div>
@@ -330,6 +357,9 @@
                     <div>
                         <a-button type="default" @click="reverse_order('meses')" style="margin-right:10px;font-size:16px">
                             <a-icon type="sort-descending"></a-icon>
+                        </a-button>
+                        <a-button type="default" @click="view_logs()" style="margin-right:10px;font-size:16px" v-if="user.info.type == 2">
+                            <a-icon type="database"></a-icon>
                         </a-button>
                         <template v-if="parseInt(opened_class_info.superid) == parseInt(user.id)">
                             <a-button type="default" @click="delete_thread(opened_mes_info.thread_id)" style="margin-right:10px">
@@ -459,7 +489,9 @@
                         <div>
                             <a-tooltip placement="top">
                                 <template slot="title">
-                                    <span>MarkDown <a href="https://www.markdownguide.org/basic-syntax" target="_blank" style="color:#fff"><a-icon type="info-circle"></a-icon></a></span>
+                                    <span>MarkDown <a href="https://www.markdownguide.org/basic-syntax" target="_blank" style="color:#fff">
+                                            <a-icon type="info-circle"></a-icon>
+                                        </a></span>
                                 </template>
                                 <a-button :type="mes_input.markdown.btn" @click="handle_markdown">
                                     <a-icon type="down-square"></a-icon>
@@ -472,8 +504,8 @@
                                     <a-progress :percent="mes_input.progress_img" size="small" v-show="mes_input.img_progress"></a-progress>
                                     <br /><br />
                                     <template v-if="check.img.status">
-                                    <a-button @click="mes_input.visible.picture = false;">Discard</a-button>
-                                    <a-button type="primary" @click="upload_img">Upload</a-button>
+                                        <a-button @click="mes_input.visible.picture = false;">Discard</a-button>
+                                        <a-button type="primary" @click="upload_img">Upload</a-button>
                                     </template>
                                 </template>
                                 <a-tooltip placement="top">
@@ -492,8 +524,8 @@
                                     <a-progress :percent="mes_input.progress_file" status="active" v-show="mes_input.file_progress" size="small"></a-progress>
                                     <br /><br />
                                     <template v-if="check.file.status">
-                                    <a-button @click="handle_cancel_upload();mes_input.visible.upload = false;">Discard</a-button>
-                                    <a-button type="primary" @click="upload_file">Upload</a-button>
+                                        <a-button @click="handle_cancel_upload();mes_input.visible.upload = false;">Discard</a-button>
+                                        <a-button type="primary" @click="upload_file">Upload</a-button>
                                     </template>
                                 </template>
                                 <a-tooltip placement="top">
@@ -509,11 +541,11 @@
                         </div>
                         <div v-show="mes_input.visible.text">
                             <a-tooltip placement="top">
-                                    <template slot="title">
-                                        <span>Sending Method</span>
-                                    </template>
-                                    <a-button @click="enter_send()" style="margin-right:0px">{{ enter.text }}</a-button>
-                                </a-tooltip>
+                                <template slot="title">
+                                    <span>Sending Method</span>
+                                </template>
+                                <a-button @click="enter_send()" style="margin-right:0px">{{ enter.text }}</a-button>
+                            </a-tooltip>
                             <a-button @click="handle_input_down" style="margin-right:10px">Discard</a-button>
                             <a-button type="primary" @click="handle_input_send(mes_input.type)">{{ mes_input.send_text }}</a-button>
                         </div>
