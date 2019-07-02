@@ -12,13 +12,13 @@ try {
     \Lazer\Classes\Helpers\Validate::table('logs')->exists();
 } catch (\Lazer\Classes\LazerException $e) { //不存在则创建
     Lazer::create('logs', array(
-        'speaker' => 'string', //发送者
-        'operator' => 'string', //操作者
-        'thread' => 'integer', //主题
+        'm_id' => 'integer', //内容条段 id
+        'speaker' => 'integer', //发送者
+        'speaker_name' => 'string', //发送者名字,减少前端数据库请求
+        'belong_class' => 'integer', //主题对应班级
         'content' => 'string', //内容
-        'after_content' => 'string', //修改类型的修改后文字
-        'operation' => 'string', //操作
-        'date' => 'integer' //时间
+        'thread' => 'integer', //班级下的主题 id
+        'date' => 'integer', //发送时间
     ));
 }
 session_start();

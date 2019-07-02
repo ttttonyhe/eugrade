@@ -25,7 +25,8 @@ try {
         'date' => 'integer', //发送时间
         'type' => 'string', //类型：文件 or 文本(+图片)
         'file_url' => 'string', //类型为文件时文件的 url
-        'file_name' => 'string' //类型文文件时的文件名,用于判断展示图标
+        'file_name' => 'string', //类型文文件时的文件名,用于判断展示图标
+        'log' => 'integer'
     ));
 }
 

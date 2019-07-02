@@ -35,13 +35,31 @@ try {
     \Lazer\Classes\Helpers\Validate::table('logs')->exists();
 } catch (\Lazer\Classes\LazerException $e) { //不存在则创建
     Lazer::create('logs', array(
-        'speaker' => 'string', //发送者
-        'operator' => 'string', //操作者
-        'thread' => 'integer', //主题
+        'id' => 'integer', //内容条段 id
+        'speaker' => 'integer', //发送者
+        'speaker_name' => 'string', //发送者名字,减少前端数据库请求
+        'belong_class' => 'integer', //主题对应班级
         'content' => 'string', //内容
-        'after_content' => 'string', //修改类型的修改后文字
-        'operation' => 'string', //操作
-        'date' => 'integer' //时间
+        'thread' => 'integer', //班级下的主题 id
+        'img_url' => 'string', //类型为文本，但有图片附件
+        'date' => 'integer', //发送时间
+        'file_url' => 'string', //类型为文件时文件的 url
+        'file_name' => 'string' //类型文文件时的文件名,用于判断展示图标
+    ));
+}
+
+//数据库创建与判断
+try {
+    \Lazer\Classes\Helpers\Validate::table('logs')->exists();
+} catch (\Lazer\Classes\LazerException $e) { //不存在则创建
+    Lazer::create('logs', array(
+        'm_id' => 'integer', //内容条段 id
+        'speaker' => 'integer', //发送者
+        'speaker_name' => 'string', //发送者名字,减少前端数据库请求
+        'belong_class' => 'integer', //主题对应班级
+        'content' => 'string', //内容
+        'thread' => 'integer', //班级下的主题 id
+        'date' => 'integer', //发送时间
     ));
 }
 
@@ -112,24 +130,19 @@ if (!empty($_POST['user']) && !empty($_POST['mes_id']) && !empty($_POST['thread_
                 if (!!$array->name) { //判断主题存在
 
                     $array = Lazer::table('messages')->limit(1)->where('id', '=', (int) $mes_id)->andWhere('thread', '=', (int) $thread)->find();
+                    $log = Lazer::table('logs')->limit(1)->where('id', '=', (int)$array->log)->andWhere('thread', '=', (int)$thread)->find();
                     if ((!empty($content) && $array->type == 'text') || (empty($content) && !empty($array->img_url))) {
-
-                        //保存记录
-                        $row = Lazer::table('logs');
-                        $row->speaker = $speaker_name;
-                        $row->operator = $operator;
-                        $row->thread = (int) $thread;
-                        $row->content = $array->content;
-                        $row->after_content = $content;
-                        $row->date = (int) time();
-                        $row->operation = 'modification';
-                        $row->save();
 
                         //修改内容
                         $array->set(array(
                             'content' => $content
                         ));
                         $array->save();
+
+                        $log->set(array(
+                            'content' => $content
+                        ));
+                        $log->save();
 
 
                         $status = 1;

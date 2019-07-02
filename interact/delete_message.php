@@ -29,21 +29,6 @@ try {
     ));
 }
 
-//数据库创建与判断
-try {
-    \Lazer\Classes\Helpers\Validate::table('logs')->exists();
-} catch (\Lazer\Classes\LazerException $e) { //不存在则创建
-    Lazer::create('logs', array(
-        'speaker' => 'string', //发送者
-        'operator' => 'string', //操作者
-        'thread' => 'integer', //主题
-        'content' => 'string', //内容
-        'after_content' => 'string', //修改类型的修改后文字
-        'operation' => 'string', //操作
-        'date' => 'integer' //时间
-    ));
-}
-
 session_start();
 
 //判断发送参数是否齐全，请求创建班级的用户是否为当前登录用户
@@ -119,27 +104,6 @@ if (!empty($_POST['user']) && !empty($_POST['mes_id']) && !empty($_POST['thread_
                             'message_count' => $t->message_count - 1
                         ));
                         $t->save();
-
-                        //保存记录
-                        $row = Lazer::table('logs');
-                        $row->speaker = $speaker_name;
-                        $row->operator = $operator;
-                        $row->thread = (int)$thread;
-                        //判断删除段类型
-                        if($array->content !== 'null' && $array->content !== null){
-                            if($array->img_url !== null){
-                                $row->content = $array->content.' [Image]'.$array->img_url;
-                            }else{
-                                $row->content = $array->content;
-                            }
-                        }elseif($array->img_url !== null){
-                            $row->content = '[Image]'.$array->img_url;
-                        }elseif($array->file_url !== null){
-                            $row->content = '[File]'.$array->file_url;
-                        }
-                        $row->date = (int)time();
-                        $row->operation = 'deletion';
-                        $row->save();
 
                         $status = 1;
                         $code = 133;

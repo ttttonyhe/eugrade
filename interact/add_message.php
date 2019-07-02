@@ -4,6 +4,7 @@ error_reporting(E_ALL & ~E_NOTICE);
 //引入composer
 require '../vendor/autoload.php';
 define('LAZER_DATA_PATH', dirname(dirname(__FILE__)) . '/data/');
+
 use Lazer\Classes\Database as Lazer;
 
 //数据库创建与判断
@@ -25,14 +26,30 @@ try {
         'date' => 'integer', //发送时间
         'type' => 'string', //类型：文件 or 文本(+图片)
         'file_url' => 'string', //类型为文件时文件的 url
-        'file_name' => 'string' //类型文文件时的文件名,用于判断展示图标
+        'file_name' => 'string', //类型文文件时的文件名,用于判断展示图标
+        'log' => 'integer'
+    ));
+}
+
+//数据库创建与判断
+try {
+    \Lazer\Classes\Helpers\Validate::table('logs')->exists();
+} catch (\Lazer\Classes\LazerException $e) { //不存在则创建
+    Lazer::create('logs', array(
+        'id' => 'integer', //内容条段 id
+        'speaker' => 'integer', //发送者
+        'speaker_name' => 'string', //发送者名字,减少前端数据库请求
+        'belong_class' => 'integer', //主题对应班级
+        'content' => 'string', //内容
+        'thread' => 'integer', //班级下的主题 id
+        'date' => 'integer', //发送时间
     ));
 }
 
 session_start();
 
 //判断发送参数是否齐全，请求创建班级的用户是否为当前登录用户
-if (!empty($_POST['speaker_name']) && !empty($_POST['thread']) && !empty($_POST['belong_class']) && !empty($_POST['speaker']) && !empty($_POST['type']) && ($_SESSION['logged_in_id'] == (int)$_POST['speaker'])) {
+if (!empty($_POST['speaker_name']) && !empty($_POST['thread']) && !empty($_POST['belong_class']) && !empty($_POST['speaker']) && !empty($_POST['type']) && ($_SESSION['logged_in_id'] == (int) $_POST['speaker'])) {
 
     //输入处理
     function input($data)
@@ -40,8 +57,8 @@ if (!empty($_POST['speaker_name']) && !empty($_POST['thread']) && !empty($_POST[
         $data = trim($data);
         $data = stripslashes($data);
         $data = htmlspecialchars($data);
-        $data = str_replace("'","&#39;",$data);
-        $data = str_replace('"',"&#34;",$data);
+        $data = str_replace("'", "&#39;", $data);
+        $data = str_replace('"', "&#34;", $data);
         return $data;
     }
 
@@ -86,7 +103,7 @@ if (!empty($_POST['speaker_name']) && !empty($_POST['thread']) && !empty($_POST[
             $code = 101;
             $mes = 'Class does not exist';
         } else {
-            $array = Lazer::table('users')->limit(1)->where('id', '=', (int)$speaker)->andWhere('name', '=', (string)$speaker_name)->find()->asArray();
+            $array = Lazer::table('users')->limit(1)->where('id', '=', (int) $speaker)->andWhere('name', '=', (string) $speaker_name)->find()->asArray();
             if (!!$array) { //判断用户存在
 
 
@@ -98,7 +115,7 @@ if (!empty($_POST['speaker_name']) && !empty($_POST['thread']) && !empty($_POST[
                     $is_super = 0;
                 }
 
-                $array = Lazer::table('threads')->limit(1)->where('id', '=', (int)$thread)->andWhere('belong_class', '=', (int)$class)->find();
+                $array = Lazer::table('threads')->limit(1)->where('id', '=', (int) $thread)->andWhere('belong_class', '=', (int) $class)->find();
                 if (!!$array->name) { //判断主题存在
 
 
@@ -108,19 +125,34 @@ if (!empty($_POST['speaker_name']) && !empty($_POST['thread']) && !empty($_POST[
 
                         $this_id = Lazer::table('messages')->findAll()->count() + 1;
                         $row = Lazer::table('messages');
-                        $row->id = (int)$this_id;
+                        $row->id = (int) $this_id;
                         $row->speaker_name = $speaker_name;
-                        $row->speaker = (int)$speaker;
-                        $row->is_super = (int)$is_super;
-                        $row->belong_class = (int)$class;
+                        $row->speaker = (int) $speaker;
+                        $row->is_super = (int) $is_super;
+                        $row->belong_class = (int) $class;
                         $row->content = $content;
-                        $row->thread = (int)$thread;
+                        $row->thread = (int) $thread;
                         $row->img_url = $img_url;
                         $row->date = time();
                         $row->type = 'text';
+
+                        //保存到 logs
+                        $lo = Lazer::table('logs');
+                        $log_id = Lazer::table('logs')->findAll()->count() + 1;
+                        $lo->id = (int) $this_id;
+                        $lo->speaker_name = $speaker_name;
+                        $lo->speaker = (int) $speaker;
+                        $lo->belong_class = (int) $class;
+                        $lo->content = $content . ' [Image](' . $img_url . ')';
+                        $lo->thread = (int) $thread;
+                        $lo->date = time();
+                        $lo->save();
+
+                        $row->log = (int) $log_id;
                         $row->save();
 
-                        $t = Lazer::table('threads')->limit(1)->where('id', '=', (int)$thread)->find();
+
+                        $t = Lazer::table('threads')->limit(1)->where('id', '=', (int) $thread)->find();
                         $t->set(array(
                             'message_count' => $t->message_count + 1
                         ));
@@ -134,19 +166,33 @@ if (!empty($_POST['speaker_name']) && !empty($_POST['thread']) && !empty($_POST[
 
                             $this_id = Lazer::table('messages')->findAll()->count() + 1;
                             $row = Lazer::table('messages');
-                            $row->id = (int)$this_id;
+                            $row->id = (int) $this_id;
                             $row->speaker_name = $speaker_name;
-                            $row->speaker = (int)$speaker;
-                            $row->is_super = (int)$is_super;
-                            $row->belong_class = (int)$class;
-                            $row->thread = (int)$thread;
+                            $row->speaker = (int) $speaker;
+                            $row->is_super = (int) $is_super;
+                            $row->belong_class = (int) $class;
+                            $row->thread = (int) $thread;
                             $row->file_url = $file_url;
                             $row->file_name = $file_name;
                             $row->date = time();
                             $row->type = 'file';
+
+                            //保存到 logs
+                            $lo = Lazer::table('logs');
+                            $log_id = Lazer::table('logs')->findAll()->count() + 1;
+                            $lo->id = (int) $this_id;
+                            $lo->speaker_name = $speaker_name;
+                            $lo->speaker = (int) $speaker;
+                            $lo->belong_class = (int) $class;
+                            $lo->content = '[File](' . $file_url . ')';
+                            $lo->thread = (int) $thread;
+                            $lo->date = time();
+                            $lo->save();
+
+                            $row->log = (int) $log_id;
                             $row->save();
 
-                            $t = Lazer::table('threads')->limit(1)->where('id', '=', (int)$thread)->find();
+                            $t = Lazer::table('threads')->limit(1)->where('id', '=', (int) $thread)->find();
                             $t->set(array(
                                 'message_count' => $t->message_count + 1
                             ));
@@ -165,18 +211,32 @@ if (!empty($_POST['speaker_name']) && !empty($_POST['thread']) && !empty($_POST[
 
                             $this_id = Lazer::table('messages')->findAll()->count() + 1;
                             $row = Lazer::table('messages');
-                            $row->id = (int)$this_id;
+                            $row->id = (int) $this_id;
                             $row->speaker_name = $speaker_name;
-                            $row->speaker = (int)$speaker;
-                            $row->is_super = (int)$is_super;
-                            $row->belong_class = (int)$class;
-                            $row->thread = (int)$thread;
+                            $row->speaker = (int) $speaker;
+                            $row->is_super = (int) $is_super;
+                            $row->belong_class = (int) $class;
+                            $row->thread = (int) $thread;
                             $row->content = $content;
                             $row->date = time();
                             $row->type = 'text';
+
+                            //保存到 logs
+                            $lo = Lazer::table('logs');
+                            $log_id = Lazer::table('logs')->findAll()->count() + 1;
+                            $lo->id = (int) $this_id;
+                            $lo->speaker_name = $speaker_name;
+                            $lo->speaker = (int) $speaker;
+                            $lo->belong_class = (int) $class;
+                            $lo->content = $content;
+                            $lo->thread = (int) $thread;
+                            $lo->date = time();
+                            $lo->save();
+
+                            $row->log = (int) $log_id;
                             $row->save();
 
-                            $t = Lazer::table('threads')->limit(1)->where('id', '=', (int)$thread)->find();
+                            $t = Lazer::table('threads')->limit(1)->where('id', '=', (int) $thread)->find();
                             $t->set(array(
                                 'message_count' => $t->message_count + 1
                             ));

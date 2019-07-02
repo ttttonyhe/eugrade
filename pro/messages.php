@@ -181,18 +181,14 @@
     <!-- 日志查看 -->
     <a-modal title="Logs" :visible="log.visible" :footer="null" @cancel="log.visible = false">
         <template v-if="!!opened_mes_info.logs.length">
-            <div v-for="log in opened_mes_info.logs" class="logs-info">
-                <div>
-                    <h3>{{ log.operator }} <em>{{ get_mes_date(log.date) }}</em> <em>{{ log.operation }}</em></h3>
-                </div>
-                <div>
-                    <template v-if="log.operation == 'deletion'">
-                        <p>{{ log.speaker }} : {{ log.content }}</p>
-                    </template>
-                    <template v-if="log.operation == 'modification'">
-                        <p>{{ log.speaker }} : {{ log.content }}</p>
-                        <p>{{ log.operator }} : {{ log.after_content }}</p>
-                    </template>
+            <div style="max-height: 60vh;overflow-y: auto;">
+                <div v-for="log in opened_mes_info.logs" class="logs-info">
+                    <div>
+                        <h3>{{ log.speaker_name }} <em>{{ get_mes_date(log.date) }}</em></h3>
+                    </div>
+                    <div>
+                        <p>{{ log.content }}</p>
+                    </div>
                 </div>
             </div>
         </template>
