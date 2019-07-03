@@ -809,3 +809,12 @@ html,body{
     font-weight: 300;
     margin-bottom: 0px
 }
+
+.thread-notify{
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #FFC107;
+    margin-top: 16px;
+    transform: translateX(-10px);
+}

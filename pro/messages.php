@@ -27,7 +27,7 @@
                     </p>
                 </div>
                 <template v-if="display_classes">
-                    <div v-for="(joined,index) in user.joined_classes" :class="'class-item ' + class_super(index)" @click="open_class(user.classes_info[index].id,index)" :id="'class_left'+user.classes_info[index].id">
+                    <div :style="class_push(user.classes_info[index].id)" v-for="(joined,index) in user.joined_classes" :class="'class-item ' + class_super(index)" @click="open_class(user.classes_info[index].id,index)" :id="'class_left'+user.classes_info[index].id">
                         <div style="margin-right: 10px;">
                             <template v-if="!!user.classes_info[index].img">
                                 <img :src="user.classes_info[index].img" class="class-item-img" />
@@ -52,6 +52,7 @@
             </div>
         </a-spin>
     </div>
+
 
     <!-- 加入班级 -->
     <a-modal title="Join a new Class" :visible="add.visible" @ok="handle_join_submit" :confirm-loading="add.confirm_join_loading" @cancel="handle_create_cancel">
@@ -265,6 +266,7 @@
                 </div>
                 <template v-if="opened_thread_info.length">
                     <div v-for="(thread_c,index) in opened_thread_info" class="class-item" :id="'thread_sub'+thread_c.id" @click="open_mes(index,thread_c.id,thread_c.belong_class)">
+                        <div class="thread-notify" v-if="thread_c.id == push.thread"></div>
                         <div>
                             <h3 v-html="thread_c.name"></h3>
                             <p>{{ thread_c.message_count }} messages</p>
@@ -536,14 +538,21 @@
 
                         </div>
                         <div v-show="mes_input.visible.text">
-                            <a-tooltip placement="top">
-                                <template slot="title">
-                                    <span>Sending Method</span>
-                                </template>
-                                <a-button @click="enter_send()" style="margin-right:0px">{{ enter.text }}</a-button>
-                            </a-tooltip>
+                            <template v-if="check_able_send()">
+                                <a-tooltip placement="top">
+                                    <template slot="title">
+                                        <span>Sending Method</span>
+                                    </template>
+                                    <a-button @click="enter_send()" style="margin-right:0px">{{ enter.text }}</a-button>
+                                </a-tooltip>
+                            </template>
                             <a-button @click="handle_input_down" style="margin-right:10px">Discard</a-button>
-                            <a-button type="primary" @click="handle_input_send(mes_input.type)">{{ mes_input.send_text }}</a-button>
+                            <template v-if="check_able_send()">
+                                <a-button type="primary" @click="handle_input_send(mes_input.type)">{{ mes_input.send_text }}</a-button>
+                            </template>
+                            <template v-else>
+                                <a-button type="primary" disabled>{{ mes_input.send_text }}</a-button>
+                            </template>
                         </div>
                     </div>
                 </div>

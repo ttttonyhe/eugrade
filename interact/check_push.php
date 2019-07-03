@@ -43,30 +43,30 @@ if (!empty($_GET['thread_count']) && !empty($_GET['thread_id']) && !empty($_SESS
     $thread = explode('a',$thread);
     $count = explode('a',$count);
 
-    if($thread == null){
+    if($thread == null){ //无法分隔数组，仅一个元素
         $thread = input($_GET['thread_id']);
         $count = input($_GET['thread_count']);
         $t = Lazer::table('threads')->limit(1)->where('id', '=', (int)$thread)->find();
-        if((int)$count < (int)$t->message_count){
+        if((int)$count !== (int)$t->message_count){
             $array[0]['classid'] = $t->belong_class;
             $array[0]['thread'] = (int)$thread;
             $array[0]['index'] = 0;
             $array[0]['name'] = $t->name;
             $array[0]['count'] = $t->message_count;
-            $array[0]['diff'] = (int)$t->message_count - $count;
+            $array[0]['diff'] = abs((int)$t->message_count - $count);
         }
     }else{
 
     $j = 0;
     for($i = 0;$i<count($thread);$i++){
         $t = Lazer::table('threads')->limit(1)->where('id', '=', (int)$thread[$i])->find();
-        if((int)$count[$i] < (int)$t->message_count){
+        if((int)$count[$i] !== (int)$t->message_count){
             $array[$j]['classid'] = $t->belong_class;
             $array[$j]['thread'] = (int)$thread[$i];
             $array[$j]['index'] = $i;
             $array[$j]['name'] = $t->name;
             $array[$j]['count'] = $t->message_count;
-            $array[$j]['diff'] = (int)$t->message_count - $count[$i];
+            $array[$j]['diff'] = abs((int)$t->message_count - $count[$i]);
             $j += 1;
         }
     }
