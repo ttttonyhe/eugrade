@@ -255,7 +255,7 @@ var antd = new Vue({
                     axios.get('../interact/select_users.php?type=avatar&id=' + response.data.speakers + '&mes=1')
                         .then(res => {
                             this.opened_mes_info.speakers = res.data;
-                            setTimeout('antd.spinning.loading = false', 600);
+                            antd.spinning.loading = false;
                         })
                 })
         },

@@ -350,7 +350,7 @@
 
 
 </div>
-<script type="text/javascript" src="../main/classes.js"></script>
+<script type="text/javascript" src="../dist/classes.js"></script>
 
 
 <?php require 'pro_footer.php'; ?>
