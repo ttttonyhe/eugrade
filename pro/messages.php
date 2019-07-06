@@ -180,7 +180,7 @@
     </a-modal>
     <!-- 内容段修改结束 -->
     <!-- 日志查看 -->
-    <a-modal title="Logs" :visible="log.visible" :footer="null" @cancel="log.visible = false">
+    <a-modal title="Thread Logs" :visible="log.visible" :footer="null" @cancel="log.visible = false">
         <template v-if="!!opened_mes_info.logs.length">
             <div style="max-height: 60vh;overflow-y: auto;">
                 <div v-for="log in opened_mes_info.logs" class="logs-info">
@@ -197,7 +197,29 @@
             <p class="mes-end" style="margin-bottom: 0px;margin-top: 0px;">- EOF -</p>
         </template>
     </a-modal>
-    <!-- 内容段修改结束 -->
+    <!-- 日志查看结束 -->
+    <!-- 日志查看 -->
+    <a-modal title="Class Logs" :visible="log.visible_class" :footer="null" @cancel="log.visible_class = false">
+        <template v-if="!!opened_class_info.logs.length">
+            <div style="max-height: 60vh;overflow-y: auto;">
+                <div v-for="(log,index) in opened_class_info.logs" class="logs-info" v-if="log.divide == null">
+                    <div>
+                        <h3>{{ log.speaker_name }} <em>{{ get_mes_date(log.date) }}</em></h3>
+                    </div>
+                    <div>
+                        <p>{{ log.content }}</p>
+                    </div>
+                </div>
+                <div :style="index ? 'margin: 40px 0 0 0;' : 'margin: 0;'" v-else>
+                    <a-divider>{{ log.divide }}</a-divider>
+                </div>
+            </div>
+        </template>
+        <template v-else>
+            <p class="mes-end" style="margin-bottom: 0px;margin-top: 0px;">- EOF -</p>
+        </template>
+    </a-modal>
+    <!-- 日志查看结束 -->
     <!-- office 内容预览 -->
     <a-modal :footer="null" :title="office.title" centered v-model="office.visible" @cancel="handle_office_close" width="80%">
         <iframe :src="'https://view.officeapps.live.com/op/embed.aspx?src=' + office.url" width="100%" height="600px" frameborder="0"></iframe>
@@ -254,11 +276,16 @@
                     <p class="mes-end">- EOF -</p>
                 </template>
             </template>
+
+
             <template v-else-if="status.thread">
                 <div class="mes-header">
                     <p style="color:#666;">
                         <a-icon type="appstore"></a-icon>&nbsp;&nbsp;Thread
-                        <a-button size="small" @click="reverse_order('threads')" style="right:85px;position:absolute">
+                        <a-button size="small" @click="view_logs('class')" style="margin-right:10px;font-size:16px;right:112px;position:absolute" v-if="user.info.type == 2">
+                            <a-icon type="database"></a-icon>
+                        </a-button>
+                        <a-button size="small" @click="reverse_order('threads')" style="right:83px;position:absolute">
                             <a-icon type="sort-descending" />
                         </a-button>
                         <a-button size="small" @click="add.visible_thread = true" style="right:20px;position:absolute">+ Add</a-button>
@@ -277,6 +304,7 @@
                     <p class="mes-end">- EOF -</p>
                 </template>
             </template>
+
         </a-spin>
         <!-- 占位 -->
         <template v-if="!spinning.center && !status.thread && !status.mark">
@@ -356,7 +384,7 @@
                         <a-button type="default" @click="reverse_order('meses')" style="margin-right:10px;font-size:16px">
                             <a-icon type="sort-descending"></a-icon>
                         </a-button>
-                        <a-button type="default" @click="view_logs()" style="margin-right:10px;font-size:16px" v-if="user.info.type == 2">
+                        <a-button type="default" @click="view_logs('thread')" style="margin-right:10px;font-size:16px" v-if="user.info.type == 2">
                             <a-icon type="database"></a-icon>
                         </a-button>
                         <template v-if="parseInt(opened_class_info.superid) == parseInt(user.id)">
@@ -383,17 +411,17 @@
                         <template v-else>
                             <div v-for="(mes,index) in opened_mes_info.meses" class="mes-stream" @mouseenter="comment_action($event)" @mouseleave="comment_action_leave($event)" :style="same_speaker(mes.speaker,index)">
                                 <div class="mes-stream-avatar" @click="view_user_info(mes.speaker)">
-                                    <template v-if="opened_mes_info.speakers[0][mes.speaker.toString()] !== null">
-                                        <img :src="opened_mes_info.speakers[0][mes.speaker.toString()]" class="class-item-img" />
+                                    <template v-if="opened_mes_info.speakers[0][mes.speaker + ''] !== null">
+                                        <img :src="opened_mes_info.speakers[0][mes.speaker + '']" class="class-item-img" />
                                     </template>
                                     <template v-else>
                                         <div class="class-img-default">
-                                            <p>{{ opened_mes_info.speakers[1][mes.speaker.toString()].substring(0,1) }}</p>
+                                            <p>{{ opened_mes_info.speakers[1][mes.speaker + ''].substring(0,1) }}</p>
                                         </div>
                                     </template>
                                 </div>
                                 <div class="mes-stream-content">
-                                    <h3 v-html="opened_mes_info.speakers[1][mes.speaker.toString()] + '&nbsp;<em>' + get_mes_date(mes.date) + '</em>'"></h3>
+                                    <h3 v-html="opened_mes_info.speakers[1][mes.speaker + ''] + '&nbsp;<em>' + get_mes_date(mes.date) + '</em>'"></h3>
                                     <template v-if="!!mes.content && !mes.img_url && mes.content !== 'null'">
                                         <div class="mes-content" v-html="process_content(mes.content)"></div>
                                     </template>
@@ -538,21 +566,14 @@
 
                         </div>
                         <div v-show="mes_input.visible.text">
-                            <template v-if="check_able_send()">
-                                <a-tooltip placement="top">
-                                    <template slot="title">
-                                        <span>Sending Method</span>
-                                    </template>
-                                    <a-button @click="enter_send()" style="margin-right:0px">{{ enter.text }}</a-button>
-                                </a-tooltip>
-                            </template>
+                            <a-tooltip placement="top">
+                                <template slot="title">
+                                    <span>Sending Method</span>
+                                </template>
+                                <a-button @click="enter_send()" style="margin-right:0px">{{ enter.text }}</a-button>
+                            </a-tooltip>
                             <a-button @click="handle_input_down" style="margin-right:10px">Discard</a-button>
-                            <template v-if="check_able_send()">
-                                <a-button type="primary" @click="handle_input_send(mes_input.type)">{{ mes_input.send_text }}</a-button>
-                            </template>
-                            <template v-else>
-                                <a-button type="primary" disabled>{{ mes_input.send_text }}</a-button>
-                            </template>
+                            <a-button type="primary" @click="handle_input_send(mes_input.type)">{{ mes_input.send_text }}</a-button>
                         </div>
                     </div>
                 </div>

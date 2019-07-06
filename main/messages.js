@@ -38,7 +38,8 @@ var antd = new Vue({
             opened_class_info: {
                 id: null,
                 superid: null,
-                index: null
+                index: null,
+                logs: []
             },
             opened_thread_info: [],
             member_marked: false,
@@ -147,10 +148,12 @@ var antd = new Vue({
             push: {
                 info: [],
                 classid: null,
-                thread: null
+                thread: null,
+                key: []
             },
             log: {
-                visible: false
+                visible: false,
+                visible_class: false
             },
         }
     },
@@ -359,6 +362,14 @@ var antd = new Vue({
         //点击主题获取消息在 right 列展示
         open_mes(index, id, belong_class, push) {
 
+            //清除当前 interval
+            window.clearInterval(window.get_mes_interval);
+            window.clearInterval(window.get_push_interval);
+
+            //关闭当前 push 通知
+            this.push.classid = null;
+            this.push.thread = null;
+
             this.spinning.loading = true;
             this.status.user = false;
             this.status.chat = true;
@@ -370,10 +381,7 @@ var antd = new Vue({
 
             this.opened_mes_info.thread_id = id;
             this.opened_mes_info.class_id = belong_class;
-            if (!push) {
-                this.opened_mes_info.index = index;
-                this.opened_mes_info.thread_info = this.opened_thread_info[index];
-            }
+            this.opened_mes_info.thread_info = this.opened_thread_info[index];
             this.edit.name = this.opened_mes_info.thread_info.name;
 
             axios.get('../interact/select_messages.php?thread_id=' + this.opened_mes_info.thread_id + '&class_id=' + this.opened_mes_info.class_id)
@@ -387,9 +395,9 @@ var antd = new Vue({
                     axios.get('../interact/select_users.php?type=avatar&id=' + response.data.speakers_unique + '&mes=1')
                         .then(res => {
                             this.opened_mes_info.speakers = res.data;
-                            this.push.thread = null;
                             //输入框监听回车发送
                             if (cookie.get('pokers_sending') == "2") {
+                                $("#message_input").unbind();
                                 $("#message_input").bind("keydown", function (e) {
                                     // 兼容FF和IE和Opera    
                                     var theEvent = e || window.event;
@@ -401,23 +409,19 @@ var antd = new Vue({
                                 this.enter.status = true;
                                 this.enter.text = 'Enter';
                             }
-                            if (!push) {
-                                //新消息推送 cookie 设置
-                                if (!!cookie.get('pokers_push') && !!cookie.get('pokers_thread_count')) {
-                                    if (cookie.get('pokers_push').split('a').indexOf(id.toString()) < 0) {
-                                        var push = cookie.get('pokers_push') + 'a' + id;
-                                        var count = cookie.get('pokers_thread_count') + 'a' + this.opened_mes_info.thread_info.message_count;
-                                        cookie.set('pokers_push', push);
-                                        cookie.set('pokers_thread_count', count);
-                                    }
-                                } else {
-                                    cookie.set('pokers_push', id);
-                                    cookie.set('pokers_thread_count', this.opened_mes_info.thread_info.message_count);
+                            //新消息推送 cookie 设置
+                            if (!!cookie.get('pokers_push') && !!cookie.get('pokers_thread_count')) {
+                                if (cookie.get('pokers_push').split('a').indexOf(id.toString()) < 0) {
+                                    var push = cookie.get('pokers_push') + 'a' + id;
+                                    var count = cookie.get('pokers_thread_count') + 'a' + this.opened_mes_info.thread_info.message_count;
+                                    cookie.set('pokers_push', push);
+                                    cookie.set('pokers_thread_count', count);
                                 }
-                                setTimeout('antd.spinning.loading = false', 600);
                             } else {
-                                setTimeout('antd.spinning.loading = false;', 600);
+                                cookie.set('pokers_push', id);
+                                cookie.set('pokers_thread_count', this.opened_mes_info.thread_info.message_count);
                             }
+                            setTimeout('antd.spinning.loading = false', 600);
                         })
                 })
 
@@ -426,7 +430,11 @@ var antd = new Vue({
             var func = function () {
                 antd.update_mes(1);
             }
+            var func_push = function () {
+                antd.check_push();
+            }
             window.get_mes_interval = setInterval(func, 5000);
+            window.get_push_interval = setInterval(func_push, 10000);
 
         },
 
@@ -1294,6 +1302,7 @@ var antd = new Vue({
                 this.enter.status = true;
                 this.enter.text = 'Enter';
                 cookie.set('pokers_sending', 2);
+                $("#message_input").unbind();
                 //输入框监听回车发送
                 $("#message_input").bind("keydown", function (e) {
                     // 兼容FF和IE和Opera    
@@ -1320,26 +1329,6 @@ var antd = new Vue({
                 this.check.img.status = false;
             }
         },
-        //展示消息
-        notify_open(type, mes, content) {
-            this.$notification[type]({
-                message: mes,
-                description: content,
-                duration: null,
-                onClick: function () {
-                    axios.get('../interact/select_classes.php?type=super&form=single&id=' + antd.push.classid)
-                        .then(res => {
-                            antd.open_class(antd.push.classid, 0, 1);
-                            antd.opened_class_info.superid = res.data.super;
-                            axios.get('../interact/select_thread.php?type=1&class_id=' + antd.push.thread)
-                                .then(res => {
-                                    antd.open_mes(0, antd.push.thread, antd.push.classid, 1);
-                                    antd.opened_mes_info.thread_info = res.data[0];
-                                })
-                        })
-                }
-            });
-        },
         //检查通知
         check_push() {
             if (!!cookie.get('pokers_push') && !!cookie.get('pokers_thread_count')) {
@@ -1358,22 +1347,33 @@ var antd = new Vue({
             }
         },
         //处理通知
-        notify_push(classid, thread, title, content) {
+        notify_push(classid, thread) {
             if (parseInt(this.opened_mes_info.thread_id) !== parseInt(thread)) {
                 this.push.classid = classid;
                 this.push.thread = thread;
-                antd.notify_open('info', title, content);
             }
         },
-        view_logs() {
-            if (this.user.info.type == 2) {
-                axios.get('../interact/select_logs.php?thread_id=' + this.opened_mes_info.thread_id)
-                    .then(res => {
-                        this.opened_mes_info.logs = res.data;
-                        this.log.visible = true;
-                    })
-            } else {
-                antd.$message.error('You are not allow to view logs');
+        view_logs(type) {
+            if (type == 'thread') {
+                if (this.user.info.type == 2) {
+                    axios.get('../interact/select_logs.php?thread_id=' + this.opened_mes_info.thread_id)
+                        .then(res => {
+                            this.opened_mes_info.logs = res.data;
+                            this.log.visible = true;
+                        })
+                } else {
+                    antd.$message.error('You are not allow to view logs');
+                }
+            } else if (type == 'class') {
+                if (this.user.info.type == 2) {
+                    axios.get('../interact/select_class_logs.php?class_id=' + this.opened_class_info.id)
+                        .then(res => {
+                            this.opened_class_info.logs = res.data;
+                            this.log.visible_class = true;
+                        })
+                } else {
+                    antd.$message.error('You are not allow to view logs');
+                }
             }
         },
         class_push(id) {
@@ -1381,19 +1381,13 @@ var antd = new Vue({
                 return 'border-left: 4px solid rgb(255, 193, 7)';
             }
         },
+        //发送内容后改变 push 的 cookie
         push_add_one() {
             var push_now = cookie.get('pokers_thread_count').split('a'); //获取消息数
             var thread_now = cookie.get('pokers_push').split('a'); //获取 thread
             var index_now = thread_now.indexOf(antd.opened_mes_info.thread_id.toString()); //获取当前 thread 所在消息数数组中的位置
             push_now[index_now] = antd.opened_thread_info[antd.opened_mes_info.index].message_count; //改变消息数
             cookie.set('pokers_thread_count', push_now.join('a')); //更新 cookie
-        },
-        check_able_send(){
-            if(!!this.mes_input.content){
-                return true;
-            }else{
-                return false;
-            }
         },
     }
 });
