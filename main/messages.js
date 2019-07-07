@@ -1019,7 +1019,7 @@ var antd = new Vue({
                 content: 'the process can not be redone',
                 onOk() {
 
-                    var query_string = "super=" + this.user.id + "&class_id=" + this.opened_mes_info.class_id + "&thread_id=" + this.opened_mes_info.thread_id;
+                    var query_string = "super=" + antd.user.id + "&class_id=" + antd.opened_mes_info.class_id + "&thread_id=" + antd.opened_mes_info.thread_id;
 
                     axios.post(
                             '../interact/delete_thread.php',
@@ -1027,22 +1027,22 @@ var antd = new Vue({
                         )
                         .then(res => {
                             if (res.data.status) {
-                                this.$message.success(res.data.mes);
-                                this.status.chat = false;
+                                antd.$message.success(res.data.mes);
+                                antd.status.chat = false;
                                 //移除当前加深
                                 $('.center .class-item').each(function () {
                                     $(this).removeClass('clicked');
                                 });
                                 //重新获取 threads 列表
-                                this.spinning.center = true;
-                                axios.get('../interact/select_thread.php?class_id=' + this.opened_mes_info.class_id)
+                                antd.spinning.center = true;
+                                axios.get('../interact/select_thread.php?class_id=' + antd.opened_mes_info.class_id)
                                     .then(resp => {
-                                        this.status.mark = false;
-                                        this.opened_thread_info = resp.data;
-                                        this.spinning.center = false;
+                                        antd.status.mark = false;
+                                        antd.opened_thread_info = resp.data;
+                                        antd.spinning.center = false;
                                     })
                             } else {
-                                this.$message.error(res.data.mes);
+                                antd.$message.error(res.data.mes);
                             }
                         })
 
