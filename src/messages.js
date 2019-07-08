@@ -404,7 +404,7 @@ var antd = new Vue({
                                     var theEvent = e || window.event;
                                     var code = theEvent.keyCode || theEvent.which || theEvent.charCode;
                                     if (code == 13) {
-                                        antd.handle_input_send('text');
+                                        antd.handle_input_send(antd.mes_input.type);
                                     }
                                 });
                                 this.enter.status = true;
@@ -1231,7 +1231,7 @@ var antd = new Vue({
                     var theEvent = e || window.event;
                     var code = theEvent.keyCode || theEvent.which || theEvent.charCode;
                     if (code == 13) {
-                        antd.handle_input_send('text');
+                        antd.handle_input_send(antd.mes_input.type);
                     }
                 });
             }

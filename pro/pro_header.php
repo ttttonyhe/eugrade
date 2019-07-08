@@ -44,7 +44,7 @@
     <script type="text/javascript" src="../statics/js/antd.js"></script>
     <script type="text/javascript" src="../statics/js/jquery.min.js"></script>
     <script type="text/javascript" src="../statics/js/moment.min.js"></script>
-    <link type="text/css" rel="stylesheet" href="../statics/css/main.css">
+    <link type="text/css" rel="stylesheet" href="../dist/css/main.css">
     <script type="text/javascript" src="../statics/js/qiniu.js"></script>
     <script>
     var cookie = {

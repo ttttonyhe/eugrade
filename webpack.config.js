@@ -1,14 +1,14 @@
 const path = require('path');
 module.exports = {
     entry: {
-        messages : './main/messages.js',
-        files : './main/files.js',
-        classes : './main/classes.js',
-        login : './main/login.js',
-        signup : './main/signup.js'
+        messages : './src/messages.js',
+        files : './src/files.js',
+        classes : './src/classes.js',
+        login : './src/login.js',
+        signup : './src/signup.js'
     },
     output : {
         filename : '[name].js',
-        path : path.resolve('dist')
+        path : path.resolve('dist/js/')
     }
 }

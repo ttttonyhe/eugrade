@@ -181,7 +181,7 @@
 
 
 </div>
-<script type="text/javascript" src="../dist/files.js"></script>
+<script type="text/javascript" src="../dist/js/files.js"></script>
 
 
 <?php require 'pro_footer.php'; ?>

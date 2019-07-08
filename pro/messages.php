@@ -603,6 +603,6 @@
 
 </div>
 <script src="../statics/js/md.js"></script>
-<script type="text/javascript" src="../dist/messages.js"></script>
+<script type="text/javascript" src="../dist/js/messages.js"></script>
 
 <?php require 'pro_footer.php'; ?>

@@ -4,7 +4,7 @@
   "description": "Clear & Organized Team Communication Tool",
   "main": "index.js",
   "scripts": {
-    "dev": "webpack --mode development"
+    "dev": "webpack --mode development && sass ./statics/css/main.scss ./dist/css/main.css --style compressed"
   },
   "repository": {
     "type": "git",
