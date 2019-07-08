@@ -25,15 +25,17 @@
 ## Main Features 功能特色
 + **Based on PHP & Vue.js & And Design for Vue**
   - 基于 PHP 、Vue.js 与 Antd
++ **Developed using Webpack & Sass**
+  - 采用了 Webpack 与 Sass
 + **Organized Classes/Files System**
   - 系统高效的团队(班级)/文件系统
 + **Clear Instant messaging system**
-  - 简洁强大的群聊系统
+  - 简洁强大的群聊系统(支持新消息推送)
 + **Neet UI design**
   - 美丽的 UI 设计与自适应
 + **0 sql everywhere**
   - 完全无数据库 (整个系统基于 json)
-+ **All-round operation system**
++ **All-round  UX Design**
   - 全方位多元的用户交互操作
 + **Easy to do secondary development**
   - 易于二次开发
@@ -41,9 +43,11 @@
 <br/>
 
 ## Usage 使用方法
-+ 注意包含的 composer.json 文件
 + 将 repo clone 到目录
++ 本地环境为 Php5.6+ & Nodejs & Ruby(sass + compass)
 + 执行 composer install 安装全部依赖
++ 执行 npm install / cnpm install 安装依赖包
++ 执行 npm run dev 打包编译
 
 <br/>
 
