@@ -51,6 +51,14 @@
 
 <br/>
 
+## Todo List 正在开发
++ [ ] 群聊支持 WebSocket
++ [ ] 用户系统支持 JWT
++ [ ] Sass 重写 CSS
++ [ ] CommonJS 应用
+
+<br/>
+
 ## Donation 赞助作者
 Your name will be on the list [Donation](https://www.snapaper.com/donate)
 <br/>
