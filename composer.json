@@ -2,6 +2,9 @@
     "require": {
         "greg0/lazer-database": "1.1.6",
         "qiniu/php-sdk": "^7.2",
-        "cboden/ratchet": "^0.4.1"
+        "cboden/ratchet": "^0.4.1",
+        "psecio/jwt": "1.*",
+        "workerman/workerman": "^3.5",
+        "workerman/channel": "^1.0"
     }
 }

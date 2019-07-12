@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/HelipengTony/pokers/issues"
   },
-  "homepage": "https://github.com/HelipengTony/pokers#readme"
+  "homepage": "https://github.com/HelipengTony/pokers#readme",
+  "dependencies": {
+    "socket.io": "^2.2.0"
+  }
 }
