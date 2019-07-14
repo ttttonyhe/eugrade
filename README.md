@@ -27,6 +27,8 @@
   - 基于 PHP 、Vue.js 与 Antd
 + **Developed using Webpack & Sass**
   - 采用了 Webpack 与 Sass
++ **WebSocket Supported**
+  - 支持 WebSocket 的聊天系统
 + **Organized Classes/Files System**
   - 系统高效的团队(班级)/文件系统
 + **Clear Instant messaging system**
@@ -45,14 +47,16 @@
 ## Usage 使用方法
 + 将 repo clone 到目录
 + 本地环境为 Php5.6+ & Nodejs & Ruby(sass + compass)
++ PHP 必须包含 pcntl、posix、Event/libevent 扩展
 + 执行 composer install 安装全部依赖
 + 执行 npm install / cnpm install 安装依赖包
 + 执行 npm run dev 打包编译
++ 参照手册配置 [WSS](http://doc.workerman.net/faq/secure-websocket-server.html)
 
 <br/>
 
 ## Todo List 正在开发
-+ [ ] 群聊支持 WebSocket
++ [x] 群聊支持 WebSocket
 + [ ] 用户系统支持 JWT
 + [ ] Sass 重写 CSS
 + [ ] CommonJS 应用
