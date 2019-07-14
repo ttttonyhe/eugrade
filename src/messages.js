@@ -2,6 +2,7 @@ var antd = new Vue({
     el: '#app',
     data() {
         return {
+            ws: null,
             md: null,
             user: {
                 id: cookie.get('logged_in_id'),
@@ -67,7 +68,6 @@ var antd = new Vue({
                 speakers: [], //每段内容对应的发送者头像
                 unique_speakers: [], //去重后的总参与人数
                 index: null,
-                last: null, //最后一段内容的唯一 id，
                 logs: []
             },
             mes_input: { //发送内容框
@@ -197,6 +197,41 @@ var antd = new Vue({
             antd.check_push();
         }
         window.get_push_interval = setInterval(func_push, 10000);
+
+        //websocket 连接
+        this.ws = new WebSocket('wss://pokers.zeo.im/wss');
+        this.ws.onmessage = function (data) {
+            var re = eval('(' + data.data + ')');
+            switch (re.op) {
+                case 'send':
+                    if (!re.status) {
+                        antd.$message.error('Service Unavailable');
+                    }
+                    break;
+                case 'connect':
+                    console.log('Connected to Pokers WS service');
+                    break;
+                case 'join':
+                    if(!re.status){
+                        antd.$message.error('Service Unavailable');
+                    }
+                    break;
+                default:
+                    //在内容段后添加一段
+                    antd.opened_mes_info.meses.push(re);
+                    if (parseInt(re.speaker) !== parseInt(antd.user.id)) {
+                        if ($(window).height() + $('#mes-container').scrollTop() >= $('#mes-inner').height()) {
+                            //当前窗口可视区域+滑动距离大于总可滑动高度,有更新直接到底部
+                            antd.bottom_mes();
+                        }else{
+                            antd.unread.visible = true;
+                            setTimeout(function(){ antd.unread.visible = false; }, 1000);
+                        }
+                    }
+                    antd.update_mes();
+                    break;
+            }
+        };
     },
     methods: {
         //判断是否为班级管理员，输出特殊样式
@@ -362,8 +397,8 @@ var antd = new Vue({
         //点击主题获取消息在 right 列展示
         open_mes(index, id, belong_class) {
 
+            this.ws.send('{"action":"join", "thread_id":' + id + ', "class_id":' + belong_class + ', "speaker":' + antd.user.id + ',"speaker_name":"' + antd.user.info.name + '"}');
             //清除当前 interval
-            window.clearInterval(window.get_mes_interval);
             window.clearInterval(window.get_push_interval);
 
             //关闭当前 push 通知
@@ -428,13 +463,9 @@ var antd = new Vue({
 
             //数据更新
             antd.update_mes();
-            var func = function () {
-                antd.update_mes(1);
-            }
             var func_push = function () {
                 antd.check_push();
             }
-            window.get_mes_interval = setInterval(func, 5000);
             window.get_push_interval = setInterval(func_push, 10000);
 
         },
@@ -715,7 +746,10 @@ var antd = new Vue({
                     )
                     .then(res => {
                         if (res.data.status) {
-                            this.update_mes();
+
+                            //广播全 thread 在线用户
+                            antd.ws.send('{"action":"send", "thread_id":' + antd.opened_mes_info.thread_id + ', "class_id":' + antd.opened_mes_info.class_id + ', "speaker":' + antd.user.id + ',"speaker_name":"' + antd.user.info.name + '","mes_id":' + res.data.code + '}');
+
                             this.mes_input.content = null;
                             this.mes_input.disable = false;
                             this.handle_cancel_upload();
@@ -738,34 +772,15 @@ var antd = new Vue({
             }
         },
         //更新内容列表(按照最后一段内容唯一 id 判断是否需要更新并滑动到底部)
-        update_mes(type) {
-            axios.get('../interact/select_messages.php?thread_id=' + this.opened_mes_info.thread_id + '&class_id=' + this.opened_mes_info.class_id + '&last=' + this.opened_mes_info.last)
+        update_mes() {
+            axios.get('../interact/select_messages.php?thread_id=' + this.opened_mes_info.thread_id + '&class_id=' + this.opened_mes_info.class_id)
                 .then(response => {
-                    if (!!response.data.update) {
-                        if (response.data.update.status == 1) {
-                            this.opened_mes_info.last = response.data.update.last;
-                            this.opened_mes_info.meses = response.data.mes;
-                            this.opened_mes_info.unique_speakers = response.data.speakers_unique.split(',');
-                            axios.get('../interact/select_users.php?type=avatar&id=' + response.data.speakers_unique + '&mes=1')
-                                .then(res => {
-                                    this.opened_mes_info.speakers = res.data;
-                                    if (!!type) {
-                                        if ($(window).height() + $('#mes-container').scrollTop() >= $('#mes-inner').height()) {
-                                            //当前窗口可视区域+滑动距离大于总可滑动高度,有更新直接到底部
-                                            this.bottom_mes();
-                                        } else {
-                                            this.unread.visible = true;
-                                            setTimeout("antd.unread.visible = false", 2000);
-                                        }
-                                        //新消息闪烁
-                                        $('#mes-inner div.mes-stream:last').eq(0).addClass('mes-new-notify');
-                                        setTimeout("$('#mes-inner div.mes-stream:last').eq(0).removeClass('mes-new-notify')", 500);
-                                    }
-                                })
-                        } else {
-                            this.opened_mes_info.last = response.data.update.last;
-                        }
-                    }
+                    this.opened_mes_info.meses = response.data.mes;
+                    this.opened_mes_info.unique_speakers = response.data.speakers_unique.split(',');
+                    axios.get('../interact/select_users.php?type=avatar&id=' + response.data.speakers_unique + '&mes=1')
+                        .then(res => {
+                            this.opened_mes_info.speakers = res.data;
+                        })
                 })
         },
         load_mes() {
@@ -778,7 +793,6 @@ var antd = new Vue({
         bottom_mes() {
             $("#mes-container").scrollTop($("#mes-inner")[0].scrollHeight);
             this.unread.visible = false;
-            this.unread.count += 0;
         },
         //上传文件(不可存在内容，上传后自动发送)
         upload_file() {

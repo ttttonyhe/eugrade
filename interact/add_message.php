@@ -123,7 +123,7 @@ if (!empty($_POST['speaker_name']) && !empty($_POST['thread']) && !empty($_POST[
 
                     if ($status == 'img') { //包含图片(不判断内容是否为空)
 
-                        $this_id = Lazer::table('messages')->findAll()->count() + 1;
+                        $this_id = Lazer::table('messages')->lastId() + 1;
                         $row = Lazer::table('messages');
                         $row->id = (int) $this_id;
                         $row->speaker_name = $speaker_name;
@@ -138,7 +138,7 @@ if (!empty($_POST['speaker_name']) && !empty($_POST['thread']) && !empty($_POST[
 
                         //保存到 logs
                         $lo = Lazer::table('logs');
-                        $log_id = Lazer::table('logs')->findAll()->count() + 1;
+                        $log_id = Lazer::table('logs')->lastId() + 1;
                         $lo->id = (int) $this_id;
                         $lo->speaker_name = $speaker_name;
                         $lo->speaker = (int) $speaker;
@@ -159,12 +159,12 @@ if (!empty($_POST['speaker_name']) && !empty($_POST['thread']) && !empty($_POST[
                         $t->save();
 
                         $status = 1;
-                        $code = 131;
+                        $code = $this_id;
                         $mes = 'Successfully sent an image + text message';
                     } elseif ($status == 'file') { //文件上传(必须无内容)
                         if (empty($content)) {
 
-                            $this_id = Lazer::table('messages')->findAll()->count() + 1;
+                            $this_id = Lazer::table('messages')->lastId() + 1;
                             $row = Lazer::table('messages');
                             $row->id = (int) $this_id;
                             $row->speaker_name = $speaker_name;
@@ -179,7 +179,7 @@ if (!empty($_POST['speaker_name']) && !empty($_POST['thread']) && !empty($_POST[
 
                             //保存到 logs
                             $lo = Lazer::table('logs');
-                            $log_id = Lazer::table('logs')->findAll()->count() + 1;
+                            $log_id = Lazer::table('logs')->lastId() + 1;
                             $lo->id = (int) $this_id;
                             $lo->speaker_name = $speaker_name;
                             $lo->speaker = (int) $speaker;
@@ -199,7 +199,7 @@ if (!empty($_POST['speaker_name']) && !empty($_POST['thread']) && !empty($_POST[
                             $t->save();
 
                             $status = 1;
-                            $code = 132;
+                            $code = $this_id;
                             $mes = 'Successfully sent a file message';
                         } else {
                             $status = 0;
@@ -209,7 +209,7 @@ if (!empty($_POST['speaker_name']) && !empty($_POST['thread']) && !empty($_POST[
                     } else { //仅文字内容(必须判断内容为空)
                         if (!empty($content)) {
 
-                            $this_id = Lazer::table('messages')->findAll()->count() + 1;
+                            $this_id = Lazer::table('messages')->lastId() + 1;
                             $row = Lazer::table('messages');
                             $row->id = (int) $this_id;
                             $row->speaker_name = $speaker_name;
@@ -223,7 +223,7 @@ if (!empty($_POST['speaker_name']) && !empty($_POST['thread']) && !empty($_POST[
 
                             //保存到 logs
                             $lo = Lazer::table('logs');
-                            $log_id = Lazer::table('logs')->findAll()->count() + 1;
+                            $log_id = Lazer::table('logs')->lastId() + 1;
                             $lo->id = (int) $this_id;
                             $lo->speaker_name = $speaker_name;
                             $lo->speaker = (int) $speaker;
@@ -243,7 +243,7 @@ if (!empty($_POST['speaker_name']) && !empty($_POST['thread']) && !empty($_POST[
                             $t->save();
 
                             $status = 1;
-                            $code = 133;
+                            $code = $this_id;
                             $mes = 'Successfully sent a text message';
                         } else {
                             $status = 0;
