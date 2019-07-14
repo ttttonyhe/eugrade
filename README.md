@@ -52,6 +52,7 @@
 + 执行 npm install / cnpm install 安装依赖包
 + 执行 npm run dev 打包编译
 + 参照手册配置 [WSS](http://doc.workerman.net/faq/secure-websocket-server.html)
++ interact 目录执行 php websocket.php start -d & 常驻后台
 
 <br/>
 
