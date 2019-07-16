@@ -455,13 +455,13 @@
                                     </template>
                                     <template v-if="mes.emoji_1 || mes.emoji_2 || mes.emoji_3">
                                         <div class="mes-stream-emoji-display">
-                                            <a-tag color="pink" v-if="mes.emoji_1" @click="remove_emoji(1,mes.id)">
+                                            <a-tag color="pink" v-if="mes.emoji_1" @click="remove_emoji(1,mes.id,index)">
                                                 <a-icon type="smile"></a-icon> x{{ parseInt(mes.emoji_1) }}
                                             </a-tag>
-                                            <a-tag color="orange" v-if="mes.emoji_2" @click="remove_emoji(2,mes.id)">
+                                            <a-tag color="orange" v-if="mes.emoji_2" @click="remove_emoji(2,mes.id,index)">
                                                 <a-icon type="meh"></a-icon> x{{ parseInt(mes.emoji_2) }}
                                             </a-tag>
-                                            <a-tag color="blue" v-if="mes.emoji_3" @click="remove_emoji(3,mes.id)">
+                                            <a-tag color="blue" v-if="mes.emoji_3" @click="remove_emoji(3,mes.id,index)">
                                                 <a-icon type="frown"></a-icon> x{{ parseInt(mes.emoji_3) }}
                                             </a-tag>
                                         </div>
@@ -469,7 +469,7 @@
                                 </div>
                                 <div class="mes-stream-emoji">
                                     <template v-if="mes.speaker == user.id || opened_class_info.superid == user.id">
-                                        <a class="a-d" @click="remove_mes(mes.id)">
+                                        <a class="a-d" @click="remove_mes(mes.id,index)">
                                             <a-icon type="delete"></a-icon>
                                         </a>
                                         <template v-if="mes.type !== 'file'">
@@ -479,13 +479,13 @@
                                         </template>
                                     </template>
                                     <a class="a-1">
-                                        <a-icon type="smile" @click="add_emoji(1,mes.id)"></a-icon>
+                                        <a-icon type="smile" @click="add_emoji(1,mes.id,index)"></a-icon>
                                     </a>
                                     <a class="a-2">
-                                        <a-icon type="meh" @click="add_emoji(2,mes.id)"></a-icon>
+                                        <a-icon type="meh" @click="add_emoji(2,mes.id,index)"></a-icon>
                                     </a>
                                     <a class="a-3">
-                                        <a-icon type="frown" @click="add_emoji(3,mes.id)"></a-icon>
+                                        <a-icon type="frown" @click="add_emoji(3,mes.id,index)"></a-icon>
                                     </a>
                                 </div>
                             </div>

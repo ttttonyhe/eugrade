@@ -116,6 +116,7 @@ var antd = new Vue({
                     visible: false,
                     content: null,
                     confirm_edit_mes_loading: false,
+                    count_id: null
                 }
             },
             emoji_added_count: 0,
@@ -198,27 +199,59 @@ var antd = new Vue({
         }
         window.get_push_interval = setInterval(func_push, 10000);
 
+        /* WebSocket 开始 */
         //websocket 连接
         this.ws = new WebSocket('wss://pokers.zeo.im/wss');
         this.ws.onmessage = function (data) {
             var re = eval('(' + data.data + ')');
             switch (re.op) {
-                case 'send':
-                    if (!re.status) {
-                        antd.$message.error('Service Unavailable');
-                    }
-                    break;
+                //创建 wss 连接
                 case 'connect':
                     console.log('Connected to Pokers Server');
                     break;
+                //加入 wss 连接
                 case 'join':
                     if (!re.status) {
                         antd.$message.error('Service Unavailable');
                     }
                     break;
+                //心跳
                 case 'keep':
                     break;
-                default:
+                //删除内容(count_id 为内容条段数)
+                case 'delete':
+                    var mes = antd.opened_mes_info.meses;
+                    if (re.status && (parseInt(re.count_id - 1) < mes.length)) {
+                        antd.opened_mes_info.meses.splice(re.count_id - 1, 1);
+                    } else {
+                        antd.$message.error('Faild to delete');
+                    }
+                    break;
+                //emoji 增加
+                case 'emoji_add':
+                    var mes = antd.opened_mes_info.meses;
+                    if (re.status && (parseInt(re.count_id - 1) < mes.length)) {
+                        var emo = 'emoji_' + parseInt(re.emoji_id);
+                        antd.opened_mes_info.meses[parseInt(re.count_id - 1)][emo] += 1;
+                    } else {
+                        antd.$message.error('Faild to add emoji');
+                    }
+                    break;
+                //emoji 删除
+                case 'emoji_remove':
+                    var mes = antd.opened_mes_info.meses;
+                    if (re.status && (parseInt(re.count_id - 1) < mes.length)) {
+                        var emo = 'emoji_' + parseInt(re.emoji_id);
+                        antd.opened_mes_info.meses[parseInt(re.count_id - 1)][emo] -= 1;
+                    } else {
+                        antd.$message.error('Faild to remove emoji');
+                    }
+                    break;
+                //编辑内容(不采用 wss，直接请求服务器)
+                case 'edit':
+                    antd.load_mes();
+                    break;
+                default: //内容更新
                     //在内容段后添加一段
                     antd.opened_mes_info.meses.push(re);
                     if (parseInt(re.speaker) !== parseInt(antd.user.id)) {
@@ -236,6 +269,9 @@ var antd = new Vue({
                     break;
             }
         };
+
+        /* WebSocket 结束 */
+
     },
     methods: {
         //判断是否为班级管理员，输出特殊样式
@@ -401,7 +437,7 @@ var antd = new Vue({
         //点击主题获取消息在 right 列展示
         open_mes(index, id, belong_class) {
 
-            this.ws.send('{"action":"join", "thread_id":' + id + ', "class_id":' + belong_class + ', "speaker":' + antd.user.id + ',"speaker_name":"' + antd.user.info.name + '"}');
+            this.ws.send('{"action":"join", "thread_id":' + id + ', "class_id":' + belong_class + ', "speaker":' + antd.user.id + ',"speaker_name":"' + antd.user.info.name + '","type" : "join"}');
             //清除当前 interval
             window.clearInterval(window.get_push_interval);
 
@@ -752,7 +788,7 @@ var antd = new Vue({
                         if (res.data.status) {
 
                             //广播全 thread 在线用户
-                            antd.ws.send('{"action":"send", "thread_id":' + antd.opened_mes_info.thread_id + ', "class_id":' + antd.opened_mes_info.class_id + ', "speaker":' + antd.user.id + ',"speaker_name":"' + antd.user.info.name + '","mes_id":' + res.data.code + '}');
+                            antd.ws.send('{"action":"send", "thread_id":' + antd.opened_mes_info.thread_id + ', "class_id":' + antd.opened_mes_info.class_id + ', "speaker":' + antd.user.id + ',"speaker_name":"' + antd.user.info.name + '","mes_id":' + res.data.code + ',"type" : "message"}');
 
                             this.mes_input.content = null;
                             this.mes_input.disable = false;
@@ -1074,7 +1110,7 @@ var antd = new Vue({
         comment_action_leave(event) {
             event.currentTarget.className = 'mes-stream';
         },
-        add_emoji(type, mes_id) {
+        add_emoji(type, mes_id, index) {
             if (this.emoji_added_count < 20) {
                 this.emoji_added_count += 1;
 
@@ -1086,7 +1122,7 @@ var antd = new Vue({
                     )
                     .then(res => {
                         if (res.data.status) {
-                            this.load_mes();
+                            antd.ws.send('{"action":"send", "thread_id":' + antd.opened_mes_info.thread_id + ', "class_id":' + antd.opened_mes_info.class_id + ', "speaker":' + antd.user.id + ',"speaker_name":"' + antd.user.info.name + '","mes_id":' + mes_id + ',"emoji_type":"add","type":"emoji","emoji_id":' + type + ',"count_id":' + (index + 1) + '}');
                         } else {
                             this.$message.error(res.data.mes);
                         }
@@ -1097,7 +1133,7 @@ var antd = new Vue({
                 this.$message.error('You are too emotional!');
             }
         },
-        remove_emoji(type, mes_id) {
+        remove_emoji(type, mes_id, index) {
             if (this.emoji_removed_count < 30) {
                 this.emoji_removed_count += 1;
 
@@ -1109,7 +1145,7 @@ var antd = new Vue({
                     )
                     .then(res => {
                         if (res.data.status) {
-                            this.load_mes();
+                            antd.ws.send('{"action":"send", "thread_id":' + antd.opened_mes_info.thread_id + ', "class_id":' + antd.opened_mes_info.class_id + ', "speaker":' + antd.user.id + ',"speaker_name":"' + antd.user.info.name + '","mes_id":' + mes_id + ',"emoji_type":"remove","type":"emoji","emoji_id":' + type + ',"count_id":' + (index + 1) + '}');
                         } else {
                             this.$message.error(res.data.mes);
                         }
@@ -1119,7 +1155,7 @@ var antd = new Vue({
                 this.$message.error('You are too emotional!');
             }
         },
-        remove_mes(mes_id) {
+        remove_mes(mes_id, index) {
 
             var query_string = "user=" + this.user.id + "&mes_id=" + mes_id + "&class_id=" + this.opened_mes_info.class_id + "&thread_id=" + this.opened_mes_info.thread_id;
 
@@ -1129,7 +1165,7 @@ var antd = new Vue({
                 )
                 .then(res => {
                     if (res.data.status) {
-                        this.load_mes();
+                        antd.ws.send('{"action":"send", "thread_id":' + antd.opened_mes_info.thread_id + ', "class_id":' + antd.opened_mes_info.class_id + ', "speaker":' + antd.user.id + ',"speaker_name":"' + antd.user.info.name + '","mes_id":' + mes_id + ',"type":"delete","count_id":' + (index + 1) + '}');
                         this.opened_thread_info[this.opened_mes_info.index].message_count--;
                     } else {
                         this.$message.error(res.data.mes);
@@ -1147,7 +1183,7 @@ var antd = new Vue({
                 )
                 .then(res => {
                     if (res.data.status) {
-                        this.load_mes();
+                        antd.ws.send('{"action":"send", "thread_id":' + antd.opened_mes_info.thread_id + ', "class_id":' + antd.opened_mes_info.class_id + ', "speaker":' + antd.user.id + ',"speaker_name":"' + antd.user.info.name + '","mes_id":' + antd.edit.mes.id + ',"type":"edit"}');
                         this.handle_edit_mes_cancel();
                     } else {
                         this.$message.error(res.data.mes);
@@ -1157,7 +1193,7 @@ var antd = new Vue({
         handle_edit_mes_cancel() {
             this.edit.mes.visible = false;
         },
-        open_mes_edit(id, content) {
+        open_mes_edit(id, content,index) {
             this.edit.mes.id = id;
             if (content == '') {
                 this.edit.mes.content = 'Empty Content';
@@ -1165,6 +1201,7 @@ var antd = new Vue({
                 this.edit.mes.content = content;
             }
             this.edit.mes.visible = true;
+            this.edit.mes.count_id = index;
         },
         open_office_preview(url, name) {
             this.office.url = url;
