@@ -1,6 +1,5 @@
 <?php
 
-
 require '../vendor/autoload.php';
 require_once '../vendor/workerman/workerman/Autoloader.php';
 require_once '../vendor/workerman/channel/src/Server.php';
@@ -9,6 +8,7 @@ define('LAZER_DATA_PATH', dirname(dirname(__FILE__)) . '/data/');
 
 use Lazer\Classes\Database as Lazer;
 use Workerman\Worker;
+use Workerman\Lib\Timer;
 
 
 $channel_server = new Channel\Server('0.0.0.0', 2206);
@@ -17,7 +17,7 @@ $worker->count = 2;
 // 全局群组到连接的映射数组
 $group_con_map = array();
 
-$worker->onWorkerStart = function () {
+$worker->onWorkerStart = function ($worker) {
     // Channel客户端连接到Channel服务端
     Channel\Client::connect('0.0.0.0', 2206);
 
@@ -29,7 +29,7 @@ $worker->onWorkerStart = function () {
         $speaker = $event_data['speaker'];
         $class = $event_data['class_id'];
 
-        $array = Lazer::table('messages')->limit(1)->where('id', '=', (int)$mes_id)->andWhere('speaker','=',(int)$speaker)->andWhere('belong_class','=',(int)$class)->find()->asArray();
+        $array = Lazer::table('messages')->limit(1)->where('id', '=', (int) $mes_id)->andWhere('speaker', '=', (int) $speaker)->andWhere('belong_class', '=', (int) $class)->find()->asArray();
 
         if (!!$array[0]['speaker']) {
             global $group_con_map;
@@ -49,10 +49,21 @@ $worker->onWorkerStart = function () {
             $group_con_map[$thread][$con_id]->send(json_encode($array));
         }
     });
+
+    //心跳计时
+    Timer::add(55, function () use ($worker) {
+        foreach ($worker->connections as $connection) {
+            $array = [
+                'op' => 'keep'
+            ];
+            $connection->send(json_encode($array));
+        }
+    });
 };
 
 //发送消息
 $worker->onMessage = function ($con, $data) {
+
     $data = json_decode($data, true);
     $cmd = $data['action'];
     $thread = $data['thread_id'];

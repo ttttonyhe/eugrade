@@ -209,12 +209,14 @@ var antd = new Vue({
                     }
                     break;
                 case 'connect':
-                    console.log('Connected to Pokers WS service');
+                    console.log('Connected to Pokers Server');
                     break;
                 case 'join':
-                    if(!re.status){
+                    if (!re.status) {
                         antd.$message.error('Service Unavailable');
                     }
+                    break;
+                case 'keep':
                     break;
                 default:
                     //在内容段后添加一段
@@ -223,9 +225,11 @@ var antd = new Vue({
                         if ($(window).height() + $('#mes-container').scrollTop() >= $('#mes-inner').height()) {
                             //当前窗口可视区域+滑动距离大于总可滑动高度,有更新直接到底部
                             antd.bottom_mes();
-                        }else{
+                        } else {
                             antd.unread.visible = true;
-                            setTimeout(function(){ antd.unread.visible = false; }, 1000);
+                            setTimeout(function () {
+                                antd.unread.visible = false;
+                            }, 1000);
                         }
                     }
                     antd.update_mes();
