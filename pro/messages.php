@@ -421,7 +421,7 @@
                                     </template>
                                 </div>
                                 <div class="mes-stream-content">
-                                    <h3 v-html="opened_mes_info.speakers[1][mes.speaker + ''] + '&nbsp;<em>' + get_mes_date(mes.date) + '</em>'"></h3>
+                                    <h3 v-html="opened_mes_info.speakers[1][mes.speaker + ''] + check_leaved(mes.speaker) + '&nbsp;<em>' + get_mes_date(mes.date) + '</em>'"></h3>
                                     <template v-if="!!mes.content && !mes.img_url && mes.content !== 'null'">
                                         <div class="mes-content" v-html="process_content(mes.content)"></div>
                                     </template>

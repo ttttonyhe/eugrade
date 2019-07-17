@@ -3,6 +3,8 @@ var antd = new Vue({
     data() {
         return {
             ws: null,
+            ws_status: false,
+            reconnect_wss: null,
             md: null,
             user: {
                 id: cookie.get('logged_in_id'),
@@ -40,7 +42,8 @@ var antd = new Vue({
                 id: null,
                 superid: null,
                 index: null,
-                logs: []
+                logs: [],
+                members: []
             },
             opened_thread_info: [],
             member_marked: false,
@@ -201,76 +204,87 @@ var antd = new Vue({
 
         /* WebSocket 开始 */
         //websocket 连接
-        this.ws = new WebSocket('wss://pokers.zeo.im/wss');
-        this.ws.onmessage = function (data) {
-            var re = eval('(' + data.data + ')');
-            switch (re.op) {
-                //创建 wss 连接
-                case 'connect':
-                    console.log('Connected to Pokers Server');
-                    break;
-                //加入 wss 连接
-                case 'join':
-                    if (!re.status) {
-                        antd.$message.error('Service Unavailable');
-                    }
-                    break;
-                //心跳
-                case 'keep':
-                    break;
-                //删除内容(count_id 为内容条段数)
-                case 'delete':
-                    var mes = antd.opened_mes_info.meses;
-                    if (re.status && (parseInt(re.count_id - 1) < mes.length)) {
-                        antd.opened_mes_info.meses.splice(re.count_id - 1, 1);
-                    } else {
-                        antd.$message.error('Faild to delete');
-                    }
-                    break;
-                //emoji 增加
-                case 'emoji_add':
-                    var mes = antd.opened_mes_info.meses;
-                    if (re.status && (parseInt(re.count_id - 1) < mes.length)) {
-                        var emo = 'emoji_' + parseInt(re.emoji_id);
-                        antd.opened_mes_info.meses[parseInt(re.count_id - 1)][emo] += 1;
-                    } else {
-                        antd.$message.error('Faild to add emoji');
-                    }
-                    break;
-                //emoji 删除
-                case 'emoji_remove':
-                    var mes = antd.opened_mes_info.meses;
-                    if (re.status && (parseInt(re.count_id - 1) < mes.length)) {
-                        var emo = 'emoji_' + parseInt(re.emoji_id);
-                        antd.opened_mes_info.meses[parseInt(re.count_id - 1)][emo] -= 1;
-                    } else {
-                        antd.$message.error('Faild to remove emoji');
-                    }
-                    break;
-                //编辑内容(不采用 wss，直接请求服务器)
-                case 'edit':
-                    antd.load_mes();
-                    break;
-                default: //内容更新
-                    //在内容段后添加一段
-                    antd.opened_mes_info.meses.push(re);
-                    if (parseInt(re.speaker) !== parseInt(antd.user.id)) {
-                        if ($(window).height() + $('#mes-container').scrollTop() >= $('#mes-inner').height()) {
-                            //当前窗口可视区域+滑动距离大于总可滑动高度,有更新直接到底部
-                            antd.bottom_mes();
-                        } else {
-                            antd.unread.visible = true;
-                            setTimeout(function () {
-                                antd.unread.visible = false;
-                            }, 1000);
+        this.reconnect_wss = function () {
+            this.ws_status = true;
+            this.ws = new WebSocket('wss://pokers.zeo.im/wss');
+            this.ws.onmessage = function (data) {
+                var re = eval('(' + data.data + ')');
+                switch (re.op) {
+                    //创建 wss 连接
+                    case 'connect':
+                        console.log('Connected to Pokers Server');
+                        break;
+                        //加入 wss 连接
+                    case 'join':
+                        if (!re.status) {
+                            antd.$message.error('Service Unavailable');
                         }
+                        break;
+                        //心跳
+                    case 'keep':
+                        break;
+                        //删除内容(count_id 为内容条段数)
+                    case 'delete':
+                        var mes = antd.opened_mes_info.meses;
+                        if (re.status && (parseInt(re.count_id - 1) < mes.length)) {
+                            antd.opened_mes_info.meses.splice(re.count_id - 1, 1);
+                        } else {
+                            antd.$message.error('Faild to delete');
+                        }
+                        break;
+                        //emoji 增加
+                    case 'emoji_add':
+                        var mes = antd.opened_mes_info.meses;
+                        if (re.status && (parseInt(re.count_id - 1) < mes.length)) {
+                            var emo = 'emoji_' + parseInt(re.emoji_id);
+                            antd.opened_mes_info.meses[parseInt(re.count_id - 1)][emo] += 1;
+                        } else {
+                            antd.$message.error('Faild to add emoji');
+                        }
+                        break;
+                        //emoji 删除
+                    case 'emoji_remove':
+                        var mes = antd.opened_mes_info.meses;
+                        if (re.status && (parseInt(re.count_id - 1) < mes.length)) {
+                            var emo = 'emoji_' + parseInt(re.emoji_id);
+                            antd.opened_mes_info.meses[parseInt(re.count_id - 1)][emo] -= 1;
+                        } else {
+                            antd.$message.error('Faild to remove emoji');
+                        }
+                        break;
+                        //编辑内容(不采用 wss，直接请求服务器)
+                    case 'edit':
+                        antd.load_mes();
+                        break;
+                    default: //内容更新
+                        if("undefined" == typeof re.status){
+                        //在内容段后添加一段
+                        antd.opened_mes_info.meses.push(re);
+                        if (parseInt(re.speaker) !== parseInt(antd.user.id)) {
+                            if ($(window).height() + $('#mes-container').scrollTop() >= $('#mes-inner').height()) {
+                                //当前窗口可视区域+滑动距离大于总可滑动高度,有更新直接到底部
+                                antd.bottom_mes();
+                            } else {
+                                antd.unread.visible = true;
+                                setTimeout(function () {
+                                    antd.unread.visible = false;
+                                }, 1000);
+                            }
+                        }
+                        antd.update_mes();
+                        antd.opened_thread_info[antd.opened_mes_info.index].message_count++;
+                    }else{
+                        antd.load_mes();
                     }
-                    antd.update_mes();
-                    antd.opened_thread_info[antd.opened_mes_info.index].message_count++;
-                    break;
-            }
-        };
+                        break;
+                }
+            };
 
+            this.ws.onclose = function () {
+                this.ws_status = false;
+            };
+        }
+        this.reconnect_wss();
         /* WebSocket 结束 */
 
     },
@@ -406,6 +420,12 @@ var antd = new Vue({
         },
         //点击班级获取主题在 center 列展示
         open_class(id, index, push) {
+
+            //websocket 断线重连
+            if(!this.ws_status){
+                this.reconnect_wss();
+            }
+
             //选中增加 class，删除其余选中
             $('.left .class-item').each(function () {
                 $(this).removeClass('clicked');
@@ -423,6 +443,10 @@ var antd = new Vue({
                 this.opened_class_info.superid = this.user.classes_info[parseInt(index)].super;
             }
             this.spinning.center = true;
+            axios.get('../interact/select_classes.php?type=member&id=' + id + '&form=single')
+                .then(res => {
+                    this.opened_class_info.members = res.data.member.split(',');
+                });
             axios.get('../interact/select_thread.php?class_id=' + id)
                 .then(resp => {
                     this.status.mark = false;
@@ -437,6 +461,10 @@ var antd = new Vue({
 
         //点击主题获取消息在 right 列展示
         open_mes(index, id, belong_class) {
+
+            if(!this.ws_status){
+                this.reconnect_wss();
+            }
 
             this.ws.send('{"action":"join", "thread_id":' + id + ', "class_id":' + belong_class + ', "speaker":' + antd.user.id + ',"speaker_name":"' + antd.user.info.name + '","type" : "join"}');
             //清除当前 interval
@@ -728,6 +756,12 @@ var antd = new Vue({
         },
         //发送内容
         handle_input_send(type) {
+
+            //websocket 断线重连
+            if(!this.ws_status){
+                this.reconnect_wss();
+            }
+
             this.mes_input.text = 'Sending...';
             this.mes_input.disable = true;
 
@@ -1112,6 +1146,11 @@ var antd = new Vue({
             event.currentTarget.className = 'mes-stream';
         },
         add_emoji(type, mes_id, index) {
+            //websocket 断线重连
+            if(!this.ws_status){
+                this.reconnect_wss();
+            }
+
             if (this.emoji_added_count < 20) {
                 this.emoji_added_count += 1;
 
@@ -1135,6 +1174,12 @@ var antd = new Vue({
             }
         },
         remove_emoji(type, mes_id, index) {
+
+            //websocket 断线重连
+            if(!this.ws_status){
+                this.reconnect_wss();
+            }
+
             if (this.emoji_removed_count < 30) {
                 this.emoji_removed_count += 1;
 
@@ -1158,6 +1203,11 @@ var antd = new Vue({
         },
         remove_mes(mes_id, index) {
 
+            //websocket 断线重连
+            if(!this.ws_status){
+                this.reconnect_wss();
+            }
+
             var query_string = "user=" + this.user.id + "&mes_id=" + mes_id + "&class_id=" + this.opened_mes_info.class_id + "&thread_id=" + this.opened_mes_info.thread_id;
 
             axios.post(
@@ -1175,6 +1225,11 @@ var antd = new Vue({
 
         },
         handle_edit_mes_submit() {
+
+            //websocket 断线重连
+            if(!this.ws_status){
+                this.reconnect_wss();
+            }
 
             var query_string = "content=" + this.edit.mes.content + "&user=" + this.user.id + "&mes_id=" + this.edit.mes.id + "&class_id=" + this.opened_mes_info.class_id + "&thread_id=" + this.opened_mes_info.thread_id;
 
@@ -1194,7 +1249,7 @@ var antd = new Vue({
         handle_edit_mes_cancel() {
             this.edit.mes.visible = false;
         },
-        open_mes_edit(id, content,index) {
+        open_mes_edit(id, content, index) {
             this.edit.mes.id = id;
             if (content == '') {
                 this.edit.mes.content = 'Empty Content';
@@ -1366,6 +1421,14 @@ var antd = new Vue({
             var index_now = thread_now.indexOf(antd.opened_mes_info.thread_id.toString()); //获取当前 thread 所在消息数数组中的位置
             push_now[index_now] = antd.opened_thread_info[antd.opened_mes_info.index].message_count; //改变消息数
             cookie.set('pokers_thread_count', push_now.join('a')); //更新 cookie
+        },
+        //判断是否在班级内
+        check_leaved(speaker) {
+            if (this.opened_class_info.members.indexOf(speaker + '') > -1) {
+                return '';
+            } else {
+                return '&nbsp;<em class="leaved_label">Leaved</em>'
+            }
         },
     }
 });
