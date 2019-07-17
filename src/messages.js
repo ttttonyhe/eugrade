@@ -3,8 +3,7 @@ var antd = new Vue({
     data() {
         return {
             ws: null,
-            ws_status: false,
-            reconnect_wss: null,
+            ws_status: 'fi',
             md: null,
             user: {
                 id: cookie.get('logged_in_id'),
@@ -204,10 +203,9 @@ var antd = new Vue({
 
         /* WebSocket 开始 */
         //websocket 连接
-        this.reconnect_wss = function () {
-            this.ws_status = true;
-            this.ws = new WebSocket('wss://pokers.zeo.im/wss');
-            this.ws.onmessage = function (data) {
+        function reconnect_wss() {
+            window.ws = new WebSocket('ws://127.0.0.1:2000');
+            window.ws.onmessage = function (data) {
                 var re = eval('(' + data.data + ')');
                 switch (re.op) {
                     //创建 wss 连接
@@ -257,34 +255,41 @@ var antd = new Vue({
                         antd.load_mes();
                         break;
                     default: //内容更新
-                        if("undefined" == typeof re.status){
-                        //在内容段后添加一段
-                        antd.opened_mes_info.meses.push(re);
-                        if (parseInt(re.speaker) !== parseInt(antd.user.id)) {
-                            if ($(window).height() + $('#mes-container').scrollTop() >= $('#mes-inner').height()) {
-                                //当前窗口可视区域+滑动距离大于总可滑动高度,有更新直接到底部
-                                antd.bottom_mes();
-                            } else {
-                                antd.unread.visible = true;
-                                setTimeout(function () {
-                                    antd.unread.visible = false;
-                                }, 1000);
+                        if ("undefined" == typeof re.status) {
+                            //在内容段后添加一段
+                            antd.opened_mes_info.meses.push(re);
+                            if (parseInt(re.speaker) !== parseInt(antd.user.id)) {
+                                if ($(window).height() + $('#mes-container').scrollTop() >= $('#mes-inner').height()) {
+                                    //当前窗口可视区域+滑动距离大于总可滑动高度,有更新直接到底部
+                                    antd.bottom_mes();
+                                } else {
+                                    antd.unread.visible = true;
+                                    setTimeout(function () {
+                                        antd.unread.visible = false;
+                                    }, 1000);
+                                }
                             }
+                            antd.update_mes();
+                            antd.opened_thread_info[antd.opened_mes_info.index].message_count++;
+                        } else {
+                            antd.load_mes();
                         }
-                        antd.update_mes();
-                        antd.opened_thread_info[antd.opened_mes_info.index].message_count++;
-                    }else{
-                        antd.load_mes();
-                    }
                         break;
                 }
             };
 
-            this.ws.onclose = function () {
-                this.ws_status = false;
+            window.ws.onclose = function () {
+                antd.ws_status = 're';
+                reconnect_wss();
+            };
+
+            window.ws.onopen = function () {
+                if (antd.ws_status == 're') {
+                    window.ws.send('{"action":"join", "thread_id":' + antd.opened_mes_info.thread_id + ', "class_id":' + antd.opened_mes_info.class_id + ', "speaker":' + antd.user.id + ',"speaker_name":"' + antd.user.info.name + '","type" : "join"}');
+                }
             };
         }
-        this.reconnect_wss();
+        reconnect_wss();
         /* WebSocket 结束 */
 
     },
@@ -420,12 +425,6 @@ var antd = new Vue({
         },
         //点击班级获取主题在 center 列展示
         open_class(id, index, push) {
-
-            //websocket 断线重连
-            if(!this.ws_status){
-                this.reconnect_wss();
-            }
-
             //选中增加 class，删除其余选中
             $('.left .class-item').each(function () {
                 $(this).removeClass('clicked');
@@ -462,11 +461,7 @@ var antd = new Vue({
         //点击主题获取消息在 right 列展示
         open_mes(index, id, belong_class) {
 
-            if(!this.ws_status){
-                this.reconnect_wss();
-            }
-
-            this.ws.send('{"action":"join", "thread_id":' + id + ', "class_id":' + belong_class + ', "speaker":' + antd.user.id + ',"speaker_name":"' + antd.user.info.name + '","type" : "join"}');
+            window.ws.send('{"action":"join", "thread_id":' + id + ', "class_id":' + belong_class + ', "speaker":' + antd.user.id + ',"speaker_name":"' + antd.user.info.name + '","type" : "join"}');
             //清除当前 interval
             window.clearInterval(window.get_push_interval);
 
@@ -756,12 +751,6 @@ var antd = new Vue({
         },
         //发送内容
         handle_input_send(type) {
-
-            //websocket 断线重连
-            if(!this.ws_status){
-                this.reconnect_wss();
-            }
-
             this.mes_input.text = 'Sending...';
             this.mes_input.disable = true;
 
@@ -823,7 +812,7 @@ var antd = new Vue({
                         if (res.data.status) {
 
                             //广播全 thread 在线用户
-                            antd.ws.send('{"action":"send", "thread_id":' + antd.opened_mes_info.thread_id + ', "class_id":' + antd.opened_mes_info.class_id + ', "speaker":' + antd.user.id + ',"speaker_name":"' + antd.user.info.name + '","mes_id":' + res.data.code + ',"type" : "message"}');
+                            window.ws.send('{"action":"send", "thread_id":' + antd.opened_mes_info.thread_id + ', "class_id":' + antd.opened_mes_info.class_id + ', "speaker":' + antd.user.id + ',"speaker_name":"' + antd.user.info.name + '","mes_id":' + res.data.code + ',"type" : "message"}');
 
                             this.mes_input.content = null;
                             this.mes_input.disable = false;
@@ -1146,11 +1135,6 @@ var antd = new Vue({
             event.currentTarget.className = 'mes-stream';
         },
         add_emoji(type, mes_id, index) {
-            //websocket 断线重连
-            if(!this.ws_status){
-                this.reconnect_wss();
-            }
-
             if (this.emoji_added_count < 20) {
                 this.emoji_added_count += 1;
 
@@ -1162,7 +1146,7 @@ var antd = new Vue({
                     )
                     .then(res => {
                         if (res.data.status) {
-                            antd.ws.send('{"action":"send", "thread_id":' + antd.opened_mes_info.thread_id + ', "class_id":' + antd.opened_mes_info.class_id + ', "speaker":' + antd.user.id + ',"speaker_name":"' + antd.user.info.name + '","mes_id":' + mes_id + ',"emoji_type":"add","type":"emoji","emoji_id":' + type + ',"count_id":' + (index + 1) + '}');
+                            window.ws.send('{"action":"send", "thread_id":' + antd.opened_mes_info.thread_id + ', "class_id":' + antd.opened_mes_info.class_id + ', "speaker":' + antd.user.id + ',"speaker_name":"' + antd.user.info.name + '","mes_id":' + mes_id + ',"emoji_type":"add","type":"emoji","emoji_id":' + type + ',"count_id":' + (index + 1) + '}');
                         } else {
                             this.$message.error(res.data.mes);
                         }
@@ -1174,12 +1158,6 @@ var antd = new Vue({
             }
         },
         remove_emoji(type, mes_id, index) {
-
-            //websocket 断线重连
-            if(!this.ws_status){
-                this.reconnect_wss();
-            }
-
             if (this.emoji_removed_count < 30) {
                 this.emoji_removed_count += 1;
 
@@ -1191,7 +1169,7 @@ var antd = new Vue({
                     )
                     .then(res => {
                         if (res.data.status) {
-                            antd.ws.send('{"action":"send", "thread_id":' + antd.opened_mes_info.thread_id + ', "class_id":' + antd.opened_mes_info.class_id + ', "speaker":' + antd.user.id + ',"speaker_name":"' + antd.user.info.name + '","mes_id":' + mes_id + ',"emoji_type":"remove","type":"emoji","emoji_id":' + type + ',"count_id":' + (index + 1) + '}');
+                            window.ws.send('{"action":"send", "thread_id":' + antd.opened_mes_info.thread_id + ', "class_id":' + antd.opened_mes_info.class_id + ', "speaker":' + antd.user.id + ',"speaker_name":"' + antd.user.info.name + '","mes_id":' + mes_id + ',"emoji_type":"remove","type":"emoji","emoji_id":' + type + ',"count_id":' + (index + 1) + '}');
                         } else {
                             this.$message.error(res.data.mes);
                         }
@@ -1203,11 +1181,6 @@ var antd = new Vue({
         },
         remove_mes(mes_id, index) {
 
-            //websocket 断线重连
-            if(!this.ws_status){
-                this.reconnect_wss();
-            }
-
             var query_string = "user=" + this.user.id + "&mes_id=" + mes_id + "&class_id=" + this.opened_mes_info.class_id + "&thread_id=" + this.opened_mes_info.thread_id;
 
             axios.post(
@@ -1216,7 +1189,7 @@ var antd = new Vue({
                 )
                 .then(res => {
                     if (res.data.status) {
-                        antd.ws.send('{"action":"send", "thread_id":' + antd.opened_mes_info.thread_id + ', "class_id":' + antd.opened_mes_info.class_id + ', "speaker":' + antd.user.id + ',"speaker_name":"' + antd.user.info.name + '","mes_id":' + mes_id + ',"type":"delete","count_id":' + (index + 1) + '}');
+                        window.ws.send('{"action":"send", "thread_id":' + antd.opened_mes_info.thread_id + ', "class_id":' + antd.opened_mes_info.class_id + ', "speaker":' + antd.user.id + ',"speaker_name":"' + antd.user.info.name + '","mes_id":' + mes_id + ',"type":"delete","count_id":' + (index + 1) + '}');
                         this.opened_thread_info[this.opened_mes_info.index].message_count--;
                     } else {
                         this.$message.error(res.data.mes);
@@ -1226,11 +1199,6 @@ var antd = new Vue({
         },
         handle_edit_mes_submit() {
 
-            //websocket 断线重连
-            if(!this.ws_status){
-                this.reconnect_wss();
-            }
-
             var query_string = "content=" + this.edit.mes.content + "&user=" + this.user.id + "&mes_id=" + this.edit.mes.id + "&class_id=" + this.opened_mes_info.class_id + "&thread_id=" + this.opened_mes_info.thread_id;
 
             axios.post(
@@ -1239,7 +1207,7 @@ var antd = new Vue({
                 )
                 .then(res => {
                     if (res.data.status) {
-                        antd.ws.send('{"action":"send", "thread_id":' + antd.opened_mes_info.thread_id + ', "class_id":' + antd.opened_mes_info.class_id + ', "speaker":' + antd.user.id + ',"speaker_name":"' + antd.user.info.name + '","mes_id":' + antd.edit.mes.id + ',"type":"edit"}');
+                        window.ws.send('{"action":"send", "thread_id":' + antd.opened_mes_info.thread_id + ', "class_id":' + antd.opened_mes_info.class_id + ', "speaker":' + antd.user.id + ',"speaker_name":"' + antd.user.info.name + '","mes_id":' + antd.edit.mes.id + ',"type":"edit"}');
                         this.handle_edit_mes_cancel();
                     } else {
                         this.$message.error(res.data.mes);
