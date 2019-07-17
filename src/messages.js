@@ -233,6 +233,7 @@ var antd = new Vue({
                         }
                     }
                     antd.update_mes();
+                    antd.opened_thread_info[antd.opened_mes_info.index].message_count++;
                     break;
             }
         };
