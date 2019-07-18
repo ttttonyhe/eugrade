@@ -766,60 +766,68 @@ body {
     margin-right: 10px;
 }
 
-.logs-info h3 {
-    color: #333;
-    margin: 0px;
-    font-size: 17px;
-}
-
-.logs-info h3 em:nth-child(2) {
-    font-style: normal;
-    color: #999;
-    font-weight: 300;
-    background: #f1f2f3;
-    font-size: 13px;
-    padding: 3px 8px;
-    border-radius: 4px;
-    text-transform: capitalize;
-    margin-left: 5px;
-}
-
-.logs-info h3 em:nth-child(1) {
-    font-style: normal;
-    color: #999;
-    font-weight: 300;
-    font-size: 14px
-}
-
-.logs-info:nth-child(1) {
-    border-bottom: 1px solid #eee;
-    padding-top: 0px;
-    padding-bottom: 10px;
-}
-
 .logs-info {
+
     border-bottom: 1px solid #eee;
-    padding: 12px 0px
+    padding: 12px 0px;
+
+    &:nth-child(1) {
+        border-bottom: 1px solid #eee;
+        padding-top: 0px;
+        padding-bottom: 10px;
+    }
+
+    h3 {
+        color: #333;
+        margin: 0px;
+        font-size: 17px;
+    }
+
+    h3 {
+        em {
+            &:nth-child(2) {
+                font-style: normal;
+                color: #999;
+                font-weight: 300;
+                background: #f1f2f3;
+                font-size: 13px;
+                padding: 3px 8px;
+                border-radius: 4px;
+                text-transform: capitalize;
+                margin-left: 5px;
+            }
+
+            &:nth-child(1) {
+                font-style: normal;
+                color: #999;
+                font-weight: 300;
+                font-size: 14px
+            }
+        }
+    }
+
+    div {
+        &:nth-child(2) {
+            border-left: 2px solid #eee;
+            padding-left: 10px;
+            color: #777;
+            margin-top: 3px;
+
+            p {
+                margin-top: -2px;
+                font-weight: 300;
+                margin-bottom: 0px;
+
+                &:nth-child(1) {
+                    margin-bottom: 0px;
+                    margin-top: 2px;
+                    font-weight: 300;
+                }
+            }
+        }
+    }
 }
 
-.logs-info div:nth-child(2) p:nth-child(1) {
-    margin-bottom: 0px;
-    margin-top: 2px;
-    font-weight: 300;
-}
-
-.logs-info div:nth-child(2) {
-    border-left: 2px solid #eee;
-    padding-left: 10px;
-    color: #777;
-    margin-top: 3px
-}
-
-.logs-info div:nth-child(2) p {
-    margin-top: -2px;
-    font-weight: 300;
-    margin-bottom: 0px
-}
 
 .thread-notify {
     width: 8px;

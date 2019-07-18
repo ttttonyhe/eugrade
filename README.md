@@ -28,13 +28,13 @@
 + **Developed using Webpack & Sass**
   - 采用了 Webpack 与 Sass
 + **WebSocket Supported**
-  - 支持 WebSocket 的聊天系统
+  - 采用 WebSocket 并支持心跳的聊天系统
 + **Organized Classes/Files System**
   - 系统高效的团队(班级)/文件系统
 + **Clear Instant messaging system**
   - 简洁强大的群聊系统(支持新消息推送)
-+ **Neet UI design**
-  - 美丽的 UI 设计与自适应
++ **Neat UI design**
+  - 美丽的 UI 设计
 + **0 sql everywhere**
   - 完全无数据库 (整个系统基于 json)
 + **All-round  UX Design**
@@ -46,12 +46,12 @@
 
 ## Usage 使用方法
 + 将 repo clone 到目录
-+ 本地环境为 Php5.6+ & Nodejs & Ruby(sass + compass)
-+ PHP 必须包含 pcntl、posix、Event/libevent 扩展
++ 本地环境为 Php5.6+ & Nodejs & Ruby (sass + compass)
++ PHP 必须包含 pcntl、posix、Event / libevent 扩展
 + 执行 composer install 安装全部依赖
 + 执行 npm install / cnpm install 安装依赖包
 + 执行 npm run dev 打包编译
-+ 参照手册配置 [WSS](http://doc.workerman.net/faq/secure-websocket-server.html)
++ 参照 Workerman 手册 [配置WSS](http://doc.workerman.net/faq/secure-websocket-server.html)
 + interact 目录执行 php websocket.php start -d & 常驻后台
 
 <br/>
