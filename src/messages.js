@@ -201,7 +201,7 @@ var antd = new Vue({
 
         /* WebSocket 开始 */
         //websocket 连接
-        this.ws = new WebSocket('wss://pokers.zeo.im/wss');
+        this.ws = new WebSocket('ws://127.0.0.1:2000');
         this.ws.onmessage = function (data) {
             var re = eval('(' + data.data + ')');
             switch (re.op) {
