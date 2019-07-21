@@ -33,7 +33,8 @@ try {
         'series_order' => 'integer', //所属系列的排序位置
         'date' => 'integer',
         'name' => 'string',
-        'candidate_count' => 'integer' //参与人数(存在数据的人数,不包含缺席),
+        'candidate_count' => 'integer', //参与人数(存在数据的人数,不包含缺席)
+        'scale' => 'string'
     ));
 }
 
@@ -52,33 +53,19 @@ if (!empty($_GET['class_id'])) {
 
     //获取参数
     $class = input($_GET['class_id']);
-    $type = input($_GET['type']);
-
-    if (empty($type)) {
-        //业务逻辑
-        $array = Lazer::table('classes')->where('id', '=', $class)->findAll()->asArray();
-        if (!!$array) {
-            $array = Lazer::table('series')->where('belong_class', '=', (int) $class)->findAll()->asArray();
-            for ($i = 0; $i < count($array); $i++) {
-                $array[$i]['topics_info'] = Lazer::table('topics')->where('belong_series', '=', (int) $array[$i]['id'])->findAll()->asArray();
-            }
-        } else {
-            $array = array(
-                'status' => 0,
-                'code' => 101,
-                'mes' => 'Class not exist'
-            );
+    //业务逻辑
+    $array = Lazer::table('classes')->where('id', '=', $class)->findAll()->asArray();
+    if (!!$array) {
+        $array = Lazer::table('series')->where('belong_class', '=', (int) $class)->findAll()->asArray();
+        for ($i = 0; $i < count($array); $i++) {
+            $array[$i]['topics_info'] = Lazer::table('topics')->where('belong_series', '=', (int) $array[$i]['id'])->findAll()->asArray();
         }
     } else {
-        //业务逻辑
-        $array = Lazer::table('series')->limit(1)->where('id', '=', (int) $class)->find()->asArray();
-        if (!$array) {
-            $array = array(
-                'status' => 0,
-                'code' => 101,
-                'mes' => 'series not exist'
-            );
-        }
+        $array = array(
+            'status' => 0,
+            'code' => 101,
+            'mes' => 'Class not exist'
+        );
     }
 } else {
     $array = array(

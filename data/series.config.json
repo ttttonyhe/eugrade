@@ -1,1 +1,1 @@
-{"last_id":2,"schema":{"id":"integer","creator":"integer","belong_class":"integer","date":"integer","name":"string","series":"string"},"relations":{}}
+{"last_id":6,"schema":{"id":"integer","creator":"integer","belong_class":"integer","date":"integer","name":"string","topics":"string"},"relations":{}}

@@ -836,14 +836,15 @@ body {
     padding: 10px 35px;
 
     h3 {
-        color: #666 !important;
+        color: #555 !important;
         max-width: 100% !important;
         font-weight: 400;
-        font-size: 14px;
+        font-size: 15px;
 
         p {
             padding-left: 25px;
-            margin: -3px 0px;
+            margin: -3px 0px -1px 0px;
+            max-width: 100% !important;
         }
     }
 }
@@ -869,11 +870,19 @@ body {
         flex-basis: 50%;
         border-right: 1px solid #eee;
         padding: 10px 0px;
+        transition: all .1s;
     }
 
     & div:nth-child(2) {
         flex-basis: 50%;
+        transition: all .1s;
         padding: 10px 0px;
+    }
+
+    & div:hover{
+        background: rgba(247, 248, 249, 0.3686274509803922);
+        border-bottom: 2px solid rgb(24, 144, 255);
+        color: rgb(24, 144, 255);
     }
 
 }
@@ -890,7 +899,7 @@ body {
     div{
         font-size: 15px;
         padding: 7px 0px;
-        flex-basis: 20%;
+        flex-basis: 16.666666666666667%;
         text-align: center;
         border-left: 1px solid #eee;
 
@@ -906,7 +915,7 @@ body {
     div{
         font-size: 15px;
     padding: 7px 10px;
-    flex-basis: 20%;
+    flex-basis: 16.666666666666667%;
     text-overflow: ellipsis;
     overflow: hidden;
     text-align: center;
@@ -918,4 +927,35 @@ body {
 
     }
     border-bottom: 1px solid #eee;
+}
+
+.topic-date{
+    color: #999;
+    font-size: 13px;
+    font-style: normal;
+    letter-spacing: 0px;
+    font-weight: 300;
+    margin-top: 6.5px;
+}
+
+.topic-header-p{
+    color: #444 !important;
+    font-weight: 600 !important;
+    font-size: 19px !important;
+}
+
+.topic-series{
+    color: #888;
+    font-size: 15px;
+    font-weight: 400;
+    font-style: normal;
+    letter-spacing: 0px;
+}
+
+.topic-table-add{
+    margin-bottom: 15px;
+}
+
+.topic-op{
+    display:flex;float:right;margin-top: -30px;
 }

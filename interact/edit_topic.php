@@ -19,14 +19,15 @@ try {
         'date' => 'integer',
         'name' => 'string',
         'candidate_count' => 'integer', //参与人数(存在数据的人数,不包含缺席)
-        'scale' => 'string'
+        'scale' => 'string',
+        'average' => 'string' //总平均数
     ));
 }
 
 session_start();
 
 //判断发送参数是否齐全，请求创建班级的用户是否为当前登录用户
-if (!empty($_POST['creator']) && !empty($_POST['name']) && !empty($_POST['belong_series']) && !empty($_POST['belong_class']) && ($_SESSION['logged_in_id'] == (int)$_POST['creator'])) {
+if (!empty($_POST['creator']) && !empty($_POST['name']) && !empty($_POST['belong_class']) && !empty($_POST['belong_series']) && !empty($_POST['topic_id']) && ($_SESSION['logged_in_id'] == (int)$_POST['creator'])) {
 
     //输入处理
     function input($data)
@@ -41,9 +42,10 @@ if (!empty($_POST['creator']) && !empty($_POST['name']) && !empty($_POST['belong
 
     //获取参数
     $id = input($_POST['creator']);
-    $name = input($_POST['name']);
     $class = input($_POST['belong_class']);
     $series = input($_POST['belong_series']);
+    $name = input($_POST['name']);
+    $topic = input($_POST['topic_id']);
 
     //业务逻辑
     $array = Lazer::table('classes')->limit(1)->where('id', '=', (int)$class)->andWhere('super','=',(int)$id)->find();
@@ -52,34 +54,26 @@ if (!empty($_POST['creator']) && !empty($_POST['name']) && !empty($_POST['belong
         $code = 101;
         $mes = 'Permission denied';
     } else {
-        $array = Lazer::table('users')->limit(1)->where('id', '=', (int)$id)->find()->asArray();
+        $array = Lazer::table('series')->limit(1)->where('id', '=', (int)$series)->andWhere('belong_class','=',(int)$class)->find()->asArray();
         if (!!$array) {
-            $array = Lazer::table('series')->limit(1)->where('id', '=', (string)$series)->find()->asArray();
+            $array = Lazer::table('topics')->limit(1)->where('id', '=', (int)$topic)->andWhere('belong_series', '=', (int)$series)->find()->asArray();
             if (!empty($array)) {
-                //建立 thread
-                $this_id = Lazer::table('topics')->lastId() + 1;
-                $row = Lazer::table('topics');
-                $row->id = $this_id;
-                $row->name = (string)$name;
-                $row->belong_class = (int)$class;
-                $row->belong_series = (int)$series;
-                $row->creator = (int)$id;
-                $row->date = time();
-                $row->average = '0';
+                $row = Lazer::table('topics')->limit(1)->where('id', '=', (int)$topic)->andWhere('belong_series', '=', (int)$series)->find();
+                $row->name = $name;
                 $row->save();
 
                 $status = 1;
                 $code = 102;
-                $mes = 'Successfully created a topic';
+                $mes = 'Successfully edited the topic name';
             } else {
                 $status = 0;
                 $code = 105;
-                $mes = 'Series has been created';
+                $mes = 'Topic does not exist';
             }
         } else {
             $status = 0;
             $code = 104;
-            $mes = 'The creator does not exist';
+            $mes = 'The series does not exist';
         }
     }
 } else {
