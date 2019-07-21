@@ -39,8 +39,12 @@
     } ?>
 
     <script type="text/javascript" src="../statics/js/vue.js"></script>
+    <script>
+        Vue.config.devtools = true
+    </script>
     <script type="text/javascript" src="../statics/js/axios.min.js"></script>
     <link type="text/css" rel="stylesheet" href="../statics/css/antd.css">
+    <script type="text/javascript" src="../statics/js/sort.js"></script>
     <script type="text/javascript" src="../statics/js/antd.js"></script>
     <script type="text/javascript" src="../statics/js/jquery.min.js"></script>
     <script type="text/javascript" src="../statics/js/moment.min.js"></script>

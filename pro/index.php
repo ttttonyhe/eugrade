@@ -95,8 +95,14 @@
                 <a-menu-item key="files" @click="switch_section('files')" style="border-right: 1px solid #eee;">
                     <a-icon type="save"></a-icon>Files
                 </a-menu-item>
-                <a-menu-item key="Classes" @click="switch_section('classes')" style="border-right: 1px solid #eee;">
+                <a-menu-item key="grades" @click="switch_section('grades')" style="border-right: 1px solid #eee;">
+                    <a-icon type="bar-chart"></a-icon>Grades
+                </a-menu-item>
+                <a-menu-item key="classes" @click="switch_section('classes')" style="border-right: 1px solid #eee;">
                     <a-icon type="bank"></a-icon>Classes
+                </a-menu-item>
+                <a-menu-item key="schools" @click="switch_section('schools')" style="border-right: 1px solid #eee;">
+                    <a-icon type="cluster"></a-icon>Schools
                 </a-menu-item>
             </a-menu>
             <div class="header-user">

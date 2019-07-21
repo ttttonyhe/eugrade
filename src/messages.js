@@ -203,29 +203,63 @@ var antd = new Vue({
 
         /* WebSocket 开始 */
         //websocket 连接
-        function reconnect_wss() {
-            window.ws = new WebSocket('ws://127.0.0.1:2000');
-            window.ws.onmessage = function (data) {
-                var re = eval('(' + data.data + ')');
-                switch (re.op) {
-                    //创建 wss 连接
-                    case 'connect':
-                        console.log('Connected to Pokers Server');
-                        break;
-                        //加入 wss 连接
-                    case 'join':
-                        if (!re.status) {
-                            antd.$message.error('Service Unavailable');
-                        }
-                        break;
-                        //心跳
-                    case 'keep':
-                        break;
-                        //删除内容(count_id 为内容条段数)
-                    case 'delete':
-                        var mes = antd.opened_mes_info.meses;
-                        if (re.status && (parseInt(re.count_id - 1) < mes.length)) {
-                            antd.opened_mes_info.meses.splice(re.count_id - 1, 1);
+        this.ws = new WebSocket('ws://127.0.0.1:2000');
+        this.ws.onmessage = function (data) {
+            var re = eval('(' + data.data + ')');
+            switch (re.op) {
+                //创建 wss 连接
+                case 'connect':
+                    console.log('Connected to Pokers Server');
+                    break;
+                //加入 wss 连接
+                case 'join':
+                    if (!re.status) {
+                        antd.$message.error('Service Unavailable');
+                    }
+                    break;
+                //心跳
+                case 'keep':
+                    break;
+                //删除内容(count_id 为内容条段数)
+                case 'delete':
+                    var mes = antd.opened_mes_info.meses;
+                    if (re.status && (parseInt(re.count_id - 1) < mes.length)) {
+                        antd.opened_mes_info.meses.splice(re.count_id - 1, 1);
+                    } else {
+                        antd.$message.error('Faild to delete');
+                    }
+                    break;
+                //emoji 增加
+                case 'emoji_add':
+                    var mes = antd.opened_mes_info.meses;
+                    if (re.status && (parseInt(re.count_id - 1) < mes.length)) {
+                        var emo = 'emoji_' + parseInt(re.emoji_id);
+                        antd.opened_mes_info.meses[parseInt(re.count_id - 1)][emo] += 1;
+                    } else {
+                        antd.$message.error('Faild to add emoji');
+                    }
+                    break;
+                //emoji 删除
+                case 'emoji_remove':
+                    var mes = antd.opened_mes_info.meses;
+                    if (re.status && (parseInt(re.count_id - 1) < mes.length)) {
+                        var emo = 'emoji_' + parseInt(re.emoji_id);
+                        antd.opened_mes_info.meses[parseInt(re.count_id - 1)][emo] -= 1;
+                    } else {
+                        antd.$message.error('Faild to remove emoji');
+                    }
+                    break;
+                //编辑内容(不采用 wss，直接请求服务器)
+                case 'edit':
+                    antd.load_mes();
+                    break;
+                default: //内容更新
+                    //在内容段后添加一段
+                    antd.opened_mes_info.meses.push(re);
+                    if (parseInt(re.speaker) !== parseInt(antd.user.id)) {
+                        if ($(window).height() + $('#mes-container').scrollTop() >= $('#mes-inner').height()) {
+                            //当前窗口可视区域+滑动距离大于总可滑动高度,有更新直接到底部
+                            antd.bottom_mes();
                         } else {
                             antd.$message.error('Faild to delete');
                         }

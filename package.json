@@ -1,7 +1,7 @@
 {
   "name": "pokers",
-  "version": "0.0.1",
-  "description": "Clear & Organized Team Communication Tool",
+  "version": "1.0.0",
+  "description": "Clear & Organized Learning Management System",
   "main": "index.js",
   "scripts": {
     "dev": "webpack --mode development && sass ./statics/css/main.scss ./dist/css/main.css --style compressed"
@@ -11,12 +11,13 @@
     "url": "git+https://github.com/HelipengTony/pokers.git"
   },
   "author": "TonyHe",
-  "license": "GPL-3.0",
+  "license": "GPL-3.0-or-later",
   "bugs": {
     "url": "https://github.com/HelipengTony/pokers/issues"
   },
   "homepage": "https://github.com/HelipengTony/pokers#readme",
   "dependencies": {
-    "socket.io": "^2.2.0"
+    "webpack": "^4.36.1",
+    "webpack-cli": "^3.3.6"
   }
 }

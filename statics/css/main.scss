@@ -101,7 +101,8 @@ body {
     padding-left: 20px;
     border-bottom: 1px solid #ececec;
     display: flex;
-    transition: all .2s
+    transition: all .2s;
+    background: #fff;
 }
 
 .super {
@@ -348,7 +349,8 @@ body {
 
 .mes-header {
     padding: 10px 23px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid #ececec;
+    background: #fff;
 }
 
 .mes-header p {
@@ -766,6 +768,61 @@ body {
     margin-right: 10px;
 }
 
+.logs-info h3 {
+    color: #333;
+    margin: 0px;
+    font-size: 17px;
+}
+
+.logs-info h3 em:nth-child(2) {
+    font-style: normal;
+    color: #999;
+    font-weight: 300;
+    background: #f1f2f3;
+    font-size: 13px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    text-transform: capitalize;
+    margin-left: 5px;
+}
+
+.logs-info h3 em:nth-child(1) {
+    font-style: normal;
+    color: #999;
+    font-weight: 300;
+    font-size: 14px
+}
+
+.logs-info:nth-child(1) {
+    border-bottom: 1px solid #eee;
+    padding-top: 0px;
+    padding-bottom: 10px;
+}
+
+.logs-info {
+    border-bottom: 1px solid #eee;
+    padding: 12px 0px
+}
+
+.logs-info div:nth-child(2) p:nth-child(1) {
+    margin-bottom: 0px;
+    margin-top: 2px;
+    font-weight: 300;
+}
+
+.logs-info div:nth-child(2) {
+    border-left: 2px solid #eee;
+    padding-left: 10px;
+    color: #777;
+    margin-top: 3px
+}
+
+.logs-info div:nth-child(2) p {
+    margin-top: -2px;
+    font-weight: 300;
+    margin-bottom: 0px
+}
+
 .logs-info {
 
     border-bottom: 1px solid #eee;
@@ -828,21 +885,130 @@ body {
     }
 }
 
+.topic-item {
+    padding: 10px 35px;
 
-.thread-notify {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #FFC107;
-    margin-top: 16px;
-    transform: translateX(-10px);
+    h3 {
+        color: #555 !important;
+        max-width: 100% !important;
+        font-weight: 400;
+        font-size: 15px;
+
+        p {
+            padding-left: 25px;
+            margin: -3px 0px -1px 0px;
+            max-width: 100% !important;
+        }
+    }
 }
 
-$leaved_label_color :rgb(249, 176, 176);
+.series-item {
+    border-top: 1px solid #eeee;
+    border-left: 3px solid #eee;
+    margin-top: 10px;
 
-.leaved_label {
-    border: 1px solid $leaved_label_color;
-    color: $leaved_label_color !important;
-    padding: 0px 3px 1px 3px;
-    border-radius: 3px;
+    &:hover {
+        background: #fff !important;
+    }
+}
+
+.topic-header {
+    display: flex;
+    font-size: 17px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+    letter-spacing: .5px;
+
+    & div:nth-child(1) {
+        flex-basis: 50%;
+        border-right: 1px solid #eee;
+        padding: 10px 0px;
+        transition: all .1s;
+    }
+
+    & div:nth-child(2) {
+        flex-basis: 50%;
+        transition: all .1s;
+        padding: 10px 0px;
+    }
+
+    & div:hover{
+        background: rgba(247, 248, 249, 0.3686274509803922);
+        border-bottom: 2px solid rgb(24, 144, 255);
+        color: rgb(24, 144, 255);
+    }
+
+}
+
+.topic-container{
+    padding: 30px;
+}
+
+.table-header{
+    background: #f7f8f9;
+    border-top: 2px solid #eee;
+    border-bottom: 2px solid #eee;
+    display: flex;
+    div{
+        font-size: 15px;
+        padding: 7px 0px;
+        flex-basis: 16.666666666666667%;
+        text-align: center;
+        border-left: 1px solid #eee;
+
+        &:last-child{
+            border-right: 1px solid #eee;
+        }
+
+    }
+}
+
+.table-item{
+    display: flex;
+    div{
+        font-size: 15px;
+    padding: 7px 10px;
+    flex-basis: 16.666666666666667%;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    text-align: center;
+    border-left: 1px solid #eee;
+
+        &:last-child{
+            border-right: 1px solid #eee;
+        }
+
+    }
+    border-bottom: 1px solid #eee;
+}
+
+.topic-date{
+    color: #999;
+    font-size: 13px;
+    font-style: normal;
+    letter-spacing: 0px;
+    font-weight: 300;
+    margin-top: 6.5px;
+}
+
+.topic-header-p{
+    color: #444 !important;
+    font-weight: 600 !important;
+    font-size: 19px !important;
+}
+
+.topic-series{
+    color: #888;
+    font-size: 15px;
+    font-weight: 400;
+    font-style: normal;
+    letter-spacing: 0px;
+}
+
+.topic-table-add{
+    margin-bottom: 15px;
+}
+
+.topic-op{
+    display:flex;float:right;margin-top: -30px;
 }

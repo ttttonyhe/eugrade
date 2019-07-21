@@ -5,7 +5,8 @@ module.exports = {
         files : './src/files.js',
         classes : './src/classes.js',
         login : './src/login.js',
-        signup : './src/signup.js'
+        signup : './src/signup.js',
+        grades : './src/grades.js'
     },
     output : {
         filename : '[name].js',
