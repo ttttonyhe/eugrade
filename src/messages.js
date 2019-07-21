@@ -3,6 +3,7 @@ var antd = new Vue({
     data() {
         return {
             ws: null,
+            ws_status: 'fi',
             md: null,
             user: {
                 id: cookie.get('logged_in_id'),
@@ -40,7 +41,8 @@ var antd = new Vue({
                 id: null,
                 superid: null,
                 index: null,
-                logs: []
+                logs: [],
+                members: []
             },
             opened_thread_info: [],
             member_marked: false,
@@ -259,17 +261,69 @@ var antd = new Vue({
                             //当前窗口可视区域+滑动距离大于总可滑动高度,有更新直接到底部
                             antd.bottom_mes();
                         } else {
-                            antd.unread.visible = true;
-                            setTimeout(function () {
-                                antd.unread.visible = false;
-                            }, 1000);
+                            antd.$message.error('Faild to delete');
                         }
-                    }
-                    antd.update_mes();
-                    break;
-            }
-        };
+                        break;
+                        //emoji 增加
+                    case 'emoji_add':
+                        var mes = antd.opened_mes_info.meses;
+                        if (re.status && (parseInt(re.count_id - 1) < mes.length)) {
+                            var emo = 'emoji_' + parseInt(re.emoji_id);
+                            antd.opened_mes_info.meses[parseInt(re.count_id - 1)][emo] += 1;
+                        } else {
+                            antd.$message.error('Faild to add emoji');
+                        }
+                        break;
+                        //emoji 删除
+                    case 'emoji_remove':
+                        var mes = antd.opened_mes_info.meses;
+                        if (re.status && (parseInt(re.count_id - 1) < mes.length)) {
+                            var emo = 'emoji_' + parseInt(re.emoji_id);
+                            antd.opened_mes_info.meses[parseInt(re.count_id - 1)][emo] -= 1;
+                        } else {
+                            antd.$message.error('Faild to remove emoji');
+                        }
+                        break;
+                        //编辑内容(不采用 wss，直接请求服务器)
+                    case 'edit':
+                        antd.load_mes();
+                        break;
+                    default: //内容更新
+                        if ("undefined" == typeof re.status) {
+                            //在内容段后添加一段
+                            antd.opened_mes_info.meses.push(re);
+                            if (parseInt(re.speaker) !== parseInt(antd.user.id)) {
+                                if ($(window).height() + $('#mes-container').scrollTop() >= $('#mes-inner').height()) {
+                                    //当前窗口可视区域+滑动距离大于总可滑动高度,有更新直接到底部
+                                    antd.bottom_mes();
+                                } else {
+                                    antd.unread.visible = true;
+                                    setTimeout(function () {
+                                        antd.unread.visible = false;
+                                    }, 1000);
+                                }
+                            }
+                            antd.update_mes();
+                            antd.opened_thread_info[antd.opened_mes_info.index].message_count++;
+                        } else {
+                            antd.load_mes();
+                        }
+                        break;
+                }
+            };
 
+            window.ws.onclose = function () {
+                antd.ws_status = 're';
+                reconnect_wss();
+            };
+
+            window.ws.onopen = function () {
+                if (antd.ws_status == 're') {
+                    window.ws.send('{"action":"join", "thread_id":' + antd.opened_mes_info.thread_id + ', "class_id":' + antd.opened_mes_info.class_id + ', "speaker":' + antd.user.id + ',"speaker_name":"' + antd.user.info.name + '","type" : "join"}');
+                }
+            };
+        }
+        reconnect_wss();
         /* WebSocket 结束 */
 
     },
@@ -422,6 +476,10 @@ var antd = new Vue({
                 this.opened_class_info.superid = this.user.classes_info[parseInt(index)].super;
             }
             this.spinning.center = true;
+            axios.get('../interact/select_classes.php?type=member&id=' + id + '&form=single')
+                .then(res => {
+                    this.opened_class_info.members = res.data.member.split(',');
+                });
             axios.get('../interact/select_thread.php?class_id=' + id)
                 .then(resp => {
                     this.status.mark = false;
@@ -437,7 +495,7 @@ var antd = new Vue({
         //点击主题获取消息在 right 列展示
         open_mes(index, id, belong_class) {
 
-            this.ws.send('{"action":"join", "thread_id":' + id + ', "class_id":' + belong_class + ', "speaker":' + antd.user.id + ',"speaker_name":"' + antd.user.info.name + '","type" : "join"}');
+            window.ws.send('{"action":"join", "thread_id":' + id + ', "class_id":' + belong_class + ', "speaker":' + antd.user.id + ',"speaker_name":"' + antd.user.info.name + '","type" : "join"}');
             //清除当前 interval
             window.clearInterval(window.get_push_interval);
 
@@ -788,7 +846,7 @@ var antd = new Vue({
                         if (res.data.status) {
 
                             //广播全 thread 在线用户
-                            antd.ws.send('{"action":"send", "thread_id":' + antd.opened_mes_info.thread_id + ', "class_id":' + antd.opened_mes_info.class_id + ', "speaker":' + antd.user.id + ',"speaker_name":"' + antd.user.info.name + '","mes_id":' + res.data.code + ',"type" : "message"}');
+                            window.ws.send('{"action":"send", "thread_id":' + antd.opened_mes_info.thread_id + ', "class_id":' + antd.opened_mes_info.class_id + ', "speaker":' + antd.user.id + ',"speaker_name":"' + antd.user.info.name + '","mes_id":' + res.data.code + ',"type" : "message"}');
 
                             this.mes_input.content = null;
                             this.mes_input.disable = false;
@@ -1122,7 +1180,7 @@ var antd = new Vue({
                     )
                     .then(res => {
                         if (res.data.status) {
-                            antd.ws.send('{"action":"send", "thread_id":' + antd.opened_mes_info.thread_id + ', "class_id":' + antd.opened_mes_info.class_id + ', "speaker":' + antd.user.id + ',"speaker_name":"' + antd.user.info.name + '","mes_id":' + mes_id + ',"emoji_type":"add","type":"emoji","emoji_id":' + type + ',"count_id":' + (index + 1) + '}');
+                            window.ws.send('{"action":"send", "thread_id":' + antd.opened_mes_info.thread_id + ', "class_id":' + antd.opened_mes_info.class_id + ', "speaker":' + antd.user.id + ',"speaker_name":"' + antd.user.info.name + '","mes_id":' + mes_id + ',"emoji_type":"add","type":"emoji","emoji_id":' + type + ',"count_id":' + (index + 1) + '}');
                         } else {
                             this.$message.error(res.data.mes);
                         }
@@ -1145,7 +1203,7 @@ var antd = new Vue({
                     )
                     .then(res => {
                         if (res.data.status) {
-                            antd.ws.send('{"action":"send", "thread_id":' + antd.opened_mes_info.thread_id + ', "class_id":' + antd.opened_mes_info.class_id + ', "speaker":' + antd.user.id + ',"speaker_name":"' + antd.user.info.name + '","mes_id":' + mes_id + ',"emoji_type":"remove","type":"emoji","emoji_id":' + type + ',"count_id":' + (index + 1) + '}');
+                            window.ws.send('{"action":"send", "thread_id":' + antd.opened_mes_info.thread_id + ', "class_id":' + antd.opened_mes_info.class_id + ', "speaker":' + antd.user.id + ',"speaker_name":"' + antd.user.info.name + '","mes_id":' + mes_id + ',"emoji_type":"remove","type":"emoji","emoji_id":' + type + ',"count_id":' + (index + 1) + '}');
                         } else {
                             this.$message.error(res.data.mes);
                         }
@@ -1165,7 +1223,7 @@ var antd = new Vue({
                 )
                 .then(res => {
                     if (res.data.status) {
-                        antd.ws.send('{"action":"send", "thread_id":' + antd.opened_mes_info.thread_id + ', "class_id":' + antd.opened_mes_info.class_id + ', "speaker":' + antd.user.id + ',"speaker_name":"' + antd.user.info.name + '","mes_id":' + mes_id + ',"type":"delete","count_id":' + (index + 1) + '}');
+                        window.ws.send('{"action":"send", "thread_id":' + antd.opened_mes_info.thread_id + ', "class_id":' + antd.opened_mes_info.class_id + ', "speaker":' + antd.user.id + ',"speaker_name":"' + antd.user.info.name + '","mes_id":' + mes_id + ',"type":"delete","count_id":' + (index + 1) + '}');
                         this.opened_thread_info[this.opened_mes_info.index].message_count--;
                     } else {
                         this.$message.error(res.data.mes);
@@ -1183,7 +1241,7 @@ var antd = new Vue({
                 )
                 .then(res => {
                     if (res.data.status) {
-                        antd.ws.send('{"action":"send", "thread_id":' + antd.opened_mes_info.thread_id + ', "class_id":' + antd.opened_mes_info.class_id + ', "speaker":' + antd.user.id + ',"speaker_name":"' + antd.user.info.name + '","mes_id":' + antd.edit.mes.id + ',"type":"edit"}');
+                        window.ws.send('{"action":"send", "thread_id":' + antd.opened_mes_info.thread_id + ', "class_id":' + antd.opened_mes_info.class_id + ', "speaker":' + antd.user.id + ',"speaker_name":"' + antd.user.info.name + '","mes_id":' + antd.edit.mes.id + ',"type":"edit"}');
                         this.handle_edit_mes_cancel();
                     } else {
                         this.$message.error(res.data.mes);
@@ -1193,7 +1251,7 @@ var antd = new Vue({
         handle_edit_mes_cancel() {
             this.edit.mes.visible = false;
         },
-        open_mes_edit(id, content,index) {
+        open_mes_edit(id, content, index) {
             this.edit.mes.id = id;
             if (content == '') {
                 this.edit.mes.content = 'Empty Content';
@@ -1365,6 +1423,14 @@ var antd = new Vue({
             var index_now = thread_now.indexOf(antd.opened_mes_info.thread_id.toString()); //获取当前 thread 所在消息数数组中的位置
             push_now[index_now] = antd.opened_thread_info[antd.opened_mes_info.index].message_count; //改变消息数
             cookie.set('pokers_thread_count', push_now.join('a')); //更新 cookie
+        },
+        //判断是否在班级内
+        check_leaved(speaker) {
+            if (this.opened_class_info.members.indexOf(speaker + '') > -1) {
+                return '';
+            } else {
+                return '&nbsp;<em class="leaved_label">Leaved</em>'
+            }
         },
     }
 });
