@@ -101,9 +101,6 @@
                 <a-menu-item key="classes" @click="switch_section('classes')" style="border-right: 1px solid #eee;">
                     <a-icon type="bank"></a-icon>Classes
                 </a-menu-item>
-                <a-menu-item key="schools" @click="switch_section('schools')" style="border-right: 1px solid #eee;">
-                    <a-icon type="cluster"></a-icon>Schools
-                </a-menu-item>
             </a-menu>
             <div class="header-user">
                 <a-dropdown :trigger="['click']">

@@ -2,7 +2,9 @@ var antd = new Vue({
     el: '#app',
     data() {
         return {
+            i: 0,
             sort: true,
+            stu_view_count: 0,
             user: {
                 id: cookie.get('logged_in_id'),
                 joined_classes: [],
@@ -107,22 +109,22 @@ var antd = new Vue({
                 yy: null,
                 mm: null,
             },
-            edit_info : {
-                visible : {
-                    series : false,
+            edit_info: {
+                visible: {
+                    series: false,
                     topic: false
                 },
-                confirm : {
-                    series : false,
-                    topic : false
+                confirm: {
+                    series: false,
+                    topic: false
                 },
-                info : {
-                    series : {
-                        name : null,
+                info: {
+                    series: {
+                        name: null,
                         id: null
                     },
-                    topic : {
-                        name : null
+                    topic: {
+                        name: null
                     }
                 }
             },
@@ -146,6 +148,29 @@ var antd = new Vue({
             opened_series_info: {
                 info: null,
                 status: false
+            },
+            stats: {
+                visible: {
+                    all: false,
+                    member: false
+                }
+            },
+            opened_stats_info: {
+                index: null,
+                info: null,
+                status: false,
+                chartData_all: {
+                    columns: ['name', 'average', 'percent'],
+                    rows: null
+                },
+                chartSettings_all: {
+                    axisSite: {
+                        left: ['average'],
+                        right: ['percent']
+                    },
+                    yAxisType: ['KMB', 'percent'],
+                    yAxisName: ['Average', 'Percentage']
+                }
             },
             chartData: {
                 columns: ['name', 'score', 'total', 'percent'],
@@ -486,13 +511,67 @@ var antd = new Vue({
 
 
         },
+        //编辑系列取消
         handle_edit_info_series_cancel() {
             this.edit_info.visible.series = false;
         },
-        open_edit_info_series(id,name){
+        //打开编辑系列 modal
+        open_edit_info_series(id, name) {
             this.edit_info.info.series.id = id;
             this.edit_info.info.series.name = name;
             this.edit_info.visible.series = true;
+        },
+
+        //打开折线图查看选择 series 的 modal
+        open_stats(key, index) {
+            if (this.opened_stats_info.index !== index) {
+                if (key == 'all') {
+                    this.stats.visible.all = true;
+                } else if (key == 'single') {
+                    this.spinning.right = true;
+                    this.opened_stats_info.index = index;
+
+                    axios.get('../interact/select_series.php?class_id=' + this.opened_class_info.id)
+                        .then(resp => {
+                            var ids = '';
+                            this.opened_stats_info.info = resp.data[this.opened_stats_info.index];
+                            for (l = 0; l < (this.opened_stats_info.info.topics_info).length; l++) {
+                                ids += ',' + this.opened_stats_info.info.topics_info[l].id;
+                            }
+                            ids = ids.substr(1, ids.length - 1);
+                            if (parseInt(this.user.id) == parseInt(this.opened_class_info.superid)) {
+                                axios.get('../interact/select_topic_average.php?topic_ids=' + ids + '&type=all')
+                                    .then(res => {
+                                        for (l = 0; l < (this.opened_stats_info.info.topics_info).length; l++) {
+                                            this.opened_stats_info.info.topics_info[l]['average'] = res.data[l][0];
+                                            this.opened_stats_info.info.topics_info[l]['percent'] = res.data[l][1];
+                                        }
+                                    });
+                            } else {
+                                axios.get('../interact/select_topic_average.php?topic_ids=' + ids + '&type=student&user=' + this.user.id)
+                                    .then(res => {
+                                        for (l = 0; l < (this.opened_stats_info.info.topics_info).length; l++) {
+                                            this.opened_stats_info.info.topics_info[l]['average'] = res.data[l][0];
+                                            this.opened_stats_info.info.topics_info[l]['percent'] = res.data[l][1];
+                                        }
+                                    });
+                            }
+                            this.opened_topic_info.status = false;
+                            this.opened_stats_info.chartData_all.rows = [];
+                            this.opened_stats_info.chartData_all.rows = this.opened_stats_info.info.topics_info;
+                            this.opened_stats_info.status = true;
+                            this.spinning.right = false;
+                            this.stats.visible.all = false;
+                        })
+                }
+            }else{
+                this.opened_topic_info.status = false;
+                this.opened_stats_info.status = true;
+                this.stats.visible.all = false;
+            }
+        },
+        handle_stats_cancel() {
+            this.stats.visible.all = false;
         },
 
 
@@ -515,7 +594,9 @@ var antd = new Vue({
             $('#class' + index).addClass('clicked');
 
             this.level_count = [0, 0, 0, 0, 0, 0, 0, 0];
+            this.opened_stats_info.chartData_all.rows = [];
             this.opened_topic_info.status = false;
+            this.opened_stats_info.status = false;
 
             this.spinning.center = true;
             this.opened_class_info.index = index;
@@ -556,7 +637,9 @@ var antd = new Vue({
 
             this.spinning.right = true;
             this.opened_topic_info.series_index = index;
+            this.opened_stats_info.status = false;
             this.opened_topic_info.grading_array = [];
+            this.opened_stats_info.chartData_all.rows = [];
 
             this.level_count = [0, 0, 0, 0, 0, 0, 0, 0];
 
@@ -732,7 +815,8 @@ var antd = new Vue({
         inRange(x, min, max) {
             return ((x - min) * (x - max) <= 0);
         },
-        get_record_level(percent,index) {
+        //获取成绩等级
+        get_record_level(percent, index) {
             if (!!this.opened_topic_info.grading) {
                 //百分比乘 100
                 var percent = percent * 100;
@@ -754,14 +838,33 @@ var antd = new Vue({
                         continue;
                     }
                 }
+            } else if (parseInt(this.user.id) !== parseInt(this.opened_class_info.superid)) {
+                return 'NG';
             }
         },
         //遍历全部 record 数据，变更 level_count 数据
-        get_levels(){
-            for(i=0;i<(this.opened_topic_info.records_data).length;i++){
-                if(!!this.opened_topic_info.records_data[i].level){
+        get_levels() {
+            for (i = 0; i < (this.opened_topic_info.records_data).length; i++) {
+                if (!!this.opened_topic_info.records_data[i].level) {
                     this.level_count[this.range_sign.indexOf(this.opened_topic_info.records_data[i].level)] += 1;
                 }
+            }
+        },
+        //学生账户查看无匹配时
+        stu_view() {
+            var count = 0;
+            for (i = 0; i < (this.opened_topic_info.records_data).length; i++) {
+                if (this.opened_topic_info.records_data[i].user_id == this.user.id) {
+                    count += 1;
+                    break;
+                } else {
+                    continue;
+                }
+            }
+            if (count == 0) {
+                return '<p class="grade-not">♂ Your Grade is not yet Available</p>';
+            } else {
+                return '';
             }
         },
     }

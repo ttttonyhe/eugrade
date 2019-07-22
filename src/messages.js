@@ -6,7 +6,7 @@ var antd = new Vue({
             ws_status: 'fi',
             md: null,
             user: {
-                id: cookie.get('logged_in_id'),
+                id: parseInt(cookie.get('logged_in_id')),
                 joined_classes: [],
                 classes_info: [],
                 info: []
@@ -161,15 +161,16 @@ var antd = new Vue({
         }
     },
     mounted() {
-        axios.get('../interact/select_users.php?type=name&id=' + cookie.get('logged_in_id') + '&form=all')
+        axios.get('../interact/select_users.php?type=name&id=' + parseInt(cookie.get('logged_in_id')) + '&form=all')
             .then(re => {
-                if (!!re.data[0].class) {
-                    this.user.joined_classes = re.data[0].class.split(',');
                     this.user.info = re.data[0];
+                    this.user.id = parseInt(this.user.info.id);
                     axios.get('../interact/get_token.php?user=' + this.user.id + '&email=' + this.user.info.email)
                         .then(res => {
                             this.mes_input.token = res.data.key;
                         })
+                if (!!re.data[0].class) {
+                    this.user.joined_classes = re.data[0].class.split(',');
                     axios.get('../interact/select_classes.php?type=class&id=' + re.data[0].class + '&form=all')
                         .then(res => {
                             this.user.classes_info = res.data;
@@ -304,11 +305,16 @@ var antd = new Vue({
             axios.get('../interact/select_users.php?type=class&id=' + cookie.get('logged_in_id') + '&form=single')
                 .then(re => {
                     this.user.joined_classes = re.data.class.split(',');
-                    axios.get('../interact/select_classes.php?type=class&id=' + re.data.class + '&form=all')
-                        .then(res => {
-                            this.user.classes_info = res.data;
-                            this.spinning.left = false;
-                        })
+                    if (!!re.data.class) {
+                        axios.get('../interact/select_classes.php?type=class&id=' + re.data.class + '&form=all')
+                            .then(res => {
+                                this.user.classes_info = res.data;
+                                this.spinning.left = false;
+                            })
+                    } else {
+                        this.user.joined_classes = [];
+                        this.user.classes_info = [];
+                    }
                 });
         },
         display_class() {

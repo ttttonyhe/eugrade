@@ -65,7 +65,6 @@ if (!empty($_POST['creator']) && !empty($_POST['name']) && !empty($_POST['belong
                 $row->belong_series = (int)$series;
                 $row->creator = (int)$id;
                 $row->date = time();
-                $row->average = '0';
                 $row->save();
 
                 $status = 1;

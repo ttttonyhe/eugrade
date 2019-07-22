@@ -27,7 +27,7 @@ var antd = new Vue({
                 confirm_create_loading: false,
                 class: {
                     name: null,
-                    des: null
+                        des: null
                 },
             },
             join: {
@@ -59,17 +59,17 @@ var antd = new Vue({
                 },
                 user: {
                     visible: false,
-                        name: '',
-                        email: '',
-                        pwd:'',
-                        percent: 0,
-                        id: null,
-                        display_percent: false
+                    name: '',
+                    email: '',
+                    pwd: '',
+                    percent: 0,
+                    id: null,
+                    display_percent: false
                 }
             },
-            invite:{
-                id:null,
-                visible:false
+            invite: {
+                id: null,
+                visible: false
             }
         }
     },
@@ -78,7 +78,6 @@ var antd = new Vue({
             .then(re => {
                 if (!!re.data.class) {
                     this.user.joined_classes = re.data.class.split(',');
-                    console.log(this.user.joined_classes);
                     axios.get('../interact/select_classes.php?type=class&id=' + re.data.class + '&form=all')
                         .then(res => {
                             this.user.classes_info = res.data;
@@ -88,7 +87,7 @@ var antd = new Vue({
                     //若不存在班级信息
                     this.spinning.left = false;
                 }
-                $('#main-container').attr('style',''); //避免爆代码
+                $('#main-container').attr('style', ''); //避免爆代码
             });
     },
     methods: {
@@ -97,12 +96,16 @@ var antd = new Vue({
             axios.get('../interact/select_users.php?type=class&id=' + cookie.get('logged_in_id') + '&form=single')
                 .then(re => {
                     this.user.joined_classes = re.data.class.split(',');
-                    console.log(this.user.joined_classes);
-                    axios.get('../interact/select_classes.php?type=class&id=' + re.data.class + '&form=all')
-                        .then(res => {
-                            this.user.classes_info = res.data;
-                            this.spinning.left = false;
-                        })
+                    if (!!re.data.class) {
+                        axios.get('../interact/select_classes.php?type=class&id=' + re.data.class + '&form=all')
+                            .then(res => {
+                                this.user.classes_info = res.data;
+                                this.spinning.left = false;
+                            })
+                    } else {
+                        this.user.joined_classes = [];
+                        this.user.classes_info = [];
+                    }
                 });
         },
         //判断是否为班级管理员，输出特殊样式
@@ -524,77 +527,77 @@ var antd = new Vue({
         },
         upload_class_img(token) {
             if ($("#class_img")[0].files[0] !== undefined) {
-                if($("#class_img")[0].files[0].size <= 2000000){
-                this.edit.confirm_edit_class_loading = true;
-                this.edit.class.display_percent = true;
-                var get_suffix = function (name) {
-                    var index = name.lastIndexOf('.');
-                    return name.substring(index);
-                }
-                var pre_name = new Date().getTime();
-                var suffix = get_suffix($("#class_img")[0].files[0].name);
-                var name = pre_name + suffix;
-                var config = {
-                    useCdnDomain: true
-                };
-                var putExtra = {
-                    mimeType: ["image/png", "image/jpeg"]
-                  };
-
-                var file = $("#class_img")[0].files[0];
-                var observable = qiniu.upload(file, name, token, putExtra, config)
-                var observer = {
-                    next(res) {
-                        antd.edit.class.percent = res.total.percent;
-                    },
-                    error(err) {
-                        antd.$message.error(err.message);
-                        antd.edit.confirm_edit_class_loading = false;
-                        antd.edit.class.display_percent = false;
-                    },
-                    complete(res) {
-                        var formData = new FormData();
-                        formData.append('class_id', antd.edit.class.id);
-                        formData.append('super', antd.user.id);
-                        formData.append('type', 'img');
-                        formData.append('url', 'https://static.ouorz.com/' + name)
-
-                        $.ajax({
-                            url: '../interact/edit_classes.php',
-                            type: "POST",
-                            data: formData,
-                            cache: false,
-                            dataType: 'json',
-                            processData: false,
-                            contentType: false,
-                            success: function (data) {
-                                if (data.status) {
-                                    antd.$message.success(data.mes);
-                                    antd.edit.confirm_edit_class_loading = false;
-                                    antd.handle_edit_class_cancel();
-                                    antd.get_all_classes(); //重新获取班级列表
-                                    /* 清空编辑内容 */
-                                    antd.edit.class.display_percent = false;
-                                    antd.edit.class.name = null;
-                                    antd.edit.class.des = null;
-                                    antd.edit.class.id = null;
-                                    antd.edit.class.percent = 0;
-                                    antd.edit.class.display_percent = false;
-                                    $("#class_img").val('');
-                                    /* 结束清空编辑内容 */
-                                    antd.opened_class_info.status = 0; //关闭中栏
-                                } else {
-                                    antd.$message.error(data.mes);
-                                    antd.edit.confirm_edit_class_loading = false;
-                                }
-                            }
-                        });
+                if ($("#class_img")[0].files[0].size <= 2000000) {
+                    this.edit.confirm_edit_class_loading = true;
+                    this.edit.class.display_percent = true;
+                    var get_suffix = function (name) {
+                        var index = name.lastIndexOf('.');
+                        return name.substring(index);
                     }
+                    var pre_name = new Date().getTime();
+                    var suffix = get_suffix($("#class_img")[0].files[0].name);
+                    var name = pre_name + suffix;
+                    var config = {
+                        useCdnDomain: true
+                    };
+                    var putExtra = {
+                        mimeType: ["image/png", "image/jpeg"]
+                    };
+
+                    var file = $("#class_img")[0].files[0];
+                    var observable = qiniu.upload(file, name, token, putExtra, config)
+                    var observer = {
+                        next(res) {
+                            antd.edit.class.percent = res.total.percent;
+                        },
+                        error(err) {
+                            antd.$message.error(err.message);
+                            antd.edit.confirm_edit_class_loading = false;
+                            antd.edit.class.display_percent = false;
+                        },
+                        complete(res) {
+                            var formData = new FormData();
+                            formData.append('class_id', antd.edit.class.id);
+                            formData.append('super', antd.user.id);
+                            formData.append('type', 'img');
+                            formData.append('url', 'https://static.ouorz.com/' + name)
+
+                            $.ajax({
+                                url: '../interact/edit_classes.php',
+                                type: "POST",
+                                data: formData,
+                                cache: false,
+                                dataType: 'json',
+                                processData: false,
+                                contentType: false,
+                                success: function (data) {
+                                    if (data.status) {
+                                        antd.$message.success(data.mes);
+                                        antd.edit.confirm_edit_class_loading = false;
+                                        antd.handle_edit_class_cancel();
+                                        antd.get_all_classes(); //重新获取班级列表
+                                        /* 清空编辑内容 */
+                                        antd.edit.class.display_percent = false;
+                                        antd.edit.class.name = null;
+                                        antd.edit.class.des = null;
+                                        antd.edit.class.id = null;
+                                        antd.edit.class.percent = 0;
+                                        antd.edit.class.display_percent = false;
+                                        $("#class_img").val('');
+                                        /* 结束清空编辑内容 */
+                                        antd.opened_class_info.status = 0; //关闭中栏
+                                    } else {
+                                        antd.$message.error(data.mes);
+                                        antd.edit.confirm_edit_class_loading = false;
+                                    }
+                                }
+                            });
+                        }
+                    }
+                    var subscription = observable.subscribe(observer);
+                } else {
+                    antd.$message.error('This img exceeded 2MB upload limit');
                 }
-                var subscription = observable.subscribe(observer);
-            }else{
-                antd.$message.error('This img exceeded 2MB upload limit');
-            }
             } else {
                 antd.$message.error('No img selected');
             }
@@ -606,9 +609,9 @@ var antd = new Vue({
             formData.append('user_id', this.edit.user.id);
             formData.append('name', this.edit.user.name);
             formData.append('email', this.edit.user.email);
-            if(type == 'teacher'){
+            if (type == 'teacher') {
                 formData.append('super', antd.user.id);
-            }else{
+            } else {
                 formData.append('pwd', antd.edit.user.pwd);
             }
             formData.append('type', 'info');
@@ -641,94 +644,94 @@ var antd = new Vue({
         handle_edit_user_cancel() {
             this.edit.user.visible = false;
         },
-        upload_user_img(token,type) {
+        upload_user_img(token, type) {
             if ($("#user_img")[0].files[0] !== undefined) {
-                if($("#user_img")[0].files[0].size <= 2000000){
-                this.edit.confirm_edit_user_loading = true;
-                this.edit.user.display_percent = true;
-                var get_suffix = function (name) {
-                    var index = name.lastIndexOf('.');
-                    return name.substring(index);
-                }
-                var pre_name = new Date().getTime();
-                var suffix = get_suffix($("#user_img")[0].files[0].name);
-                var name = pre_name + suffix;
-                var config = {
-                    useCdnDomain: true
-                };
-                var putExtra = {
-                    mimeType: ["image/png", "image/jpeg"]
-                  };
-
-                var file = $("#user_img")[0].files[0];
-                var observable = qiniu.upload(file, name, token, putExtra, config)
-                var observer = {
-                    next(res) {
-                        antd.edit.user.percent = Math.round(res.total.percent);
-                    },
-                    error(err) {
-                        antd.$message.error(err.message);
-                        antd.edit.confirm_edit_user_loading = false;
-                        antd.edit.user.display_percent = false;
-                    },
-                    complete(res) {
-                        var formData = new FormData();
-                        formData.append('user_id', antd.edit.user.id);
-                        if(type == 'teacher'){
-                            formData.append('super', antd.user.id);
-                        }
-                        formData.append('type', 'img');
-                        formData.append('url', 'https://static.ouorz.com/' + name)
-
-                        $.ajax({
-                            url: '../interact/edit_users.php',
-                            type: "POST",
-                            data: formData,
-                            cache: false,
-                            dataType: 'json',
-                            processData: false,
-                            contentType: false,
-                            success: function (data) {
-                                if (data.status) {
-                                    antd.$message.success(data.mes);
-                                    antd.edit.confirm_edit_user_loading = false;
-                                    /* 清空编辑内容 */
-                                    antd.edit.user.display_percent = false;
-                                    antd.edit.user.name = null;
-                                    antd.edit.user.email = null;
-                                    antd.edit.user.id = null;
-                                    antd.edit.user.percent = 0;
-                                    antd.edit.user.display_percent = false;
-                                    $("#user_img").val('');
-                                    /* 结束清空编辑内容 */
-                                    antd.handle_edit_user_cancel();
-                                    antd.opened_member_info.status = 0; //关闭右栏
-                                    antd.opened_class_info.status = 0; //关闭中栏
-                                } else {
-                                    antd.$message.error(data.mes);
-                                    antd.edit.confirm_edit_user_loading = false;
-                                }
-                            }
-                        });
+                if ($("#user_img")[0].files[0].size <= 2000000) {
+                    this.edit.confirm_edit_user_loading = true;
+                    this.edit.user.display_percent = true;
+                    var get_suffix = function (name) {
+                        var index = name.lastIndexOf('.');
+                        return name.substring(index);
                     }
+                    var pre_name = new Date().getTime();
+                    var suffix = get_suffix($("#user_img")[0].files[0].name);
+                    var name = pre_name + suffix;
+                    var config = {
+                        useCdnDomain: true
+                    };
+                    var putExtra = {
+                        mimeType: ["image/png", "image/jpeg"]
+                    };
+
+                    var file = $("#user_img")[0].files[0];
+                    var observable = qiniu.upload(file, name, token, putExtra, config)
+                    var observer = {
+                        next(res) {
+                            antd.edit.user.percent = Math.round(res.total.percent);
+                        },
+                        error(err) {
+                            antd.$message.error(err.message);
+                            antd.edit.confirm_edit_user_loading = false;
+                            antd.edit.user.display_percent = false;
+                        },
+                        complete(res) {
+                            var formData = new FormData();
+                            formData.append('user_id', antd.edit.user.id);
+                            if (type == 'teacher') {
+                                formData.append('super', antd.user.id);
+                            }
+                            formData.append('type', 'img');
+                            formData.append('url', 'https://static.ouorz.com/' + name)
+
+                            $.ajax({
+                                url: '../interact/edit_users.php',
+                                type: "POST",
+                                data: formData,
+                                cache: false,
+                                dataType: 'json',
+                                processData: false,
+                                contentType: false,
+                                success: function (data) {
+                                    if (data.status) {
+                                        antd.$message.success(data.mes);
+                                        antd.edit.confirm_edit_user_loading = false;
+                                        /* 清空编辑内容 */
+                                        antd.edit.user.display_percent = false;
+                                        antd.edit.user.name = null;
+                                        antd.edit.user.email = null;
+                                        antd.edit.user.id = null;
+                                        antd.edit.user.percent = 0;
+                                        antd.edit.user.display_percent = false;
+                                        $("#user_img").val('');
+                                        /* 结束清空编辑内容 */
+                                        antd.handle_edit_user_cancel();
+                                        antd.opened_member_info.status = 0; //关闭右栏
+                                        antd.opened_class_info.status = 0; //关闭中栏
+                                    } else {
+                                        antd.$message.error(data.mes);
+                                        antd.edit.confirm_edit_user_loading = false;
+                                    }
+                                }
+                            });
+                        }
+                    }
+                    var subscription = observable.subscribe(observer);
+                } else {
+                    antd.$message.error('This img exceeded 2MB upload limit');
                 }
-                var subscription = observable.subscribe(observer);
-            }else{
-                antd.$message.error('This img exceeded 2MB upload limit');
-            }
             } else {
                 antd.$message.error('No img selected');
             }
         },
-        handle_invite(id){
-            this.invite.id = 'cxk'+id;
+        handle_invite(id) {
+            this.invite.id = 'cxk' + id;
             this.invite.visible = true;
         },
-        handle_invite_close(){
+        handle_invite_close() {
             this.invite.visible = false;
         },
-        reverse_order(key){
-            switch(key){
+        reverse_order(key) {
+            switch (key) {
                 case 'classes':
                     this.user.joined_classes = this.user.joined_classes.reverse();
                     this.user.classes_info = this.user.classes_info.reverse();

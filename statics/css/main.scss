@@ -1033,3 +1033,146 @@ body {
     padding: 0px 3px 1px 3px;
     border-radius: 3px
 }
+
+.grade-card {
+    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.08);
+    width: 100%;
+    border: 2px solid #1890ff;
+    border-radius: 4px;
+    height: 300px;
+
+    .info {
+        display: flex;
+        padding: 20px 10px 13px 10px;
+
+        .author {
+            display: flex;
+            flex-basis: 80%;
+            margin-left: 3%;
+
+            img {
+                height: 40px;
+                width: 40px;
+                border-radius: 50%;
+                border: 1px solid #eee;
+            }
+
+            .author-info {
+                margin-left: 10px;
+
+                h3 {
+                    margin-bottom: -4px;
+                }
+
+                p {
+                    margin: 0px;
+                    font-weight: 300;
+                    margin-left: 1px;
+                    color: #777;
+                }
+            }
+        }
+
+        .date {
+            margin-bottom: 0px;
+            margin-top: 10px;
+            font-size: 16px;
+            color: #999;
+        }
+
+    }
+
+    .score {
+        display: flex;
+        border-top: 1px solid #eee;
+        padding: 15px 0;
+
+        .number {
+            flex-basis: 50%;
+            text-align: center;
+            border-right: 2px solid #eee;
+
+            .paper{
+                color: #4CAF50;
+                font-size: 34px;
+                margin-bottom: -6px;
+                margin-top: 5px;
+            }
+            .paper-slogan{
+                font-size: 20px;
+                margin: 0px;
+                font-weight: 300;
+                letter-spacing: 2px;
+                margin-bottom: -15px;
+            }
+            h1 {
+                font-size: 45px;
+                margin: 0px;
+                margin-top: -4px;
+                font-size: 75px;
+            }
+        }
+
+        .level {
+            flex-basis: 50%;
+            text-align: center;
+
+            .crown{
+                color: #fbbc05;
+                font-size: 40px;
+                margin-top: 2px;
+                margin-bottom: -12px;
+            }
+            p {
+                font-size: 20px;
+                margin: 0px;
+                font-weight: 300;
+                letter-spacing: 2px;
+            }
+
+            h2 {
+                margin: 0px;
+                font-size: 70px;
+                margin-top: -10px;
+            }
+        }
+    }
+}
+
+.grade-bottom{
+    margin-top: 15px;
+}
+
+.grade-not{
+    border: 2px solid #02a9f4;
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-size: 15px;
+    color: #02a9f4;
+    letter-spacing: .5px;
+}
+
+.select-stats{
+    border: 1px solid #eee;
+    padding: 5px 15px;
+    border-radius: 4px;
+    transition: all .1s;
+    margin-bottom: 10px;
+
+    &:hover{
+        background: #f7f8f9;
+    }
+
+    h2{
+        margin: 0px;
+    font-size: 18px;
+    display: inline-block;
+    letter-spacing: .5px;
+    }
+
+    p{
+        margin: 0px;
+    color: #888;
+    font-weight: 300;
+    }
+}

@@ -8,8 +8,8 @@
     <div class="left">
         <a-spin :spinning="spinning.left">
             <div class="main-header">
-                <h3>Grades</h3>
-                <p>Manage students' grades</p>
+                <h3>Grades<a-tag color="green" style="transform: translateY(-3.1px);margin-left: 5px;">Beta</a-tag></h3>
+                <p>Manage/View your grades</p>
             </div>
             <template v-if="Object.keys(user.joined_classes).length">
                 <div class="mes-item">
@@ -68,6 +68,14 @@
         </a-input>
     </a-modal>
     <!-- 编辑系列结束 -->
+    <!-- 查看 series 折线图 -->
+    <a-modal :footer="null" title="View Series Stats" :visible="stats.visible.all" @cancel="handle_stats_cancel()">
+        <div class="select-stats" v-for="(series_c,index) in opened_series_info.info" @click="open_stats('single',index)">
+            <h2>{{ series_c.name }}</h2>
+            <p>{{ (series_c.topics_info).length }} Topics</p>
+        </div>
+    </a-modal>
+    <!-- 查看 series 折线图结束 -->
 
     <div class="center">
         <a-spin :spinning="spinning.center">
@@ -76,6 +84,16 @@
                     <div class="mes-header">
                         <p style="color:#666;">
                             <a-icon type="bar-chart"></a-icon>&nbsp;&nbsp;Series
+                            <template v-if="parseInt(user.id) == parseInt(opened_class_info.superid)">
+                                <a-button size="small" @click="open_stats('all')" style="right:81px;position:absolute">
+                                    <a-icon type="line-chart"></a-icon>
+                                </a-button>
+                            </template>
+                            <template v-else>
+                                <a-button size="small" @click="open_stats('all')" style="right:20px;position:absolute">
+                                    <a-icon type="line-chart"></a-icon>
+                                </a-button>
+                            </template>
                             <a-button size="small" @click="add.visible.series = true" style="right:20px;position:absolute" v-if="parseInt(user.id) == parseInt(opened_class_info.superid)">+ Add</a-button>
                         </p>
                     </div>
@@ -165,8 +183,8 @@
         </a-input-group>
         <br />
         <a-input-group compact>
-            <a-input-number placeholder="Score" style="width: 30%" :min="0" :max="edit.total" :step="0.5" v-model="edit.score"></a-input-number>
             <a-input-number placeholder="Total" style="width: 30%" :min="0" :step="0.5" v-model="edit.total"></a-input-number>
+            <a-input-number placeholder="Score" style="width: 30%" :min="0" :max="edit.total" :step="0.5" v-model="edit.score"></a-input-number>
         </a-input-group>
     </a-modal>
     <!-- 编辑记录结束 -->
@@ -230,7 +248,7 @@
 
                 <div class="mes-header" style="padding: 14.2px 23px;">
                     <p class="topic-header-p">
-                        <a-icon type="bar-chart"></a-icon>&nbsp;&nbsp;{{ opened_topic_info.info.name }}
+                        <a-icon type="branches"></a-icon>&nbsp;&nbsp;{{ opened_topic_info.info.name }}
                         <em class="topic-series">({{ opened_series_info.info[opened_topic_info.series_index].name }})</em>
                         <div class="topic-op">
                             <em class="topic-date" style="margin-right: 15px;">{{ get_date(opened_topic_info.info.date) }}</em>
@@ -248,7 +266,7 @@
                     </p>
                 </div>
 
-                <div class="topic-header">
+                <div class="topic-header" v-if="<?php echo $type; ?> == 2">
                     <div :style="opened_topic_info.section ? 'border-bottom: 2px solid #1890ff;color: #1890ff;' : ''" @click="opened_topic_info.section = !opened_topic_info.section;level_count = [0,0,0,0,0,0,0,0]">Table</div>
                     <div :style="opened_topic_info.section ? '' : 'border-bottom: 2px solid #1890ff;color: #1890ff;'" @click="opened_topic_info.section = !opened_topic_info.section;get_levels();">Chart</div>
                 </div>
@@ -257,7 +275,7 @@
 
                     <template v-if="opened_topic_info.section">
 
-                        <div class="topic-table-add">
+                        <div class="topic-table-add" :style="parseInt(user.id) == parseInt(opened_class_info.superid) ? '' : 'margin-bottom: 45px'">
                             <template v-if="parseInt(user.id) == parseInt(opened_class_info.superid)">
                                 <a-button type="primary" @click="add.visible.record = true" v-if="(opened_topic_info.records_data).length < (opened_class_info.members).length" style="margin-right:10px">+ Add a Record</a-button>
                                 <a-button @click="range.visible = true">Edit Grading Scale</a-button>
@@ -266,10 +284,10 @@
                                 <template slot="content">
                                     <p v-for="(scale,index) in range.scale" v-if="!!scale.max"><b>{{ range_sign[index].toUpperCase() }}</b> : {{ scale.max }}% ~ {{ scale.min }}%</p>
                                 </template>
-                                <a-button style="float:right">Grading Scale</a-button>
+                                <a-button :style="parseInt(user.id) == parseInt(opened_class_info.superid) ? 'float:right' : 'float:left'">Grading Scale</a-button>
                             </a-popover>
                         </div>
-                        <div class="table" v-if="(opened_topic_info.records_data).length !== 0">
+                        <div class="table" v-if="(opened_topic_info.records_data).length !== 0 && <?php echo $type; ?> == 2">
                             <div class="table-header">
                                 <div>Index</div>
                                 <div>Date</div>
@@ -309,6 +327,53 @@
                             </template>
                         </div>
 
+                        <!-- 成绩展示卡片 -->
+                        <div v-if="<?php echo $type; ?> == 1">
+                            <template v-for="(data,index) in opened_topic_info.records_data" v-if="data.user_id == user.id">
+                                <div class="grade-card">
+                                    <div class="info">
+                                        <div class="author">
+                                            <div>
+                                                <img src="<?php echo $avatar; ?>">
+                                            </div>
+                                            <div class="author-info">
+                                                <h3>{{ data.name }}</h3>
+                                                <p>has scored:</p>
+                                            </div>
+                                        </div>
+                                        <div class="date">
+                                            <p>{{ get_date(data.date) }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="score">
+                                        <div class="number">
+                                            <p class="paper">
+                                                <a-icon type="file-done"></a-icon>
+                                            </p>
+                                            <p class="paper-slogan">Score</p>
+                                            <h1>{{ data.score }}</h1>
+                                        </div>
+                                        <div class="level">
+                                            <p class="crown">
+                                                <a-icon type="crown"></a-icon>
+                                            </p>
+                                            <p>Level</p>
+                                            <h2>{{ data.level ? data.level.toUpperCase() : get_record_level(data.percent,index) }}</h2>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="grade-bottom">
+                                    <a-button>
+                                        <b>Total Score</b> : {{ data.total }}
+                                    </a-button>
+                                    <a-button>
+                                        <b>Class Average Score</b> : {{ parseFloat(opened_topic_info.average) }}
+                                    </a-button>
+                                </div>
+                            </template>
+                            <div v-html="stu_view()"></div>
+                        </div>
+
                     </template>
 
                     <template v-else>
@@ -318,16 +383,35 @@
                             <b>Average Score</b> : {{ parseFloat(opened_topic_info.average) }}
                         </a-button>
                         <br /><br />
-                        <a-button-group>
-                            <a-button v-for="(count,index) in level_count" v-if="count > 0">
+                            <a-button v-for="(count,index) in level_count" v-if="count > 0" style="margin: 5px 10px 5px 0px;" >
                                 <b>{{ 'Level ' + range_sign[index].toUpperCase() }}</b> : {{ count + ' Students' }}
                             </a-button>
-                        </a-button-group>
                     </template>
 
                 </div>
 
             </template>
+
+            <!-- Series 折线统计图 -->
+            <template v-else-if="opened_stats_info.status">
+                <div class="mes-header" style="padding: 14.2px 23px;">
+                    <p class="topic-header-p">
+                        <a-icon type="fork"></a-icon>&nbsp;&nbsp;{{ opened_stats_info.info.name }}
+                        <em class="topic-series">Stats</em>
+                        <div class="topic-op">
+                            <em class="topic-date" style="margin-right: 15px;">{{ get_date(opened_stats_info.info.date) }}</em>
+                        </div>
+                    </p>
+                </div>
+                <div class="topic-container">
+                    <ve-line :data="opened_stats_info.chartData_all" :settings="opened_stats_info.chartSettings_all" v-if="(opened_stats_info.chartData_all.rows).length !== 0"></ve-line>
+                    <p v-else style="font-size:16px;color:#999;letter-spacing:.5px">Chart is temporarily unavailable</p>
+                    <a-button>
+                        <b>Notice</b> : You might need to reload the web page to see updates
+                    </a-button>
+                </div>
+            </template>
+            <!-- Series 折线统计图 -->
         </a-spin>
         <!-- 占位 -->
         <template v-if="!spinning.right && !opened_topic_info.status">
