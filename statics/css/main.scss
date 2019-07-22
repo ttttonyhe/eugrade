@@ -932,7 +932,7 @@ body {
         padding: 10px 0px;
     }
 
-    & div:hover{
+    & div:hover {
         background: rgba(247, 248, 249, 0.3686274509803922);
         border-bottom: 2px solid rgb(24, 144, 255);
         color: rgb(24, 144, 255);
@@ -940,49 +940,52 @@ body {
 
 }
 
-.topic-container{
+.topic-container {
     padding: 30px;
 }
 
-.table-header{
+.table-header {
     background: #f7f8f9;
     border-top: 2px solid #eee;
     border-bottom: 2px solid #eee;
     display: flex;
-    div{
+
+    div {
         font-size: 15px;
         padding: 7px 0px;
         flex-basis: 16.666666666666667%;
         text-align: center;
         border-left: 1px solid #eee;
 
-        &:last-child{
+        &:last-child {
             border-right: 1px solid #eee;
         }
 
     }
 }
 
-.table-item{
+.table-item {
     display: flex;
-    div{
-        font-size: 15px;
-    padding: 7px 10px;
-    flex-basis: 16.666666666666667%;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    text-align: center;
-    border-left: 1px solid #eee;
 
-        &:last-child{
+    div {
+        font-size: 15px;
+        padding: 7px 10px;
+        flex-basis: 16.666666666666667%;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        text-align: center;
+        border-left: 1px solid #eee;
+
+        &:last-child {
             border-right: 1px solid #eee;
         }
 
     }
+
     border-bottom: 1px solid #eee;
 }
 
-.topic-date{
+.topic-date {
     color: #999;
     font-size: 13px;
     font-style: normal;
@@ -991,13 +994,13 @@ body {
     margin-top: 6.5px;
 }
 
-.topic-header-p{
+.topic-header-p {
     color: #444 !important;
     font-weight: 600 !important;
     font-size: 19px !important;
 }
 
-.topic-series{
+.topic-series {
     color: #888;
     font-size: 15px;
     font-weight: 400;
@@ -1005,10 +1008,28 @@ body {
     letter-spacing: 0px;
 }
 
-.topic-table-add{
+.topic-table-add {
     margin-bottom: 15px;
 }
 
-.topic-op{
-    display:flex;float:right;margin-top: -30px;
+.topic-op {
+    display: flex;
+    float: right;
+    margin-top: -30px;
+}
+
+.thread-notify {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #FFC107;
+    margin-top: 16px;
+    transform: translateX(-10px)
+}
+
+.leaved_label {
+    border: 1px solid #f9b0b0;
+    color: #f9b0b0 !important;
+    padding: 0px 3px 1px 3px;
+    border-radius: 3px
 }
