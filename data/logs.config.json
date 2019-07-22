@@ -1,1 +1,5 @@
+<<<<<<< HEAD
+{"last_id":194,"schema":{"id":"integer","speaker":"integer","speaker_name":"string","belong_class":"integer","content":"string","thread":"integer","date":"integer"},"relations":{}}
+=======
 {"last_id":208,"schema":{"id":"integer","speaker":"integer","speaker_name":"string","belong_class":"integer","content":"string","thread":"integer","date":"integer"},"relations":{}}
+>>>>>>> ac878d07b44ecce6f1b0e2af72ad855c4dc229ac
