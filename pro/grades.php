@@ -165,8 +165,8 @@
         </a-input-group>
         <br />
         <a-input-group compact>
-            <a-input-number placeholder="Score" style="width: 30%" :min="0" :max="edit.total" :step="0.5" v-model="edit.score"></a-input-number>
             <a-input-number placeholder="Total" style="width: 30%" :min="0" :step="0.5" v-model="edit.total"></a-input-number>
+            <a-input-number placeholder="Score" style="width: 30%" :min="0" :max="edit.total" :step="0.5" v-model="edit.score"></a-input-number>
         </a-input-group>
     </a-modal>
     <!-- 编辑记录结束 -->
