@@ -10,7 +10,7 @@ use Lazer\Classes\Database as Lazer;
 use Workerman\Worker;
 use Workerman\Lib\Timer;
 
-
+define('HEARTBEAT_TIME', 55);
 $channel_server = new Channel\Server('0.0.0.0', 2206);
 $worker = new Worker('websocket://0.0.0.0:2000');
 $worker->count = 2;
@@ -155,12 +155,18 @@ $worker->onWorkerStart = function ($worker) {
     });
 
     //心跳计时
-    Timer::add(55, function () use ($worker) {
-        foreach ($worker->connections as $connection) {
-            $array = [
-                'op' => 'keep'
-            ];
-            $connection->send(json_encode($array));
+    Timer::add(1, function()use($worker){
+        $time_now = time();
+        foreach($worker->connections as $connection) {
+            // 有可能该connection还没收到过消息，则lastMessageTime设置为当前时间
+            if (empty($connection->lastMessageTime)) {
+                $connection->lastMessageTime = $time_now;
+                continue;
+            }
+            // 上次通讯时间间隔大于心跳间隔，则认为客户端已经下线，关闭连接
+            if ($time_now - $connection->lastMessageTime > HEARTBEAT_TIME) {
+                $connection->close();
+            }
         }
     });
 };
@@ -171,6 +177,8 @@ $worker->onMessage = function ($con, $data) {
     $data = json_decode($data, true);
     $cmd = input($data['action']);
     $thread = input($data['thread_id']);
+    //心跳时间
+    $con->lastMessageTime = time();
     $class = input($data['class_id']);
     $user = input($data['speaker']);
     $user_name = input($data['speaker_name']);
@@ -190,6 +198,7 @@ $worker->onMessage = function ($con, $data) {
 
                     switch ($cmd) {
                         case "join":
+                            $con->group_id = $thread;
                             global $group_con_map;
                             // 将连接加入到对应的群组数组里
                             $group_con_map[$thread][$con->id] = $con;
