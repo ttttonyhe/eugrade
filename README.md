@@ -60,9 +60,10 @@
 + [x] 群聊支持 WebSocket
 + [ ] 用户系统支持 JWT
 + [x] Sass 重写 CSS
-+ [ ] Grades 成绩管理系统
++ [x] Grades 成绩管理系统
 + [ ] Schools 校园系统
-+ [ ] CommonJS 应用
++ [ ] 模块化重构
++ [ ] 网站首页
 
 <br/>
 
