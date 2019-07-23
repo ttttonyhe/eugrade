@@ -155,6 +155,9 @@ var antd = new Vue({
                     member: false
                 }
             },
+            switch: {
+                user_id: null
+            },
             opened_stats_info: {
                 index: null,
                 info: null,
@@ -523,55 +526,75 @@ var antd = new Vue({
         },
 
         //打开折线图查看选择 series 的 modal
-        open_stats(key, index) {
-            if (this.opened_stats_info.index !== index) {
-                if (key == 'all') {
-                    this.stats.visible.all = true;
-                } else if (key == 'single') {
-                    this.spinning.right = true;
-                    this.opened_stats_info.index = index;
+        open_stats(key, index, type, user) {
+            if (key == 'all') {
+                this.stats.visible.all = true;
+            } else if (key == 'single') {
+                this.spinning.right = true;
+                this.opened_stats_info.index = index;
 
-                    axios.get('../interact/select_series.php?class_id=' + this.opened_class_info.id)
-                        .then(resp => {
-                            var ids = '';
-                            this.opened_stats_info.info = resp.data[this.opened_stats_info.index];
-                            for (l = 0; l < (this.opened_stats_info.info.topics_info).length; l++) {
-                                ids += ',' + this.opened_stats_info.info.topics_info[l].id;
-                            }
-                            ids = ids.substr(1, ids.length - 1);
-                            if (parseInt(this.user.id) == parseInt(this.opened_class_info.superid)) {
-                                axios.get('../interact/select_topic_average.php?topic_ids=' + ids + '&type=all')
-                                    .then(res => {
-                                        for (l = 0; l < (this.opened_stats_info.info.topics_info).length; l++) {
-                                            this.opened_stats_info.info.topics_info[l]['average'] = res.data[l][0];
-                                            this.opened_stats_info.info.topics_info[l]['percent'] = res.data[l][1];
-                                        }
-                                    });
+                axios.get('../interact/select_series.php?class_id=' + this.opened_class_info.id)
+                    .then(resp => {
+                        var ids = '';
+                        this.opened_stats_info.info = resp.data[this.opened_stats_info.index];
+                        for (l = 0; l < (this.opened_stats_info.info.topics_info).length; l++) {
+                            ids += ',' + this.opened_stats_info.info.topics_info[l].id;
+                        }
+                        ids = ids.substr(1, ids.length - 1);
+                        if (parseInt(this.user.id) == parseInt(this.opened_class_info.superid) && type == 'view_topics') {
+                            this.opened_stats_info.chartSettings_all = {
+                                axisSite: {
+                                    left: ['average'],
+                                    right: ['percent']
+                                },
+                                yAxisType: ['KMB', 'percent'],
+                                yAxisName: ['Average', 'Percentage']
+                            };
+                            axios.get('../interact/select_topic_average.php?topic_ids=' + ids + '&type=all')
+                                .then(res => {
+                                    for (l = 0; l < (this.opened_stats_info.info.topics_info).length; l++) {
+                                        this.opened_stats_info.info.topics_info[l]['average'] = res.data[l][0];
+                                        this.opened_stats_info.info.topics_info[l]['percent'] = res.data[l][1];
+                                    }
+                                });
+                        } else {
+                            if (type == 'view_users') {
+                                var user_id = user;
                             } else {
-                                axios.get('../interact/select_topic_average.php?topic_ids=' + ids + '&type=student&user=' + this.user.id)
-                                    .then(res => {
-                                        for (l = 0; l < (this.opened_stats_info.info.topics_info).length; l++) {
-                                            this.opened_stats_info.info.topics_info[l]['average'] = res.data[l][0];
-                                            this.opened_stats_info.info.topics_info[l]['percent'] = res.data[l][1];
-                                        }
-                                    });
+                                var user_id = this.user.id;
                             }
-                            this.opened_topic_info.status = false;
-                            this.opened_stats_info.chartData_all.rows = [];
-                            this.opened_stats_info.chartData_all.rows = this.opened_stats_info.info.topics_info;
-                            this.opened_stats_info.status = true;
-                            this.spinning.right = false;
-                            this.stats.visible.all = false;
-                        })
-                }
-            }else{
-                this.opened_topic_info.status = false;
-                this.opened_stats_info.status = true;
-                this.stats.visible.all = false;
+                            this.opened_stats_info.chartSettings_all = {
+                                axisSite: {
+                                    left: ['average'],
+                                    right: ['percent']
+                                },
+                                yAxisType: ['KMB', 'percent'],
+                                yAxisName: ['Score', 'Percentage']
+                            };
+                            axios.get('../interact/select_topic_average.php?topic_ids=' + ids + '&type=student&user=' + user_id)
+                                .then(res => {
+                                    for (l = 0; l < (this.opened_stats_info.info.topics_info).length; l++) {
+                                        this.opened_stats_info.info.topics_info[l]['average'] = res.data[l][0];
+                                        this.opened_stats_info.info.topics_info[l]['percent'] = res.data[l][1];
+                                    }
+                                });
+                        }
+                        this.opened_topic_info.status = false;
+                        this.opened_stats_info.chartData_all.rows = [];
+                        this.opened_stats_info.chartData_all.rows = this.opened_stats_info.info.topics_info;
+                        this.opened_stats_info.status = true;
+                        this.spinning.right = false;
+                        this.stats.visible.all = false;
+                    })
             }
         },
         handle_stats_cancel() {
             this.stats.visible.all = false;
+        },
+        display_chart() {
+            var temp = this.opened_stats_info.info.topics_info[0].name;
+            this.opened_stats_info.info.topics_info[0].name = 'XXX';
+            this.opened_stats_info.info.topics_info[0].name = temp;
         },
 
 
@@ -867,5 +890,13 @@ var antd = new Vue({
                 return '';
             }
         },
+        handle_switch_user(value) {
+            if (value == 'all_topics') {
+                this.open_stats('single', this.opened_stats_info.index, 'view_topics');
+            } else {
+                this.switch.user_id = parseInt(value);
+                this.open_stats('single', this.opened_stats_info.index, 'view_users', this.switch.user_id);
+            }
+        }
     }
 });

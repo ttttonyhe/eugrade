@@ -78,7 +78,7 @@ if (!empty($_GET['topic_ids']) && !empty($_GET['type'])) {
             $array[$k][1] = $total / $total_total;
         } else {
             $array[$k][0] = 0;
-            $array[$k][1] = 1;
+            $array[$k][1] = 0;
         }
     }
 } else {

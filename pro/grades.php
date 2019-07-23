@@ -8,7 +8,8 @@
     <div class="left">
         <a-spin :spinning="spinning.left">
             <div class="main-header">
-                <h3>Grades<a-tag color="green" style="transform: translateY(-3.1px);margin-left: 5px;">Beta</a-tag></h3>
+                <h3>Grades<a-tag color="green" style="transform: translateY(-3.1px);margin-left: 5px;">Beta</a-tag>
+                </h3>
                 <p>Manage/View your grades</p>
             </div>
             <template v-if="Object.keys(user.joined_classes).length">
@@ -70,10 +71,19 @@
     <!-- 编辑系列结束 -->
     <!-- 查看 series 折线图 -->
     <a-modal :footer="null" title="View Series Stats" :visible="stats.visible.all" @cancel="handle_stats_cancel()">
-        <div class="select-stats" v-for="(series_c,index) in opened_series_info.info" @click="open_stats('single',index)">
-            <h2>{{ series_c.name }}</h2>
-            <p>{{ (series_c.topics_info).length }} Topics</p>
-        </div>
+        <template v-if="parseInt(user.id) == parseInt(opened_class_info.superid)">
+            <div class="select-stats" v-for="(series_c,index) in opened_series_info.info" @click="open_stats('single',index,'view_topics')">
+                <h2>{{ series_c.name }}</h2>
+                <p>{{ (series_c.topics_info).length }} Topics</p>
+            </div>
+        </template>
+        <template v-else>
+            <div class="select-stats" v-for="(series_c,index) in opened_series_info.info" @click="open_stats('single',index)">
+                <h2>{{ series_c.name }}</h2>
+                <p>{{ (series_c.topics_info).length }} Topics</p>
+            </div>
+        </template>
+        <p class="mes-end" style="margin-top: 0px;margin-bottom: 5px;">- EOF -</p>
     </a-modal>
     <!-- 查看 series 折线图结束 -->
 
@@ -143,7 +153,7 @@
         </a-spin>
         <!-- 占位 -->
         <template v-if="!spinning.center && !opened_series_info.status">
-            <div style="margin-top:-10px">
+            <div style="padding:20px 30px">
                 <a-skeleton :paragraph="{rows: 2}" v-for="i in 6"></a-skeleton>
             </div>
         </template>
@@ -367,7 +377,7 @@
                                         <b>Total Score</b> : {{ data.total }}
                                     </a-button>
                                     <a-button>
-                                        <b>Class Average Score</b> : {{ parseFloat(opened_topic_info.average) }}
+                                        <b>Class Average Score</b> : {{ parseFloat(opened_topic_info.average).toFixed(1) }}
                                     </a-button>
                                 </div>
                             </template>
@@ -380,12 +390,12 @@
                         <ve-histogram :data="chartData" :settings="chartSettings" v-if="chartData.rows.length"></ve-histogram>
                         <p v-else style="font-size:16px;color:#999;letter-spacing:.5px">Chart is temporarily unavailable</p>
                         <a-button>
-                            <b>Average Score</b> : {{ parseFloat(opened_topic_info.average) }}
+                            <b>Average Score</b> : {{ parseFloat(opened_topic_info.average).toFixed(1) }}
                         </a-button>
                         <br /><br />
-                            <a-button v-for="(count,index) in level_count" v-if="count > 0" style="margin: 5px 10px 5px 0px;" >
-                                <b>{{ 'Level ' + range_sign[index].toUpperCase() }}</b> : {{ count + ' Students' }}
-                            </a-button>
+                        <a-button v-for="(count,index) in level_count" v-if="count > 0" style="margin: 5px 10px 5px 0px;">
+                            <b>{{ 'Level ' + range_sign[index].toUpperCase() }}</b> : {{ count + ' Students' }}
+                        </a-button>
                     </template>
 
                 </div>
@@ -406,15 +416,23 @@
                 <div class="topic-container">
                     <ve-line :data="opened_stats_info.chartData_all" :settings="opened_stats_info.chartSettings_all" v-if="(opened_stats_info.chartData_all.rows).length !== 0"></ve-line>
                     <p v-else style="font-size:16px;color:#999;letter-spacing:.5px">Chart is temporarily unavailable</p>
-                    <a-button>
-                        <b>Notice</b> : You might need to reload the web page to see updates
-                    </a-button>
+                    <template v-if="parseInt(user.id) == parseInt(opened_class_info.superid)">
+                        <a-select placeholder="Select a subject" defaultValue="all_topics" style="width: 120px;margin-right:10px" @change="handle_switch_user">
+                            <a-select-option value="all_topics">All Topics</a-select-option>
+                            <a-select-option v-for="person in opened_class_info.members" :value="person.id">{{ person.name }}</a-select-option>
+                        </a-select>
+                    </template>
+                    <a-button @click="display_chart()" type="primary">Click to Display</a-button>
+                    <template v-if="parseInt(user.id) == parseInt(opened_class_info.superid)">
+                        <br /><br />
+                    </template>
+                    <a-button><b>Notice</b> : You might need to reload the web page to see updates</a-button>
                 </div>
             </template>
             <!-- Series 折线统计图 -->
         </a-spin>
         <!-- 占位 -->
-        <template v-if="!spinning.right && !opened_topic_info.status">
+        <template v-if="!spinning.right && !opened_topic_info.status && !opened_stats_info.status">
             <div style="padding:20px 30px">
                 <a-skeleton avatar :paragraph="{rows: 1}" v-for="i in 9"></a-skeleton>
             </div>
