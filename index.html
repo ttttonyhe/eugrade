@@ -26,9 +26,11 @@
                     Pokers helps you achieve efficient collaboration within schools</p>
             </div>
             <div style="text-align: center;margin-top: 30px;margin-bottom: -70px">
-                <a href="login.html"><a-button type="primary" size="large" style="margin-right: 10px">Get Started <a-icon
-                        type="right-circle"></a-icon>
-                </a-button></a>
+                <a href="login.html">
+                    <a-button type="primary" size="large" style="margin-right: 10px">Get Started <a-icon
+                            type="right-circle"></a-icon>
+                    </a-button>
+                </a>
                 <a-button size="large">Why Pokers</a-button>
             </div>
             <div
@@ -38,7 +40,12 @@
     </div>
     <script type="text/javascript">
         var antd = new Vue({
-            el: '#app'
+            el: '#app',
+            mounted(){
+                if (!!cookie.get('logged_in_id')) {
+                    window.location.href = 'https://pokers.zeo.im/pro';
+                }
+            }
         });
     </script>
 </body>
