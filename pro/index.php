@@ -55,7 +55,7 @@
 
 <body>
     <div id="app" style="max-height: 100vh;overflow-y: hidden;opacity:0">
-        <title v-html="current.title">Pokers | Clear & Organized Team Communication Solution</title>
+        <title v-html="current.title">Eugrade | Efficient Collaboration within Schools</title>
         <div>
             <a-menu mode="horizontal" v-model="current.nav">
                 <a-sub-menu style="border-right: 1px solid #eee;">
@@ -208,7 +208,7 @@
                 current: {
                     nav: ['messages'],
                     page: 'messages.php',
-                    title: 'Pokers | Messages'
+                    title: 'Eugrade | Messages'
                 },
                 spinning: true,
                 edit: {

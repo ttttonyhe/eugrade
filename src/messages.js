@@ -205,13 +205,13 @@ var antd = new Vue({
         /* WebSocket 开始 */
         function reconnect_wss() {
             //websocket 连接
-            window.ws = new WebSocket('ws://127.0.0.1:2000');
+            window.ws = new WebSocket('wss://www.eugrade.com/wss');
             window.ws.onmessage = function (data) {
                 var re = eval('(' + data.data + ')');
                 switch (re.op) {
                     //创建 wss 连接
                     case 'connect':
-                        console.log('Connected to Pokers Server');
+                        console.log('Connected to Eugrade Server');
                         break;
                         //加入 wss 连接
                     case 'join':
