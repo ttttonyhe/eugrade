@@ -397,7 +397,41 @@
                         </a-button>
                     </div>
                 </div>
-                <div :class="mes_input.container" id="mes-container">
+
+                <!-- 消息顶置 -->
+                <div class="mes-pin" v-if="!!thread_info.pinned.mes">
+                    <p>
+                        <template v-if="opened_class_info.superid !== user.id">
+                            <a @click="close_pin()">
+                                <a-icon type="close"></a-icon>
+                            </a>
+                        </template>
+                        <template v-else>
+                            <a-dropdown :trigger="['click']">
+                                <a class="ant-dropdown-link" href="#">
+                                    <a-icon type="close"></a-icon>
+                                </a>
+                                <a-menu slot="overlay">
+                                    <a-menu-item key="0">
+                                        <a @click="close_pin()">
+                                            <a-icon type="close"></a-icon> Close
+                                        </a>
+                                    </a-menu-item>
+                                    <a-menu-item key="0">
+                                        <a @click="pin_mes(thread_info.pinned.id,1,'remove')">
+                                            <a-icon type="delete"></a-icon> Remove
+                                        </a>
+                                    </a-menu-item>
+                                </a-menu>
+                            </a-dropdown>
+                        </template>
+                    </p>
+                    <p>Pinned Message</p>
+                    <p><a :href="'#'+thread_info.pinned.id" v-html="thread_info.pinned.mes"></a></p>
+                </div>
+                <!-- 消息顶置结束 -->
+
+                <div :class="mes_input.container" id="mes-container" :style="!!thread_info.pinned.mes ? pin_mes_container() : ''">
                     <div id="mes-inner">
                         <template v-if="spinning.loading">
                             <div style="padding:10px 40px">
@@ -409,7 +443,7 @@
                             </div>
                         </template>
                         <template v-else>
-                            <div v-for="(mes,index) in opened_mes_info.meses" class="mes-stream" @mouseenter="comment_action($event)" @mouseleave="comment_action_leave($event)" :style="same_speaker(mes.speaker,index)">
+                            <div v-for="(mes,index) in opened_mes_info.meses" class="mes-stream" @mouseenter="comment_action($event)" @mouseleave="comment_action_leave($event)" :style="same_speaker(mes.speaker,index)" :id="mes.id">
                                 <div class="mes-stream-avatar" @click="view_user_info(mes.speaker)">
                                     <template v-if="opened_mes_info.speakers[0][mes.speaker + ''] !== null">
                                         <img :src="opened_mes_info.speakers[0][mes.speaker + '']" class="class-item-img" />
@@ -423,7 +457,7 @@
                                 <div class="mes-stream-content">
                                     <h3 v-html="opened_mes_info.speakers[1][mes.speaker + ''] + check_leaved(mes.speaker) + '&nbsp;<em>' + get_mes_date(mes.date) + '</em>'"></h3>
                                     <template v-if="!!mes.content && !mes.img_url && mes.content !== 'null'">
-                                        <div class="mes-content" v-html="process_content(mes.content)"></div>
+                                        <div class="mes-content" v-html="mes.id == thread_info.pinned.id ? '<em class=\'pin-tag\'>Pinned</em>' + process_content(mes.content) : process_content(mes.content)"></div>
                                     </template>
                                     <template v-else-if="!!mes.img_url">
                                         <template v-if="!!mes.content && mes.content !== 'null'">
@@ -468,16 +502,6 @@
                                     </template>
                                 </div>
                                 <div class="mes-stream-emoji">
-                                    <template v-if="mes.speaker == user.id || opened_class_info.superid == user.id">
-                                        <a class="a-d" @click="remove_mes(mes.id,index)">
-                                            <a-icon type="delete"></a-icon>
-                                        </a>
-                                        <template v-if="mes.type !== 'file'">
-                                            <a class="a-e" @click="open_mes_edit(mes.id,mes.content)">
-                                                <a-icon type="edit"></a-icon>
-                                            </a>
-                                        </template>
-                                    </template>
                                     <a class="a-1">
                                         <a-icon type="smile" @click="add_emoji(1,mes.id,index)"></a-icon>
                                     </a>
@@ -487,6 +511,34 @@
                                     <a class="a-3">
                                         <a-icon type="frown" @click="add_emoji(3,mes.id,index)"></a-icon>
                                     </a>
+                                    <template v-if="mes.speaker == user.id || opened_class_info.superid == user.id">
+                                        <a-dropdown :trigger="['click']">
+                                            <a class="ant-dropdown-link" href="#">
+                                                <a-icon type="ellipsis"></a-icon>
+                                            </a>
+                                            <a-menu slot="overlay">
+                                                <template v-if="opened_class_info.superid == user.id">
+                                                    <a-menu-item key="0">
+                                                        <a @click="pin_mes(mes.id,index,'add')">
+                                                            <a-icon type="pushpin"></a-icon> Pin
+                                                        </a>
+                                                    </a-menu-item>
+                                                </template>
+                                                <a-menu-item key="1">
+                                                    <a class="a-d" @click="remove_mes(mes.id,index)">
+                                                        <a-icon type="delete"></a-icon> Delete
+                                                    </a>
+                                                </a-menu-item>
+                                                <template v-if="mes.type !== 'file'">
+                                                    <a-menu-item key="2">
+                                                        <a class="a-e" @click="open_mes_edit(mes.id,mes.content)">
+                                                            <a-icon type="edit"></a-icon> Edit
+                                                        </a>
+                                                    </a-menu-item>
+                                                </template>
+                                            </a-menu>
+                                        </a-dropdown>
+                                    </template>
                                 </div>
                             </div>
                             <p class="mes-end">- EOF -</p>

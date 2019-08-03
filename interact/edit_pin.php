@@ -11,7 +11,7 @@ require 'database/db_thread.php';
 session_start();
 
 //判断发送参数是否齐全，请求创建班级的用户是否为当前登录用户
-if (!empty($_POST['class_id']) && !empty($_POST['thread_id']) && !empty($_POST['user']) && !empty($_POST['mes_id']) && ($_SESSION['logged_in_id'] == (int)$_POST['user'])) {
+if (!empty($_POST['class_id']) && !empty($_POST['thread_id']) && !empty($_POST['user']) && !empty($_POST['mes_id']) && !empty($_POST['type']) && ($_SESSION['logged_in_id'] == (int)$_POST['user'])) {
 
     //输入处理
     function input($data)
@@ -28,7 +28,8 @@ if (!empty($_POST['class_id']) && !empty($_POST['thread_id']) && !empty($_POST['
     $class_id = input($_POST['class_id']);
     $thread_id = input($_POST['thread_id']);
     $user = input($_POST['user']);
-    $name = input($_POST['name']);
+    $mes_id = input($_POST['mes_id']);
+    $type = input($_POST['type']);
 
 
     //业务逻辑
@@ -39,17 +40,28 @@ if (!empty($_POST['class_id']) && !empty($_POST['thread_id']) && !empty($_POST['
         $mes = 'Class does not exist';
     } else {
         $array = Lazer::table('users')->limit(1)->where('id', '=', (int)$user)->find()->asArray();
-        if (!!$array) {
+        if (!!$array && $array[0]['type'] == 2) {
             $array = Lazer::table('threads')->limit(1)->where('id', '=', (int)$thread_id)->andWhere('belong_class', '=', (int)$class_id)->find()->asArray();
             if (!!$array) {
+                $array = Lazer::table('messages')->limit(1)->where('id', '=', (int)$mes_id)->andWhere('thread', '=', (int)$thread_id)->find()->asArray();
+                if(!!$array){
+                    if($type == 'remove'){
+                        $mes_id = 0;
+                    }
                 $thread = Lazer::table('threads')->limit(1)->where('id', '=', (int)$thread_id)->andWhere('belong_class', '=', (int)$class_id)->find();
                 $thread->set(array(
-                    'name' => $name
+                    'pin' => (int)$mes_id
                 ));
                 $thread->save();
+
                 $status = 1;
+                $code = 127;
+                $mes = 'Successfully pinned a message';
+            }else{
+                $status = 0;
                 $code = 126;
-                $mes = 'Successfully edited thread info';
+                $mes = 'Message does not exist';
+            }
             } else {
                 $status = 0;
                 $code = 125;
@@ -58,7 +70,7 @@ if (!empty($_POST['class_id']) && !empty($_POST['thread_id']) && !empty($_POST['
         } else {
             $status = 0;
             $code = 104;
-            $mes = 'User does not exist';
+            $mes = 'User does not exist or not a teacher';
         }
     }
 } else {
