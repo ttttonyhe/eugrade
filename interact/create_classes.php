@@ -6,21 +6,8 @@ require '../vendor/autoload.php';
 define('LAZER_DATA_PATH', dirname(dirname(__FILE__)) . '/data/');
 use Lazer\Classes\Database as Lazer;
 
-//数据库创建与判断
-try {
-    \Lazer\Classes\Helpers\Validate::table('classes')->exists();
-} catch (\Lazer\Classes\LazerException $e) { //不存在则创建
-    Lazer::create('classes', array(
-        'id' => 'integer',
-        'name' => 'string',
-        'des' => 'string',
-        'img' => 'string',
-        'count' => 'integer',
-        'super' => 'integer',
-        'member' => 'string',
-        'date' => 'integer'
-    ));
-}
+require 'database/db_classes.php';
+
 
 session_start();
 

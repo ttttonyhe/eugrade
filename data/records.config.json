@@ -1,1 +1,1 @@
-{"last_id":40,"schema":{"id":"integer","creator":"integer","user_id":"integer","belong_topic":"integer","date":"integer","name":"string","score":"string","total":"string","percent":"string"},"relations":{}}
+{"last_id":1,"schema":{"id":"integer","creator":"integer","user_id":"integer","belong_topic":"integer","date":"integer","name":"string","score":"string","total":"string","percent":"string"},"relations":{}}

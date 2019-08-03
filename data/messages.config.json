@@ -1,9 +1,1 @@
-<<<<<<< HEAD
-{"last_id":206,"schema":{"id":"integer","speaker":"integer","speaker_name":"string","is_super":"integer","belong_class":"integer","content":"string","thread":"integer","emoji_1":"integer","emoji_2":"integer","emoji_3":"integer","img_url":"string","date":"integer","type":"string","file_url":"string","file_name":"string","log":"integer"},"relations":{}}
-=======
-<<<<<<< HEAD
-{"last_id":188,"schema":{"id":"integer","speaker":"integer","speaker_name":"string","is_super":"integer","belong_class":"integer","content":"string","thread":"integer","emoji_1":"integer","emoji_2":"integer","emoji_3":"integer","img_url":"string","date":"integer","type":"string","file_url":"string","file_name":"string","log":"integer"},"relations":{}}
-=======
-{"last_id":202,"schema":{"id":"integer","speaker":"integer","speaker_name":"string","is_super":"integer","belong_class":"integer","content":"string","thread":"integer","emoji_1":"integer","emoji_2":"integer","emoji_3":"integer","img_url":"string","date":"integer","type":"string","file_url":"string","file_name":"string","log":"integer"},"relations":{}}
->>>>>>> ac878d07b44ecce6f1b0e2af72ad855c4dc229ac
->>>>>>> c22db50460d7b5bb592e5aa3a365dca9cccaac4c
+{"last_id":3,"schema":{"id":"integer","speaker":"integer","speaker_name":"string","is_super":"integer","belong_class":"integer","content":"string","thread":"integer","emoji_1":"integer","emoji_2":"integer","emoji_3":"integer","img_url":"string","date":"integer","type":"string","file_url":"string","file_name":"string","log":"integer"},"relations":{}}

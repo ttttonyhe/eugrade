@@ -11,7 +11,7 @@ require 'database/db_thread.php';
 session_start();
 
 //判断发送参数是否齐全，请求创建班级的用户是否为当前登录用户
-if (!empty($_POST['class_id']) && !empty($_POST['thread_id']) && !empty($_POST['user']) && !empty($_POST['name']) && ($_SESSION['logged_in_id'] == (int)$_POST['user'])) {
+if (!empty($_POST['class_id']) && !empty($_POST['thread_id']) && !empty($_POST['user']) && !empty($_POST['mes_id']) && ($_SESSION['logged_in_id'] == (int)$_POST['user'])) {
 
     //输入处理
     function input($data)

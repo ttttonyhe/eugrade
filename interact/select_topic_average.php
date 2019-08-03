@@ -7,39 +7,9 @@ define('LAZER_DATA_PATH', dirname(dirname(__FILE__)) . '/data/');
 
 use Lazer\Classes\Database as Lazer;
 
-//数据库创建与判断
-try {
-    \Lazer\Classes\Helpers\Validate::table('topics')->exists();
-} catch (\Lazer\Classes\LazerException $e) { //不存在则创建
-    Lazer::create('topics', array(
-        'id' => 'integer',
-        'creator' => 'integer',
-        'belong_class' => 'integer',
-        'belong_series' => 'integer', //所属系列
-        'series_order' => 'integer', //所属系列的排序位置
-        'date' => 'integer',
-        'name' => 'string',
-        'candidate_count' => 'integer', //参与人数(存在数据的人数,不包含缺席)
-        'scale' => 'string'
-    ));
-}
+require 'database/db_topic.php';
 
-//数据库创建与判断
-try {
-    \Lazer\Classes\Helpers\Validate::table('records')->exists();
-} catch (\Lazer\Classes\LazerException $e) { //不存在则创建
-    Lazer::create('records', array(
-        'id' => 'integer',
-        'creator' => 'integer',
-        'user_id' => 'integer',
-        'belong_topic' => 'integer',
-        'date' => 'integer',
-        'name' => 'string',
-        'score' => 'string', //包含浮点数
-        'total' => 'string', //包含浮点数
-        'percent' => 'string' //得分比 浮点数
-    ));
-}
+require 'database/db_record.php';
 
 if (!empty($_GET['topic_ids']) && !empty($_GET['type'])) {
 

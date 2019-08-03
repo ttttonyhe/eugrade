@@ -6,19 +6,7 @@ require '../vendor/autoload.php';
 define('LAZER_DATA_PATH', dirname(dirname(__FILE__)) . '/data/');
 use Lazer\Classes\Database as Lazer;
 
-//数据库创建与判断
-try {
-    \Lazer\Classes\Helpers\Validate::table('threads')->exists();
-} catch (\Lazer\Classes\LazerException $e) { //不存在则创建
-    Lazer::create('threads', array(
-        'id' => 'integer',
-        'creator' => 'integer',
-        'belong_class' => 'integer',
-        'date' => 'integer',
-        'name' => 'string',
-        'message_count' => 'integer'
-    ));
-}
+require 'database/db_thread.php';
 
 session_start();
 

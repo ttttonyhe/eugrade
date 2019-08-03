@@ -205,7 +205,7 @@ var antd = new Vue({
         /* WebSocket 开始 */
         function reconnect_wss() {
             //websocket 连接
-            window.ws = new WebSocket('wss://www.eugrade.com/wss');
+            window.ws = new WebSocket('ws://127.0.0.1:2000');
             window.ws.onmessage = function (data) {
                 var re = eval('(' + data.data + ')');
                 switch (re.op) {
@@ -981,6 +981,7 @@ var antd = new Vue({
             this.mes_input.markdown.btn = 'default';
             this.check.file.status = false;
             this.check.img.status = false;
+            this.mes_input.visible.text = true;
         },
         //获取文件格式的内容段图标、颜色
         get_file_icon(name) {

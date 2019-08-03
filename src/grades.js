@@ -697,10 +697,12 @@ var antd = new Vue({
 
                     this.opened_topic_info.info = res.data[0];
                     this.opened_topic_info.average = this.opened_topic_info.info.average;
-                    //初始按照 score 升序排序
-                    this.opened_topic_info.records_data = res.data['records'].sort(
-                        firstBy('score')
-                    );
+                    if ("undefined" != typeof res.data['records']) {
+                        //初始按照 score 升序排序
+                        this.opened_topic_info.records_data = res.data['records'].sort(
+                            firstBy('score')
+                        );
+                    }
 
                     this.edit_info.info.topic.name = this.opened_topic_info.info.name;
 

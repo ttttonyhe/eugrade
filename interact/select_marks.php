@@ -6,18 +6,7 @@ require '../vendor/autoload.php';
 define('LAZER_DATA_PATH', dirname(dirname(__FILE__)) . '/data/');
 use Lazer\Classes\Database as Lazer;
 
-//数据库创建与判断
-try {
-    \Lazer\Classes\Helpers\Validate::table('marks')->exists();
-} catch (\Lazer\Classes\LazerException $e) { //不存在则创建
-    Lazer::create('marks', array(
-        'id' => 'integer',
-        'class' => 'integer',
-        'user' => 'integer',
-        'type' => 'string',
-        'marker' => 'integer'
-    ));
-}
+require 'database/db_mark.php';
 
 if (!empty($_GET['form']) && !empty($_GET['marker'])) {
 
