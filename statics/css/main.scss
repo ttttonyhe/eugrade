@@ -589,38 +589,46 @@ body {
     display: none;
 }
 
-.mes-display .mes-stream-emoji {
-    display: flex !important;
-    padding-top: 10px;
-}
+.mes-display {
+    .mes-stream-emoji {
+        display: flex !important;
+        padding-top: 10px;
 
-.mes-display .mes-stream-emoji .a-1 {
-    font-size: 20px;
-    color: #F44336;
-}
+        .ant-dropdown-link {
+            font-size: 20px;
+            color: #999;
+            margin-left: 5px;
+        }
 
-.mes-display .mes-stream-emoji .a-2 {
-    font-size: 20px;
-    color: #FF9800;
-    margin-left: 5px;
-}
+        .a-1 {
+            font-size: 20px;
+            color: #F44336;
+        }
 
-.mes-display .mes-stream-emoji .a-3 {
-    font-size: 20px;
-    color: #9E9E9E;
-    margin-left: 5px;
-}
+        .a-2 {
+            font-size: 20px;
+            color: #FF9800;
+            margin-left: 5px;
+        }
 
-.mes-display .mes-stream-emoji .a-e {
-    font-size: 20px;
-    color: #999;
-    margin-right: 10px;
-}
+        .a-3 {
+            font-size: 20px;
+            color: #9E9E9E;
+            margin-left: 5px;
+        }
 
-.mes-display .mes-stream-emoji .a-d {
-    font-size: 20px;
-    color: #999;
-    margin-right: 5px;
+        .a-e {
+            font-size: 20px;
+            color: #999;
+            margin-right: 10px;
+        }
+
+        .a-d {
+            font-size: 20px;
+            color: #999;
+            margin-right: 5px;
+        }
+    }
 }
 
 .mes-stream-emoji-display {
@@ -1092,19 +1100,21 @@ body {
             text-align: center;
             border-right: 2px solid #eee;
 
-            .paper{
+            .paper {
                 color: #4CAF50;
                 font-size: 34px;
                 margin-bottom: -6px;
                 margin-top: 5px;
             }
-            .paper-slogan{
+
+            .paper-slogan {
                 font-size: 20px;
                 margin: 0px;
                 font-weight: 300;
                 letter-spacing: 2px;
                 margin-bottom: -15px;
             }
+
             h1 {
                 font-size: 45px;
                 margin: 0px;
@@ -1117,12 +1127,13 @@ body {
             flex-basis: 50%;
             text-align: center;
 
-            .crown{
+            .crown {
                 color: #fbbc05;
                 font-size: 40px;
                 margin-top: 2px;
                 margin-bottom: -12px;
             }
+
             p {
                 font-size: 20px;
                 margin: 0px;
@@ -1139,11 +1150,11 @@ body {
     }
 }
 
-.grade-bottom{
+.grade-bottom {
     margin-top: 15px;
 }
 
-.grade-not{
+.grade-not {
     border: 2px solid #02a9f4;
     padding: 10px 20px;
     border-radius: 4px;
@@ -1152,34 +1163,89 @@ body {
     letter-spacing: .5px;
 }
 
-.select-stats{
+.select-stats {
     border: 1px solid #eee;
     padding: 5px 15px;
     border-radius: 4px;
     transition: all .1s;
     margin-bottom: 10px;
 
-    &:hover{
+    &:hover {
         background: #f7f8f9;
     }
 
-    h2{
+    h2 {
         margin: 0px;
-    font-size: 18px;
-    display: inline-block;
-    letter-spacing: .5px;
+        font-size: 18px;
+        display: inline-block;
+        letter-spacing: .5px;
     }
 
-    p{
+    p {
         margin: 0px;
-    color: #888;
-    font-weight: 300;
+        color: #888;
+        font-weight: 300;
     }
 }
 
+.mes-pin {
+    display: flex;
+    background: #f7f8f9;
+    padding: 10px 20px;
+    box-shadow: inset -1px 0px 3px 0px rgba(0, 0, 0, 0.06);
+
+    p {
+        &:nth-child(1) {
+            margin: 0px;
+            color: #999;
+            transform: translateY(0.5px);
+        }
+
+        &:nth-child(2) {
+            margin: 0px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        &:nth-child(3) {
+            margin: 0px;
+            margin-left: 20px;
+            border-left: 2px solid rgba(158, 158, 158, 0.31);
+            padding-left: 20px;
+            color: #777;
+            white-space: nowrap;
+            width: 80%;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            a{
+                color: #777;
+                text-decoration: none;
+                &:hover{
+                    color: #777;
+                    text-decoration: none;
+                }
+            }
+        }
+    }
+}
+
+.pin-tag{
+    color: rgb(3, 169, 244);
+    font-style: normal;
+    border-radius: 4px;
+    border: 1px solid rgb(3, 169, 244);
+    padding: 1px 5px;
+    margin-right: 5px;
+}
+
+
+
+
 /* 首页 */
-.index-container{
+.index-container {
     background-image: url(/pokers/statics/img/pattern.png);
     background-repeat: repeat;
 }
+
+
 /* 首页 */

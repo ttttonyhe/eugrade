@@ -45,6 +45,14 @@ var antd = new Vue({
                 members: []
             },
             opened_thread_info: [],
+            thread_info: {
+                pinned: {
+                    id: null,
+                    mes: null,
+                    index: null
+                },
+                reported: null
+            },
             member_marked: false,
             class_marked: false,
             mark: {
@@ -163,12 +171,12 @@ var antd = new Vue({
     mounted() {
         axios.get('../interact/select_users.php?type=name&id=' + parseInt(cookie.get('logged_in_id')) + '&form=all')
             .then(re => {
-                    this.user.info = re.data[0];
-                    this.user.id = parseInt(this.user.info.id);
-                    axios.get('../interact/get_token.php?user=' + this.user.id + '&email=' + this.user.info.email)
-                        .then(res => {
-                            this.mes_input.token = res.data.key;
-                        })
+                this.user.info = re.data[0];
+                this.user.id = parseInt(this.user.info.id);
+                axios.get('../interact/get_token.php?user=' + this.user.id + '&email=' + this.user.info.email)
+                    .then(res => {
+                        this.mes_input.token = res.data.key;
+                    })
                 if (!!re.data[0].class) {
                     this.user.joined_classes = re.data[0].class.split(',');
                     axios.get('../interact/select_classes.php?type=class&id=' + re.data[0].class + '&form=all')
@@ -428,6 +436,8 @@ var antd = new Vue({
         },
         //点击班级获取主题在 center 列展示
         open_class(id, index, push) {
+
+            this.close_all_status();
             //选中增加 class，删除其余选中
             $('.left .class-item').each(function () {
                 $(this).removeClass('clicked');
@@ -523,6 +533,15 @@ var antd = new Vue({
                             } else {
                                 cookie.set('pokers_push', id);
                                 cookie.set('pokers_thread_count', this.opened_mes_info.thread_info.message_count);
+                            }
+
+                            //判断顶置信息
+                            if (!!this.opened_thread_info[0].pin) {
+                                this.thread_info.pinned.id = this.opened_thread_info[0].pin;
+                                axios.get('../interact/select_messages.php?thread_id=' + this.opened_mes_info.thread_id + '&class_id=' + this.opened_mes_info.class_id + '&mes_id=' + this.thread_info.pinned.id + '&type=single')
+                                    .then(resp => {
+                                        this.thread_info.pinned.mes = resp.data[0].content;
+                                    })
                             }
                             this.spinning.loading = false;
                         })
@@ -1400,6 +1419,60 @@ var antd = new Vue({
                 return '';
             } else {
                 return '&nbsp;<em class="leaved_label">Leaved</em>'
+            }
+        },
+        //消息顶置
+        pin_mes(id, index, type) {
+            if (type == 'add') {
+                var query_string = "user=" + this.user.id + "&mes_id=" + parseInt(id) + "&class_id=" + this.opened_mes_info.class_id + "&thread_id=" + this.opened_mes_info.thread_id + "&type=add";
+            } else {
+                var query_string = "user=" + this.user.id + "&mes_id=" + this.thread_info.pinned.id + "&class_id=" + this.opened_mes_info.class_id + "&thread_id=" + this.opened_mes_info.thread_id + "&type=remove";
+            }
+            axios.post(
+                    '../interact/edit_pin.php',
+                    query_string
+                )
+                .then(res => {
+                    if (res.data.status) {
+                        if (type == 'add') {
+                            this.thread_info.pinned.id = id;
+                            this.thread_info.pinned.index = index;
+                            this.thread_info.pinned.mes = this.opened_mes_info.meses[parseInt(index)].content;
+                        } else {
+                            this.close_pin('key');
+                        }
+                    } else {
+                        this.$message.error(res.data.mes);
+                    }
+                })
+        },
+        //关闭顶置显示
+        close_pin(key) {
+            this.thread_info.pinned.mes = null;
+            if(!!key){
+                this.thread_info.pinned.id = null;
+            }
+            this.thread_info.pinned.idnex = null;
+        },
+        //关闭全部部分的 status
+        close_all_status(){
+            this.status.mark = false;
+            this.status.chat = false;
+            this.status.user = false;
+            this.status.thread = false;
+            this.status.info = false;
+        },
+        //存在顶置消息时的消息界面 container 判断
+        pin_mes_container(){
+            switch(this.mes_input.container){
+                case 'mes-container-normal':
+                    return 'height: calc(100vh - 190px) !important;'
+                    break;
+                case 'mes-container':
+                    return 'height: calc(100vh - 300px) !important;'
+                    break;
+                default:
+                    break;
             }
         },
     }
