@@ -1,6 +1,6 @@
 <div align="center">
-  <h1>Pokers</h1>
-  <p>Clear & Oganized Team Communication Solution</p>
+  <h1>Eugrade</h1>
+  <p>Clear & Oganized Online Learning Management Solution</p>
   <a href="https://github.com/HelipengTony/pokers">
     <img src="https://img.shields.io/github/forks/HelipengTony/pokers.svg" alt="forks">
   </a>
