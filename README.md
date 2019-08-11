@@ -91,10 +91,12 @@
 <br/>
 
 ## Donation 赞助作者
-Your name will be on the list [Donation](https://www.snapaper.com/donate)
+If you feel that my project is helpful to you and you are willing to give me a little support, you can donate to me in the following ways, which will help me to maintain the continuous development of this project, thank you very much!
 <br/>
 
 ![Donate](https://i.loli.net/2019/02/18/5c6a80afd1e26.png)
+
+Your name will be kept on the list [Donation](https://www.snapaper.com/donate)
 
 <br/>
 
