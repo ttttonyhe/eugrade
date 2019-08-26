@@ -90,7 +90,7 @@
             <template v-if="status.files">
                 <div class="mes-header">
                     <p style="color:#333;font-weight:600">
-                        <a-icon type="folder-open"></a-icon>&nbsp;&nbsp;{{ opened_mes_info.thread_info.name }}
+                        <a-icon type="folder-open"></a-icon>&nbsp;&nbsp;<span v-html="opened_mes_info.thread_info.name"></span>
                         <a-button size="small" @click="reverse_order('files')" style="right:20px;position:absolute"><a-icon type="sort-descending" /></a-button>
                     </p>
                 </div>

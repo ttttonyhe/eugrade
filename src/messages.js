@@ -166,6 +166,7 @@ var antd = new Vue({
                 visible: false,
                 visible_class: false
             },
+            wss_connected: false
         }
     },
     mounted() {
@@ -213,13 +214,14 @@ var antd = new Vue({
         /* WebSocket 开始 */
         function reconnect_wss() {
             //websocket 连接
-            window.ws = new WebSocket('ws://127.0.0.1:2000');
+            window.ws = new WebSocket('wss://www.eugrade.com/wss');
             window.ws.onmessage = function (data) {
                 var re = eval('(' + data.data + ')');
                 switch (re.op) {
                     //创建 wss 连接
                     case 'connect':
                         console.log('Connected to Eugrade Server');
+                        antd.wss_connected = true;
                         break;
                         //加入 wss 连接
                     case 'join':
@@ -474,6 +476,7 @@ var antd = new Vue({
         //点击主题获取消息在 right 列展示
         open_mes(index, id, belong_class) {
 
+            if(this.wss_connected){
             window.ws.send('{"action":"join", "thread_id":' + id + ', "class_id":' + belong_class + ', "speaker":' + antd.user.id + ',"speaker_name":"' + antd.user.info.name + '","type" : "join"}');
             //清除当前 interval
             window.clearInterval(window.get_push_interval);
@@ -553,7 +556,9 @@ var antd = new Vue({
                 antd.check_push();
             }
             window.get_push_interval = setInterval(func_push, 10000);
-
+        }else{
+            this.$message.error('Please wait while we connect to messages server');
+        }
         },
 
 
