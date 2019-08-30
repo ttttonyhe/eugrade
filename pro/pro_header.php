@@ -6,7 +6,7 @@
     <title>Eugrade Inside</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="Shortcut Icon" href="../statics/img/pokers_icon.ico" type="image/x-icon">
+    <link rel="Shortcut Icon" href="https://static.ouorz.com/eugrade.ico" type="image/x-icon">
     <?php
     //引入composer
     require '../vendor/autoload.php';

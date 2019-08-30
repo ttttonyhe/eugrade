@@ -4,50 +4,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="Shortcut Icon" href="statics/img/pokers_icon.ico" type="image/x-icon">
+    <link rel="Shortcut Icon" href="https://static.ouorz.com/eugrade.ico" type="image/x-icon">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Eugrade | Efficient Collaboration within Schools</title>
+    <title>Eugrade | Communication and collaboration platform for Education</title>
     <script type="text/javascript" src="statics/js/vue.js"></script>
-    <link type="text/css" rel="stylesheet" href="statics/css/antd.css">
-    <script type="text/javascript" src="statics/js/antd.js"></script>
     <link type="text/css" rel="stylesheet" href="dist/css/main.css">
+    <style>
+        body {
+            background: transparent;
+            font-family: sans-serif;
+        }
+    </style>
 </head>
 
 <body>
     <div id="app">
-        <div class="index-container" style="background: #fff;width: 100%;height: 100vh;">
-            <div style="text-align: center;width: 80%;margin: 0 auto;padding-top: 13vh;">
-                <h1
-                    style="font-size: 44px;font-weight: 700;letter-spacing: .7px;line-height: 1.3;font-family: sans-serif">
-                    Tame the chaos of
-                    your communication with Teachers/Students</h1>
-                <p
-                    style="color: #777;font-size: 21px;font-weight: 200;letter-spacing: 1px;margin-top: -10px;font-family: sans-serif">
-                    Pokers helps you achieve efficient collaboration within schools</p>
+        <header class="index-bg">
+            <h1><img src="https://static.ouorz.com/eugrade_logo.png"> Eugrade</h1>
+            <nav>
+                <p><a href="https://github.com/HelipengTony/pokers">Open-Source</a></p>
+                <p><a href="https://www.ouorz.com">Blog</a></p>
+                <p><a href="https://www.eugrade.com/login.html">Dashboard <b>→</b></a></p>
+            </nav>
+        </header>
+        <section class="index-header">
+            <h1>Communication and Collaboration Platform</h1>
+            <p>for Education.</p>
+            <a href="https://www.eugrade.com/login.html">Get Started <b>→</b></a>
+        </section>
+
+        <section class="index-demo">
+            <img src="https://static.ouorz.com/QQ20190722-195614@2x.png">
+            <div class="content">
+                <h3>Grades System</h3>
+                <p>Manage students' grades through a more effient way. A rediscovery of grades data. That's Eugrade.</p>
             </div>
-            <div style="text-align: center;margin-top: 30px;margin-bottom: -70px">
-                <a href="login.html">
-                    <a-button type="primary" size="large" style="margin-right: 10px">Get Started <a-icon
-                            type="right-circle"></a-icon>
-                    </a-button>
-                </a>
-                <a-button size="large">Why Eugrade</a-button>
+        </section>
+
+        <section class="index-demo index-demo-one">
+            <img src="https://static.ouorz.com/QQ20190811-154033@2x.png">
+            <div class="content">
+                <h3>Files System</h3>
+                <p>Where information is easy to find, forever. That's Eugrade.</p>
             </div>
-            <div
-                style="background-image: url(http://localhost/pokers/statics/img/bg_index.png);width: 100%;height: 60vh;background-size: contain;background-repeat: no-repeat;margin: 0 auto;background-position: center;">
+        </section>
+
+        <section class="index-demo index-demo-two">
+            <img src="https://static.ouorz.com/QQ20190811-153801@2x.png">
+            <div class="content">
+                <h3>Instant Messaging</h3>
+                <p>A distraction-free IM platform where conversations stay organized and on-topic. That’s Eugrade.</p>
             </div>
-        </div>
+        </section>
+
+        <footer></footer>
     </div>
+
+
+
+
     <script type="text/javascript">
         var antd = new Vue({
             el: '#app',
-            mounted(){
+            mounted() {
                 if (!!cookie.get('logged_in_id')) {
                     window.location.href = 'https://www.eugrade.com/pro';
                 }
             }
         });
     </script>
+
+
+
+
+
 </body>
 
 

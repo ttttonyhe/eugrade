@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="Shortcut Icon" href="../statics/img/pokers_icon.ico" type="image/x-icon">
+    <link rel="Shortcut Icon" href="https://static.ouorz.com/eugrade.ico" type="image/x-icon">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <?php
     //引入composer
@@ -55,12 +55,12 @@
 
 <body>
     <div id="app" style="max-height: 100vh;overflow-y: hidden;opacity:0">
-        <title v-html="current.title">Eugrade | Efficient Collaboration within Schools</title>
+        <title v-html="current.title">Eugrade | Communication and collaboration platform for Education</title>
         <div>
             <a-menu mode="horizontal" v-model="current.nav">
                 <a-sub-menu style="border-right: 1px solid #eee;">
                     <span slot="title" class="submenu-title-wrapper">
-                        <img src="../statics/img/pokers_logo.png" class="header-logo" />
+                        <img src="https://static.ouorz.com/eugrade_logo.png" class="header-logo" />
                     </span>
                     <a-menu-item-group title="Application">
                         <a-menu-item><a href="https://www.snapaper.com">
@@ -85,7 +85,7 @@
                     </a-menu-item-group>
                     <a-menu-item-group title="Version">
                         <a-menu-item>
-                            <a-icon type="robot"></a-icon>Beta v0.16
+                            <a-icon type="robot"></a-icon>Beta v0.18
                         </a-menu-item>
                     </a-menu-item-group>
                 </a-sub-menu>
