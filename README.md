@@ -1,6 +1,6 @@
 <div align="center">
   <h1>Eugrade</h1>
-  <p>Clear & Oganized Team Management & Communication Platform</p>
+  <p>Communication and Collaboration Platform for Education</p>
   <a href="https://github.com/HelipengTony/pokers">
     <img src="https://img.shields.io/github/forks/HelipengTony/pokers.svg" alt="forks">
   </a>
@@ -86,7 +86,7 @@
 + [x] Grades 成绩管理系统
 + [ ] Schools 校园系统
 + [ ] 模块化重构
-+ [ ] 网站首页
++ [x] 网站首页
 
 <br/>
 

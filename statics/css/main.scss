@@ -1317,7 +1317,8 @@ $index-margin : 190px;
             margin-right: 15px;
             border-right: 2px solid #fff;
             padding-right: 15px;
-            a{
+
+            a {
                 color: #fff !important;
                 text-decoration: none;
             }
@@ -1381,7 +1382,7 @@ $demo-width: 330px;
     width: $demo-width;
     border-radius: 10px;
     background: #fff;
-    box-shadow: 0 1px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
 
     img {
         width: 100%;
@@ -1410,9 +1411,9 @@ $demo-width: 330px;
         }
     }
 
-    &:hover{
+    &:hover {
         z-index: 5;
-        transform: scale(1.05,1.05);
+        transform: scale(1.05, 1.05);
     }
 }
 
@@ -1428,6 +1429,19 @@ $demo-width: 330px;
     width: $demo-width;
     top: 270px;
     right: 340px;
+}
+
+
+@media screen and (min-width:1600px) {
+    .index-bg {
+        width: 100%;
+        padding: 20px 320px;
+    }
+
+    .index-header {
+        width: 80vh;
+        margin-left: 320px;
+    }
 }
 
 /* 首页 */
