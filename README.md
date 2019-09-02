@@ -23,17 +23,33 @@
   - 基于 PHP 、Vue.js 与 Antd
 + **Developed using Webpack & Sass**
   - 采用了 Webpack 与 Sass
-+ **WebSocket Supported**
++ **WebSocket Supported (Based on Workerman)**
   - 采用 WebSocket 并支持心跳的聊天系统
-+ **Organized Classes/Files/Grades System**
-  - 系统高效的团队(班级)/绩点/文件系统
-+ **Clear Instant messaging system**
-  - 简洁强大的群聊系统(支持新消息推送)
++ **Organized Classes / Files / Grades System**
+  - 高效的团队(班级)/绩点/文件系统
+    - 班级(成员)管理
+    - 成绩录入
+    - 成绩展示
+    - 成绩图标
+    - 成绩趋势
+    - 文件名编辑
+    - 文件按话题归档
+    - Office 文件预览
+    - ...
++ **Powerful Instant messaging system**
+  - 简洁强大的群聊系统
+    - 图片上传
+    - 文件上传
+    - MarkDown 渲染
+    - emoji 评论
+    - 删除/编辑消息
+    - 消息置顶
+    - ...
 + **Neat UI design**
   - 美丽的 UI 设计
-+ **0 sql everywhere**
++ **0 sql everywhere (Based on Lazer-Database)**
   - 完全无数据库 (整个系统基于 json)
-+ **All-round  UX Design**
++ **All-round UX Design (Inspired from Twist)**
   - 全方位多元的用户交互操作
 + **Easy to do secondary development**
   - 易于二次开发
