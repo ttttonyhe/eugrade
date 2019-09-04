@@ -10,6 +10,7 @@
     //引入composer
     require '../vendor/autoload.php';
     define('LAZER_DATA_PATH', dirname(dirname(__FILE__)) . '/data/');
+
     use Lazer\Classes\Database as Lazer;
     use Qiniu\Auth;
 
@@ -35,14 +36,14 @@
         </script>
     <?php } else {
 
-    //获取登录用户信息
-    $array = Lazer::table('users')->where('id', '=', $_SESSION['logged_in_id'])->limit(1)->find()->asArray();
-    $id = $_SESSION['logged_in_id'];
-    $name = $array[0]['name'];
-    $email = $array[0]['email'];
-    $avatar = $array[0]['avatar'];
-    $type = $array[0]['type'];
-} ?>
+        //获取登录用户信息
+        $array = Lazer::table('users')->where('id', '=', $_SESSION['logged_in_id'])->limit(1)->find()->asArray();
+        $id = $_SESSION['logged_in_id'];
+        $name = $array[0]['name'];
+        $email = $array[0]['email'];
+        $avatar = $array[0]['avatar'];
+        $type = $array[0]['type'];
+    } ?>
 
     <script type="text/javascript" src="../statics/js/vue.js"></script>
     <script type="text/javascript" src="../statics/js/axios.min.js"></script>
@@ -62,32 +63,21 @@
                     <span slot="title" class="submenu-title-wrapper">
                         <img src="https://static.ouorz.com/eugrade_logo.png" class="header-logo" />
                     </span>
-                    <a-menu-item-group title="Application">
-                        <a-menu-item><a href="https://www.snapaper.com">
-                                <a-icon type="solution"></a-icon>Snapaper
-                            </a></a-menu-item>
-                        <a-menu-item><a href="https://www.zeo.im">
-                                <a-icon type="compass"></a-icon>ZEO.IM
-                            </a></a-menu-item>
-                    </a-menu-item-group>
-                    <a-menu-item-group title="Terms">
-                        <a-menu-item><a href="https://www.ouorz.com/pokers-terms-of-service.html">
-                                <a-icon type="file-done"></a-icon>Terms of Service
-                            </a></a-menu-item>
-                        <a-menu-item><a href="https://www.ouorz.com/pokers-privacy-policy.html">
-                                <a-icon type="file-protect"></a-icon>Privacy Policy
-                            </a></a-menu-item>
-                    </a-menu-item-group>
-                    <a-menu-item-group title="Donation">
-                        <a-menu-item><a href="https://www.snapaper.com/donate" style="color:hotpink">
-                                <a-icon type="pay-circle"></a-icon>Dnoate to Me
-                            </a></a-menu-item>
-                    </a-menu-item-group>
-                    <a-menu-item-group title="Version">
-                        <a-menu-item>
-                            <a-icon type="robot"></a-icon>Beta v0.18
-                        </a-menu-item>
-                    </a-menu-item-group>
+                    <a-menu-item><a href="https://www.ouorz.com/pokers-terms-of-service.html">
+                            <a-icon type="file-done"></a-icon>Terms of Service
+                        </a></a-menu-item>
+                    <a-menu-item><a href="https://www.ouorz.com/pokers-privacy-policy.html">
+                            <a-icon type="file-protect"></a-icon>Privacy Policy
+                        </a></a-menu-item>
+                    <a-menu-item><a href="https://www.snapaper.com/donate" style="color:hotpink">
+                            <a-icon type="pay-circle"></a-icon>Dnoate to Me
+                        </a></a-menu-item>
+                    <a-menu-item>
+                        <a-icon type="robot"></a-icon>Beta v0.181
+                    </a-menu-item>
+                    <a-menu-item><a href="https://shimo.im/forms/KghdKCKqGYtHygKj/fill">
+                            <a-icon type="customer-service"></a-icon>FeedBack
+                        </a></a-menu-item>
                 </a-sub-menu>
                 <a-menu-item key="messages" @click="switch_section('messages')" style="border-right: 1px solid #eee;">
                     <a-icon type="project"></a-icon>Messages
@@ -101,6 +91,17 @@
                 <a-menu-item key="classes" @click="switch_section('classes')" style="border-right: 1px solid #eee;">
                     <a-icon type="bank"></a-icon>Classes
                 </a-menu-item>
+                <a-sub-menu style="border-right: 1px solid #eee;">
+                    <span slot="title" class="submenu-title-wrapper">
+                        <a-icon type="bank"></a-icon>Resources
+                    </span>
+                    <a-menu-item><a href="https://www.snapaper.com">
+                            <a-icon type="solution"></a-icon>Snapaper
+                        </a></a-menu-item>
+                    <a-menu-item><a href="https://platform.snapaper.com">
+                            <a-icon type="compass"></a-icon>Snapaper Platform
+                        </a></a-menu-item>
+                </a-sub-menu>
             </a-menu>
             <div class="header-user">
                 <a-dropdown :trigger="['click']">
@@ -224,9 +225,9 @@
                         display_percent: false
                     }
                 },
-                notice:{
-                    status : false,
-                    content : null
+                notice: {
+                    status: false,
+                    content: null
                 }
             }
         },
