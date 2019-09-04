@@ -93,7 +93,7 @@
                 </a-menu-item>
                 <a-sub-menu style="border-right: 1px solid #eee;">
                     <span slot="title" class="submenu-title-wrapper">
-                        <a-icon type="bank"></a-icon>Resources
+                        <a-icon type="appstore"></a-icon>Resources
                     </span>
                     <a-menu-item><a href="https://www.snapaper.com">
                             <a-icon type="solution"></a-icon>Snapaper
