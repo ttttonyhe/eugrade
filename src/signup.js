@@ -60,6 +60,7 @@ var antd = new Vue({
                     formData.append('email', values['email']);
                     formData.append('password', values['password']);
                     formData.append('type', values['type']);
+                    formData.append('invite', values['invite']);
 
                     $.ajax({
                         url: 'interact/register.php',

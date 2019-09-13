@@ -35,6 +35,7 @@
     - 文件名编辑
     - 文件按话题归档
     - Office 文件预览
+    - 班级成员批量生成
     - ...
 + **Powerful Instant messaging system**
   - 简洁强大的群聊系统
@@ -45,8 +46,11 @@
     - 删除/编辑消息
     - 消息置顶
     - ...
-+ **Neat UI design**
++ **Neat UI design (English/Chinese Language Supported)**
   - 美丽的 UI 设计
+    - English
+    - 简体中文
+    - 语言一键切换
 + **0 sql everywhere (Based on Lazer-Database)**
   - 完全无数据库 (整个系统基于 json)
 + **All-round UX Design (Inspired from Twist)**

@@ -120,7 +120,7 @@ if (!empty($_POST['pwd']) && !empty($_POST['class_id']) && !empty($_POST['user_i
                             $false[] = $name_origin; //保存注册失败的用户名
                         } else {
                             $pwd = (string) $pwd;
-                            $this_id = Lazer::table('users')->findAll()->count() + 1;
+                            $this_id = Lazer::table('users')->lastId() + 1;
 
                             //存入数据库
                             $row = Lazer::table('users');

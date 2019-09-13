@@ -25,9 +25,9 @@ if (!empty($_POST['email']) && !empty($_POST['password']) && !empty($_POST['name
     class check
     {
         //验证用户名
-        public function name()
+        public function name($name)
         {
-            $name = input($_POST['name']);
+            $name = $name;
             $array = Lazer::table('users')->findAll()->asArray('name');
             if (array_key_exists($name, $array)) {
                 return 0;
@@ -36,9 +36,9 @@ if (!empty($_POST['email']) && !empty($_POST['password']) && !empty($_POST['name
             }
         }
         //验证邮箱
-        public function email()
+        public function email($email)
         {
-            $email = input($_POST['email']);
+            $email = $email;
             $array = Lazer::table('users')->findAll()->asArray('email');
             if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 if (array_key_exists($email, $array)) {
@@ -63,12 +63,12 @@ if (!empty($_POST['email']) && !empty($_POST['password']) && !empty($_POST['name
     //业务逻辑
     $check = new check();
     if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        if ($check->email()) {
-            if ($check->name()) {
+        if ($check->email($email)) {
+            if ($check->name($name)) {
                 //判断注册类型，教师账户需要输入邀请码
                 if($type == 'a' || ($type == 'b' && $code == 'eugrade_teacher')){
                     
-                    $this_id = Lazer::table('users')->findAll()->count() + 1;
+                    $this_id = Lazer::table('users')->lastId() + 1;
                     $row = Lazer::table('users');
                     $row->id = $this_id;
                     $row->name = $name;
@@ -84,7 +84,7 @@ if (!empty($_POST['email']) && !empty($_POST['password']) && !empty($_POST['name
                     $row->save();
                 $status = 1;
                 $code = 104;
-                $mes = $this_id;
+                $mes = Lazer::table('users')->lastId();
 
                 //自动登录
                 session_start();

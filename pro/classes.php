@@ -11,7 +11,9 @@
                 1: '班级列表',
                 2: '加入新班级',
                 3: '建立新班级',
-                4: '位成员'
+                4: '位成员',
+                5: '创建成员',
+                6: '成员账户将使用你输入的 <b>姓名</b> 和 <b>密码</b> 来创建. 中文姓名将自动转换为拼音，邮件地址格式为：<b>姓名拼音@eugrade.com</b>'
             },
             view: {
                 1: '设置',
@@ -42,7 +44,9 @@
                 1: 'Classes',
                 2: 'Join a new Class',
                 3: 'Create a new Class',
-                4: 'Members'
+                4: 'Members',
+                5: 'Create Members',
+                6: 'Member Accounts will be generated using its <b>nickname</b> and a <b>common password</b>. Chinese Nickname will be transfered to Pinyin, email addresses will be like <b>nickname@eugrade.com</b>'
             },
             view: {
                 1: 'Settings',
@@ -117,9 +121,9 @@
     </div>
 
     <!-- 批量成员添加 -->
-    <a-modal title="Create Members" :visible="multi.visible" @ok="handle_multi_submit" :confirm-loading="multi.confirm_multi_loading" @cancel="handle_multi_cancel">
+    <a-modal :title="lang.tab[5]" :visible="multi.visible" @ok="handle_multi_submit" :confirm-loading="multi.confirm_multi_loading" @cancel="handle_multi_cancel">
         <template v-if="!multi.data_status">
-            <p>Member Accounts will be generated using its <b>nickname</b> and a <b>common password</b>. Chinese Nickname will be transfered to Pinyin, email addresses will be like <b>nickname@eugrade.com</b></p>
+            <p v-html="lang.tab[6]"></p>
             <a-input placeholder="Password" v-model="multi.pwd">
                 <a-icon slot="prefix" type="key" />
             </a-input>

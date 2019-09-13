@@ -299,7 +299,7 @@
             },
             switch_section(key) {
                 this.current.nav = key;
-                this.current.title = 'Pokers | ' + this.capital(key);
+                this.current.title = 'Eugrade | ' + this.capital(key);
                 this.current.page = key + '.php';
                 this.spinning = true;
                 setTimeout('antd.spinning = false;', 1000);

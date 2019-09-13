@@ -45,8 +45,8 @@ if (!empty($_POST['class_id']) && !empty($_POST['thread_id']) && !empty($_POST['
             $array = Lazer::table('threads')->limit(1)->where('id', '=', (int) $thread_id)->andWhere('belong_class', '=', (int) $class_id)->find()->asArray();
             if (!!$array) {
                 $array = Lazer::table('messages')->limit(1)->where('id', '=', (int) $mes_id)->andWhere('thread', '=', (int) $thread_id)->find()->asArray();
-                if (!!$array) {
-                    if (!empty($array[0]['content'])) {
+                if (!!$array || ($type == 'remove')) {
+                    if (!empty($array[0]['content']) || ($type == 'remove')) {
                         if ($type == 'remove') {
                             $mes_id = 0;
                         }

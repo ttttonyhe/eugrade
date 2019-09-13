@@ -270,7 +270,7 @@ if (cookie.get('eugrade_lang') == 'zh_cn') {
         <a-auto-complete class="certain-category-search" placeholder="Name" v-model="add.info.record.name" @change="change_name">
             <template slot="dataSource">
                 <a-select-opt-group>
-                    <a-select-option v-for="(person,index) in opened_topic_info.members_unused" :value="person.name + '|' + person.id + '|' + index">{{ person.name }}</a-select-option>
+                    <a-select-option v-if="parseInt(person.id) !== parseInt(user.id)" v-for="(person,index) in opened_topic_info.members_unused" :value="person.name + '|' + person.id + '|' + index">{{ person.name }}</a-select-option>
                 </a-select-opt-group>
             </template>
         </a-auto-complete>
