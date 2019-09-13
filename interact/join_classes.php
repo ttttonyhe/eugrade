@@ -46,7 +46,7 @@ if (!empty($_POST['class_id']) && !empty($_POST['stu_id'])) {
                 ));
                 $class->save();
 
-                //更改管理员的 class 字段
+                //更改当前用户的 class 字段
                 $array = Lazer::table('users')->limit(1)->where('id', '=', (int)$stu)->find();
                 if (!empty($array->class)) {
                     if (!in_array($id, explode(',', $array->class))) {

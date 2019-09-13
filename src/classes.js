@@ -1,3 +1,5 @@
+import { throws } from "assert";
+
 var antd = new Vue({
     el: '#app',
     data() {
@@ -21,7 +23,8 @@ var antd = new Vue({
                 supername: null,
                 superid: null,
                 members: [],
-                img: null
+                img: null,
+                index: null
             },
             add: {
                 visible: false,
@@ -30,6 +33,19 @@ var antd = new Vue({
                     name: null,
                         des: null
                 },
+            },
+            multi: {
+                data_status: false,
+                visible: false,
+                confirm_multi_loading: false,
+                count: 0,
+                names: '',
+                pwd: '',
+                names_check: true,
+                return: {
+                    fails: [],
+                    successes: []
+                }
             },
             join: {
                 visible: false,
@@ -200,6 +216,8 @@ var antd = new Vue({
                 $(this).removeClass('clicked');
             });
             $('#class' + index).addClass('clicked');
+
+            this.opened_class_info.index = index;
 
             this.spinning.center = true;
             this.edit.class.name = this.opened_class_info.name = this.user.classes_info[index].name;
@@ -743,5 +761,89 @@ var antd = new Vue({
                     break;
             }
         },
+        //提交批量用户注册
+        handle_multi_submit() {
+            if (!this.multi.data_status) {
+                this.multi.names = '';
+                this.multi.names_check = true;
+
+                //获取全部姓名
+                $('input[name=multi_member]').each(function () {
+                    var temp_name = $(this).val();
+                    temp_name = temp_name.split("|").join(""); //删除分隔符
+                    if (temp_name !== '') { //删除分隔符后仍剩其他字符
+                        antd.multi.names = antd.multi.names + '|' + temp_name;
+                    } else {
+                        antd.multi.names_check = false;
+                    }
+                });
+
+                if (this.multi.names_check) {
+
+                    //获取全部用户昵称
+                    this.multi.names = this.multi.names.substr(1, (this.multi.names).length);
+
+                    var query_string = "pwd=" + this.multi.pwd + "&names=" + this.multi.names + "&class_id=" + this.opened_class_info.id + "&user_id=" + this.user.id;
+
+                    //提交请求
+                    axios.post(
+                            '../interact/multi_create_member.php',
+                            query_string
+                        )
+                        .then(res => {
+                            if (res.data.status) {
+                                //获取注册成功的用户名+邮箱与失败的用户名
+                                this.multi.return.fails = res.data.info.fails;
+                                this.multi.return.successes = res.data.info.successes;
+                                this.multi.data_status = true;
+                                this.$message.success(res.data.mes);
+                                this.open_class_info(this.opened_class_info.index);
+                            } else {
+                                this.multi.data_status = false;
+                                this.multi.confirm_multi_loading = false;
+                                this.multi.count = 0;
+                                this.multi.names = '';
+                                this.multi.names_check = true;
+                                this.multi.pwd = '';
+                                this.multi.return.fails = [];
+                                this.multi.return.successes = [];
+                                this.$message.error(res.data.mes);
+                            }
+                        })
+
+
+                } else {
+                    antd.$message.error('Invaild nickname, please avoid using special characters');
+                }
+            } else {
+                this.handle_multi_cancel();
+            }
+        },
+        handle_multi_cancel() {
+            this.multi.data_status = false;
+            this.multi.confirm_multi_loading = false;
+            this.multi.count = 0;
+            this.multi.names = '';
+            this.multi.names_check = true;
+            this.multi.pwd = '';
+            this.multi.return.fails = [];
+            this.multi.return.successes = [];
+            this.multi.visible = false;
+        },
+        add_multi_member() {
+            if((this.multi.count + 1) < 50){
+                this.multi.count += 1;
+            }else{
+                this.multi.count = 50;
+                antd.$message.error('You are only allow to create maximum 50 accounts at a time');
+            }
+        },
+        remove_multi_member() {
+            if((this.multi.count - 1) > 0){
+                this.multi.count -= 1;
+            }else{
+                this.multi.count = 0;
+            }
+        }
     }
 });

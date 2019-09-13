@@ -1,7 +1,7 @@
 <?php require 'pro_header.php'; ?>
 
 <script>
-if (cookie.get('eugrade_lang') == 'zh_cn') {
+    if (cookie.get('eugrade_lang') == 'zh_cn') {
         var lang_json = {
             title: {
                 1: '班级',
@@ -76,10 +76,12 @@ if (cookie.get('eugrade_lang') == 'zh_cn') {
                 <p>{{ lang.title[2].substr(1,lang.title[2].length) }}</p>
             </div>
             <template v-if="Object.keys(user.joined_classes).length">
-            <div class="mes-item">
+                <div class="mes-item">
                     <p>
                         <a-icon type="team"></a-icon>&nbsp;&nbsp;{{ lang.tab[1] }}
-                        <a-button size="small" @click="reverse_order('classes')" style="font-size:14px;"><a-icon type="sort-descending" /></a-button>
+                        <a-button size="small" @click="reverse_order('classes')" style="font-size:14px;">
+                            <a-icon type="sort-descending" />
+                        </a-button>
                     </p>
                 </div>
                 <div v-for="(joined,index) in user.joined_classes" :class="'class-item ' + class_super(index)" @click="open_class_info(index)" :id="'class'+index">
@@ -114,6 +116,43 @@ if (cookie.get('eugrade_lang') == 'zh_cn') {
         </a-spin>
     </div>
 
+    <!-- 批量成员添加 -->
+    <a-modal title="Create Members" :visible="multi.visible" @ok="handle_multi_submit" :confirm-loading="multi.confirm_multi_loading" @cancel="handle_multi_cancel">
+        <template v-if="!multi.data_status">
+            <p>Member Accounts will be generated using its <b>nickname</b> and a <b>common password</b>. Chinese Nickname will be transfered to Pinyin, email addresses will be like <b>nickname@eugrade.com</b></p>
+            <a-input placeholder="Password" v-model="multi.pwd">
+                <a-icon slot="prefix" type="key" />
+            </a-input>
+            <br />
+            <div style="display:flex;margin: 15px 0;">
+                <a-button type="primary" @click="add_multi_member" style="width: 49%;margin-right: 2%;">+ Add</a-button>
+                <a-button @click="remove_multi_member" style="width: 49%;">- Remove</a-button>
+            </div>
+            <div v-for="(count,index) in multi.count" style="margin-bottom:10px">
+                <a-input :placeholder="'Nickname ' + (index + 1)" name="multi_member">
+                    <a-icon slot="prefix" type="user" />
+                </a-input>
+            </div>
+        </template>
+        <template v-else>
+            <div v-if="!!multi.return.fails">
+                <h2 style="margin-bottom:0px">Fails</h2>
+                <p>Please change the following nickname(s):</p>
+                <div v-for="f in multi.return.fails" class="multi-list">
+                    <p><b>{{ f.name }}</b></p>
+                </div>
+            </div>
+            <div v-if="!!multi.return.successes">
+                <h2 style="margin-bottom:0px">Successes</h2>
+                <p>Accounts of the following nickname(s) have been generated and added to this class:</p>
+                <div v-for="s in multi.return.successes" class="multi-list">
+                    <p><b>{{ s.name }}</b> | Email: <b>{{ s.email }}</b> | PWD: <b>{{ multi.pwd }}</b></p>
+                </div>
+            </div>
+        </template>
+    </a-modal>
+    <!-- 批量成员添加 -->
+
     <div class="center class-center">
         <a-spin :spinning="spinning.center">
             <template v-if="opened_class_info.status">
@@ -136,6 +175,7 @@ if (cookie.get('eugrade_lang') == 'zh_cn') {
                         <a-dropdown placement="bottomRight">
                             <a-button>{{ lang.view[1] }}</a-button>
                             <a-menu slot="overlay">
+                                <!-- 编辑信息/离开班级 -->
                                 <template v-if="user.id == opened_class_info.superid">
                                     <a-menu-item>
                                         <a @click="edit.class.visible = true">
@@ -150,6 +190,19 @@ if (cookie.get('eugrade_lang') == 'zh_cn') {
                                         </a>
                                     </a-menu-item>
                                 </template>
+                                <!-- 编辑信息/离开班级 -->
+
+                                <!-- 批量成员增加 -->
+                                <template v-if="user.id == opened_class_info.superid">
+                                    <a-menu-item>
+                                        <a @click="multi.visible = true">
+                                            <a-icon type="usergroup-add"></a-icon> Create Members
+                                        </a>
+                                    </a-menu-item>
+                                </template>
+                                <!-- 批量成员增加 -->
+
+                                <!-- 星标收藏 -->
                                 <template v-if="class_marked">
                                     <a-menu-item>
                                         <a style="color:#FF4040" @click="demark_process(opened_class_info.id,'class')">
@@ -164,6 +217,7 @@ if (cookie.get('eugrade_lang') == 'zh_cn') {
                                         </a>
                                     </a-menu-item>
                                 </template>
+                                <!-- 星标收藏 -->
                             </a-menu>
                         </a-dropdown>
                     </div>
@@ -293,7 +347,7 @@ if (cookie.get('eugrade_lang') == 'zh_cn') {
 
 
 
-<?php if ((int)$type == 2) { ?>
+<?php if ((int) $type == 2) { ?>
     <!-- 新建班级 -->
     <a-modal :title="lang.tab[3]" :visible="add.visible" @ok="handle_create_submit" :confirm-loading="add.confirm_create_loading" @cancel="handle_create_cancel">
         <a-input :placeholder="lang.view[15]" v-model="add.class.name">
@@ -386,11 +440,11 @@ if (cookie.get('eugrade_lang') == 'zh_cn') {
 
 <!-- 加入班级 -->
 <a-modal :title="lang.tab[2]" :visible="join.visible" @ok="handle_join_submit" :confirm-loading="join.confirm_join_loading" @cancel="handle_join_cancel">
-        <a-input placeholder="Class ID" v-model="join.id">
-            <a-icon slot="prefix" type="team" />
-        </a-input>
-    </a-modal>
-    <!-- 加入班级结束 -->
+    <a-input placeholder="Class ID" v-model="join.id">
+        <a-icon slot="prefix" type="team" />
+    </a-input>
+</a-modal>
+<!-- 加入班级结束 -->
 
 <a-modal :footer="null" :title="lang.view[9]" centered v-model="invite.visible" @cancel="handle_invite_close">
     <div class="class-invite-div">
