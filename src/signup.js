@@ -29,16 +29,31 @@ var antd = new Vue({
             form: null,
             valid: null,
             valid_text: null,
+            type: 1,
+            disable: true
         }
     },
     mounted() {
         this.form = this.$form.createForm(this);
     },
     methods: {
+        handle_type_change(type){
+            if(type.target.value == 'b'){
+                this.type = 2;
+            }else{
+                this.type = 1;
+            }
+        },
+        handle_check_change(value){
+            if(value.target.checked){
+                this.disable = false;
+            }else{
+                this.disable = true;
+            }
+        },
         handleSubmit(e) {
             e.preventDefault();
             this.form.validateFields((err, values) => {
-                console.log(values);
                 if (!err) { //无填写错误
                     var formData = new FormData();
                     formData.append('name', values['name']);

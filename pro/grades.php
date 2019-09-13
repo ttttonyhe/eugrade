@@ -1,6 +1,110 @@
 <?php require 'pro_header.php'; ?>
 
-
+<script>
+if (cookie.get('eugrade_lang') == 'zh_cn') {
+        var lang_json = {
+            title: {
+                1: '成绩',
+                2: '管理/查看班级成绩信息'
+            },
+            tab: {
+                1: '班级',
+                2: '主题',
+                3: '系列',
+                4: '增加',
+                5: '暂无主题',
+                6: '考生',
+                7: '增加系列',
+                8: '增加主题',
+                9: '修改主题',
+                10: '修改系列',
+                11: '名',
+                12: '编辑记录信息',
+                13: '编辑等级划分',
+                14: '增加记录'
+            },
+            view: {
+                1: '表格',
+                2: '统计图',
+                3: '成绩划分',
+                4: '未划分',
+                5: '编辑',
+                6: '删除',
+                7: '平均分',
+                8: '系列统计',
+                9: '点击显示图表',
+                10: '全部主题',
+                11: '你可能需要刷新页面以查看最新数据',
+                12: '统计表暂时不可用',
+                13: '班级平均分',
+                14: '取得了:',
+                table: {
+                    1: '标号',
+                    2: '日期',
+                    3: '姓名',
+                    4: '成绩',
+                    5: '总分',
+                    6: '等级',
+                    7: '操作',
+                    8: '年份',
+                    9: '月份',
+                    10: '日'
+                }
+            }
+        }
+    } else {
+        var lang_json = {
+            title: {
+                1: 'Grades',
+                2: 'Manage/View your grades'
+            },
+            tab: {
+                1: 'Classes',
+                2: 'Topic',
+                3: 'Series',
+                4: 'Add',
+                5: 'No Topics Yet',
+                6: 'Candidates',
+                7: 'Add a new series',
+                8: 'Add a new topic',
+                9: 'Edit a topic',
+                10: 'Edit a series',
+                11: ' Name',
+                12: 'Edit a Record',
+                13: 'Edit Grading Scale',
+                14: 'Add a Record'
+            },
+            view: {
+                1: 'Table',
+                2: 'Chart',
+                3: 'Grading Scale',
+                4: 'Grading Scale Needed',
+                5: 'Edit',
+                6: 'Delete',
+                7: 'Average Score',
+                8: 'View Series Stats',
+                9: 'Click to Display',
+                10: 'All Topics',
+                11: 'You might need to reload the web page to see updates',
+                12: 'Chart is temporarily unavailable',
+                13: 'Class Average Score',
+                14: 'has scored:',
+                table: {
+                    1: 'Index',
+                    2: 'Date',
+                    3: 'Name',
+                    4: 'Score',
+                    5: 'Total',
+                    6: 'Level',
+                    7: 'Action',
+                    8: 'Year',
+                    9: 'Month',
+                    10: 'Day'
+                }
+            }
+        }
+    }
+</script>
 
 
 <div class="main-container" id="main-container" style="opacity:0">
@@ -8,14 +112,14 @@
     <div class="left">
         <a-spin :spinning="spinning.left">
             <div class="main-header">
-                <h3>Grades<a-tag color="green" style="transform: translateY(-3.1px);margin-left: 5px;">Beta</a-tag>
+                <h3>{{ lang.title[1] }}<a-tag color="green" style="transform: translateY(-3.1px);margin-left: 5px;">Beta</a-tag>
                 </h3>
-                <p>Manage/View your grades</p>
+                <p>{{ lang.title[2].substr(1,lang.title[2].length) }}</p>
             </div>
             <template v-if="Object.keys(user.joined_classes).length">
                 <div class="mes-item">
                     <p>
-                        <a-icon type="team"></a-icon>&nbsp;&nbsp;Classes
+                        <a-icon type="team"></a-icon>&nbsp;&nbsp;{{ lang.tab[1] }}
                         <a-button size="small" @click="reverse_order('classes')" style="font-size:14px;">
                             <a-icon type="sort-descending" />
                         </a-button>
@@ -42,45 +146,45 @@
     </div>
 
     <!-- 增加系列 -->
-    <a-modal title="Add a new series" :visible="add.visible.series" @ok="handle_series_submit(opened_class_info.id)" :confirm-loading="add.confirm.series" @cancel="handle_series_cancel()">
-        <a-input placeholder="Series Name" v-model="add.info.series.name">
+    <a-modal :title="lang.tab[7]" :visible="add.visible.series" @ok="handle_series_submit(opened_class_info.id)" :confirm-loading="add.confirm.series" @cancel="handle_series_cancel()">
+        <a-input :placeholder="lang.tab[3] + lang.tab[11]" v-model="add.info.series.name">
             <a-icon slot="prefix" type="bar-chart" />
         </a-input>
     </a-modal>
     <!-- 增加系列结束 -->
     <!-- 增加主题 -->
-    <a-modal title="Add a new topic" :visible="add.visible.topic" @ok="handle_topic_submit()" :confirm-loading="add.confirm.topic" @cancel="handle_topic_cancel()">
-        <a-input placeholder="Topic Name" v-model="add.info.topic.name">
+    <a-modal :title="lang.tab[8]" :visible="add.visible.topic" @ok="handle_topic_submit()" :confirm-loading="add.confirm.topic" @cancel="handle_topic_cancel()">
+        <a-input :placeholder="lang.tab[2] + lang.tab[11]" v-model="add.info.topic.name">
             <a-icon slot="prefix" type="bar-chart" />
         </a-input>
     </a-modal>
     <!-- 增加主题结束 -->
     <!-- 编辑主题 -->
-    <a-modal title="Edit a topic" :visible="edit_info.visible.topic" @ok="handle_edit_info_topic_submit()" :confirm-loading="edit_info.confirm.topic" @cancel="handle_edit_info_topic_cancel()">
-        <a-input placeholder="Topic Name" v-model="edit_info.info.topic.name">
+    <a-modal :title="lang.tab[9]" :visible="edit_info.visible.topic" @ok="handle_edit_info_topic_submit()" :confirm-loading="edit_info.confirm.topic" @cancel="handle_edit_info_topic_cancel()">
+        <a-input :placeholder="lang.tab[2] + lang.tab[11]" v-model="edit_info.info.topic.name">
             <a-icon slot="prefix" type="bar-chart" />
         </a-input>
     </a-modal>
     <!-- 编辑主题结束 -->
     <!-- 编辑系列 -->
-    <a-modal title="Edit a series" :visible="edit_info.visible.series" @ok="handle_edit_info_series_submit()" :confirm-loading="edit_info.confirm.series" @cancel="handle_edit_info_series_cancel()">
-        <a-input placeholder="Series Name" v-model="edit_info.info.series.name">
+    <a-modal :title="lang.tab[10]" :visible="edit_info.visible.series" @ok="handle_edit_info_series_submit()" :confirm-loading="edit_info.confirm.series" @cancel="handle_edit_info_series_cancel()">
+        <a-input :placeholder="lang.tab[3] + lang.tab[11]" v-model="edit_info.info.series.name">
             <a-icon slot="prefix" type="bar-chart" />
         </a-input>
     </a-modal>
     <!-- 编辑系列结束 -->
     <!-- 查看 series 折线图 -->
-    <a-modal :footer="null" title="View Series Stats" :visible="stats.visible.all" @cancel="handle_stats_cancel()">
+    <a-modal :footer="null" :title="lang.view[8]" :visible="stats.visible.all" @cancel="handle_stats_cancel()">
         <template v-if="parseInt(user.id) == parseInt(opened_class_info.superid)">
             <div class="select-stats" v-for="(series_c,index) in opened_series_info.info" @click="open_stats('single',index,'view_topics')">
                 <h2>{{ series_c.name }}</h2>
-                <p>{{ (series_c.topics_info).length }} Topics</p>
+                <p>{{ (series_c.topics_info).length }} {{ lang.tab[2] }}</p>
             </div>
         </template>
         <template v-else>
             <div class="select-stats" v-for="(series_c,index) in opened_series_info.info" @click="open_stats('single',index)">
                 <h2>{{ series_c.name }}</h2>
-                <p>{{ (series_c.topics_info).length }} Topics</p>
+                <p>{{ (series_c.topics_info).length }} {{ lang.tab[2] }}</p>
             </div>
         </template>
         <p class="mes-end" style="margin-top: 0px;margin-bottom: 5px;">- EOF -</p>
@@ -93,7 +197,7 @@
                 <div :style="opened_series_info.info.length ? 'background: #f8f9fa;' : ''">
                     <div class="mes-header">
                         <p style="color:#666;">
-                            <a-icon type="bar-chart"></a-icon>&nbsp;&nbsp;Series
+                            <a-icon type="bar-chart"></a-icon>&nbsp;&nbsp;{{ lang.tab[3] }}
                             <template v-if="parseInt(user.id) == parseInt(opened_class_info.superid)">
                                 <a-button size="small" @click="open_stats('all')" style="right:81px;position:absolute">
                                     <a-icon type="line-chart"></a-icon>
@@ -104,7 +208,7 @@
                                     <a-icon type="line-chart"></a-icon>
                                 </a-button>
                             </template>
-                            <a-button size="small" @click="add.visible.series = true" style="right:20px;position:absolute" v-if="parseInt(user.id) == parseInt(opened_class_info.superid)">+ Add</a-button>
+                            <a-button size="small" @click="add.visible.series = true" style="right:20px;position:absolute" v-if="parseInt(user.id) == parseInt(opened_class_info.superid)">+ {{ lang.tab[4] }}</a-button>
                         </p>
                     </div>
 
@@ -130,14 +234,14 @@
                                 <div v-for="topic_c in series_c.topics_info" class="class-item topic-item" :id="'topic_sub'+topic_c.id" @click="open_topic_info(topic_c.id,index)">
                                     <h3>
                                         <a-icon type="branches"></a-icon>&nbsp;&nbsp;{{ topic_c.name }}
-                                        <p>{{ get_date(topic_c.date) }} | {{ topic_c.candidate_count }} Candidates</p>
+                                        <p>{{ get_date(topic_c.date) }} | {{ topic_c.candidate_count }} {{ lang.tab[6] }}</p>
                                     </h3>
                                 </div>
                             </template>
                             <template v-else>
                                 <div class="class-item topic-item">
                                     <h3>
-                                        <a-icon type="branches"></a-icon>&nbsp;&nbsp;No Topics Yet
+                                        <a-icon type="branches"></a-icon>&nbsp;&nbsp;{{ lang.tab[5] }}
                                     </h3>
                                 </div>
                             </template>
@@ -162,7 +266,7 @@
 
 
     <!-- 增加记录 -->
-    <a-modal title="Add a Record" :visible="add.visible.record" @ok="handle_record_submit()" :confirm-loading="add.confirm.record" @cancel="handle_record_cancel()">
+    <a-modal :title="lang.tab[14]" :visible="add.visible.record" @ok="handle_record_submit()" :confirm-loading="add.confirm.record" @cancel="handle_record_cancel()">
         <a-auto-complete class="certain-category-search" placeholder="Name" v-model="add.info.record.name" @change="change_name">
             <template slot="dataSource">
                 <a-select-opt-group>
@@ -172,35 +276,35 @@
         </a-auto-complete>
         <br /><br />
         <a-input-group>
-            <a-input-number placeholder="Year" :min="2018" :max="2021" v-model="add.info.record.yy" style="margin-right:10px"></a-input-number>
-            <a-input-number placeholder="Month" :min="1" :max="12" v-model="add.info.record.mm" style="margin-right:10px"></a-input-number>
-            <a-input-number placeholder="Day" :min="1" :max="31" v-model="add.info.record.dd"></a-input-number>
+            <a-input-number :placeholder="lang.view.table[8]" :min="2018" :max="2021" v-model="add.info.record.yy" style="margin-right:10px"></a-input-number>
+            <a-input-number :placeholder="lang.view.table[9]" :min="1" :max="12" v-model="add.info.record.mm" style="margin-right:10px"></a-input-number>
+            <a-input-number :placeholder="lang.view.table[10]" :min="1" :max="31" v-model="add.info.record.dd"></a-input-number>
         </a-input-group>
         <br />
         <a-input-group compact>
-            <a-input-number placeholder="Total" style="width: 30%" :min="0" :step="0.5" v-model="add.info.record.total"></a-input-number>
-            <a-input-number placeholder="Score" style="width: 30%" :min="0" :max="add.info.record.total" :step="0.5" v-model="add.info.record.score"></a-input-number>
+            <a-input-number :placeholder="lang.view.table[5]" style="width: 30%" :min="0" :step="0.5" v-model="add.info.record.total"></a-input-number>
+            <a-input-number :placeholder="lang.view.table[4]" style="width: 30%" :min="0" :max="add.info.record.total" :step="0.5" v-model="add.info.record.score"></a-input-number>
         </a-input-group>
     </a-modal>
     <!-- 增加记录结束 -->
 
     <!-- 编辑记录 -->
-    <a-modal title="Edit a Record" :visible="edit.visible" @ok="handle_edit_submit()" :confirm-loading="edit.confirm" @cancel="handle_edit_cancel()">
+    <a-modal :title="lang.tab[12]" :visible="edit.visible" @ok="handle_edit_submit()" :confirm-loading="edit.confirm" @cancel="handle_edit_cancel()">
         <a-input-group>
-            <a-input-number placeholder="Year" :min="2018" :max="2021" v-model="edit.yy" style="margin-right:10px"></a-input-number>
-            <a-input-number placeholder="Month" :min="1" :max="12" v-model="edit.mm" style="margin-right:10px"></a-input-number>
-            <a-input-number placeholder="Day" :min="1" :max="31" v-model="edit.dd"></a-input-number>
+            <a-input-number :placeholder="lang.view.table[8]" :min="2018" :max="2021" v-model="edit.yy" style="margin-right:10px"></a-input-number>
+            <a-input-number :placeholder="lang.view.table[9]" :min="1" :max="12" v-model="edit.mm" style="margin-right:10px"></a-input-number>
+            <a-input-number :placeholder="lang.view.table[10]" :min="1" :max="31" v-model="edit.dd"></a-input-number>
         </a-input-group>
         <br />
         <a-input-group compact>
-            <a-input-number placeholder="Total" style="width: 30%" :min="0" :step="0.5" v-model="edit.total"></a-input-number>
-            <a-input-number placeholder="Score" style="width: 30%" :min="0" :max="edit.total" :step="0.5" v-model="edit.score"></a-input-number>
+            <a-input-number :placeholder="lang.view.table[5]" style="width: 30%" :min="0" :step="0.5" v-model="edit.total"></a-input-number>
+            <a-input-number :placeholder="lang.view.table[4]" style="width: 30%" :min="0" :max="edit.total" :step="0.5" v-model="edit.score"></a-input-number>
         </a-input-group>
     </a-modal>
     <!-- 编辑记录结束 -->
 
     <!-- 设置范围 -->
-    <a-modal title="Edit Grading Scale" :visible="range.visible" @ok="handle_range_submit()" :confirm-loading="range.confirm" @cancel="handle_range_cancel()">
+    <a-modal :title="lang.tab[13]" :visible="range.visible" @ok="handle_range_submit()" :confirm-loading="range.confirm" @cancel="handle_range_cancel()">
         <a-form-item label="A*(max|min)">
             <a-input-group compact>
                 <a-input-number style="width: 30%" :min="range.scale[0].min" :max="100" :step="1" :formatter="value => `${value}%`" :parser="value => value.replace('%', '')" v-model="range.scale[0].max"></a-input-number>
@@ -277,8 +381,8 @@
                 </div>
 
                 <div class="topic-header" v-if="<?php echo $type; ?> == 2">
-                    <div :style="opened_topic_info.section ? 'border-bottom: 2px solid #1890ff;color: #1890ff;' : ''" @click="opened_topic_info.section = !opened_topic_info.section;level_count = [0,0,0,0,0,0,0,0]">Table</div>
-                    <div :style="opened_topic_info.section ? '' : 'border-bottom: 2px solid #1890ff;color: #1890ff;'" @click="opened_topic_info.section = !opened_topic_info.section;get_levels();">Chart</div>
+                    <div :style="opened_topic_info.section ? 'border-bottom: 2px solid #1890ff;color: #1890ff;' : ''" @click="opened_topic_info.section = !opened_topic_info.section;level_count = [0,0,0,0,0,0,0,0]">{{ lang.view[1] }}</div>
+                    <div :style="opened_topic_info.section ? '' : 'border-bottom: 2px solid #1890ff;color: #1890ff;'" @click="opened_topic_info.section = !opened_topic_info.section;get_levels();">{{ lang.view[2] }}</div>
                 </div>
 
                 <div class="topic-container">
@@ -287,28 +391,28 @@
 
                         <div class="topic-table-add" :style="parseInt(user.id) == parseInt(opened_class_info.superid) ? '' : 'margin-bottom: 45px'">
                             <template v-if="parseInt(user.id) == parseInt(opened_class_info.superid)">
-                                <a-button type="primary" @click="add.visible.record = true" v-if="(opened_topic_info.records_data).length < (opened_class_info.members).length" style="margin-right:10px">+ Add a Record</a-button>
-                                <a-button @click="range.visible = true">Edit Grading Scale</a-button>
+                                <a-button type="primary" @click="add.visible.record = true" v-if="(opened_topic_info.records_data).length < (opened_class_info.members).length" style="margin-right:10px">+ {{ lang.tab[14] }}</a-button>
+                                <a-button @click="range.visible = true">{{ lang.tab[13] }}</a-button>
                             </template>
-                            <a-popover title="Grading Scale" trigger="click">
+                            <a-popover :title="lang.view[3]" trigger="click">
                                 <template slot="content">
                                     <p v-for="(scale,index) in range.scale" v-if="!!scale.max"><b>{{ range_sign[index].toUpperCase() }}</b> : {{ scale.max }}% ~ {{ scale.min }}%</p>
                                 </template>
-                                <a-button :style="parseInt(user.id) == parseInt(opened_class_info.superid) ? 'float:right' : 'float:left'">Grading Scale</a-button>
+                                <a-button :style="parseInt(user.id) == parseInt(opened_class_info.superid) ? 'float:right' : 'float:left'">{{ lang.view[3] }}</a-button>
                             </a-popover>
                         </div>
                         <div class="table" v-if="(opened_topic_info.records_data).length !== 0 && <?php echo $type; ?> == 2">
                             <div class="table-header">
-                                <div>Index</div>
-                                <div>Date</div>
-                                <div>Name</div>
-                                <div @click="sortBy('score')">Score&nbsp;&nbsp;<a-icon type="sort-ascending" v-if="sort"></a-icon>
+                                <div>{{ lang.view.table[1] }}</div>
+                                <div>{{ lang.view.table[2] }}</div>
+                                <div>{{ lang.view.table[3] }}</div>
+                                <div @click="sortBy('score')">{{ lang.view.table[4] }}&nbsp;&nbsp;<a-icon type="sort-ascending" v-if="sort"></a-icon>
                                     <a-icon type="sort-descending" v-else></a-icon>
                                 </div>
-                                <div>Total</div>
-                                <div>Level</div>
+                                <div>{{ lang.view.table[5] }}</div>
+                                <div>{{ lang.view.table[6] }}</div>
                                 <template v-if="parseInt(user.id) == parseInt(opened_class_info.superid)">
-                                    <div>Action</div>
+                                    <div>{{ lang.view.table[7] }}</div>
                                 </template>
                             </div>
                             <template v-for="(data,index) in opened_topic_info.records_data">
@@ -322,15 +426,15 @@
                                     <div style="font-size:16px" v-else>
                                         <a-tooltip placement="topLeft">
                                             <template slot="title">
-                                                <span>Grading Scale Needed</span>
+                                                <span>{{ lang.view[4] }}</span>
                                             </template>
                                             <a-icon type="info-circle"></a-icon>
                                         </a-tooltip>
                                     </div>
                                     <template v-if="parseInt(user.id) == parseInt(opened_class_info.superid)">
                                         <div style="display:flex">
-                                            <a-button size="small" @click="edit_record(index)" style="margin-right: 5px;">Edit</a-button>
-                                            <a-button type="danger" size="small" @click="delete_record(data.id)">Delete</a-button>
+                                            <a-button size="small" @click="edit_record(index)" style="margin-right: 5px;">{{ lang.view[5] }}</a-button>
+                                            <a-button type="danger" size="small" @click="delete_record(data.id)">{{ lang.view[6] }}</a-button>
                                         </div>
                                     </template>
                                 </div>
@@ -348,7 +452,7 @@
                                             </div>
                                             <div class="author-info">
                                                 <h3>{{ data.name }}</h3>
-                                                <p>has scored:</p>
+                                                <p>{{ lang.view[14] }}</p>
                                             </div>
                                         </div>
                                         <div class="date">
@@ -360,24 +464,24 @@
                                             <p class="paper">
                                                 <a-icon type="file-done"></a-icon>
                                             </p>
-                                            <p class="paper-slogan">Score</p>
+                                            <p class="paper-slogan">{{ lang.view.table[4] }}</p>
                                             <h1>{{ data.score }}</h1>
                                         </div>
                                         <div class="level">
                                             <p class="crown">
                                                 <a-icon type="crown"></a-icon>
                                             </p>
-                                            <p>Level</p>
+                                            <p>{{ lang.view.table[6] }}</p>
                                             <h2>{{ data.level ? data.level.toUpperCase() : get_record_level(data.percent,index) }}</h2>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="grade-bottom">
                                     <a-button>
-                                        <b>Total Score</b> : {{ data.total }}
+                                        <b>{{ lang.view.table[5] }}</b> : {{ data.total }}
                                     </a-button>
                                     <a-button>
-                                        <b>Class Average Score</b> : {{ parseFloat(opened_topic_info.average).toFixed(1) }}
+                                        <b>{{ lang.view[13] }}</b> : {{ parseFloat(opened_topic_info.average).toFixed(1) }}
                                     </a-button>
                                 </div>
                             </template>
@@ -388,9 +492,9 @@
 
                     <template v-else>
                         <ve-histogram :data="chartData" :settings="chartSettings" v-if="chartData.rows.length"></ve-histogram>
-                        <p v-else style="font-size:16px;color:#999;letter-spacing:.5px">Chart is temporarily unavailable</p>
+                        <p v-else style="font-size:16px;color:#999;letter-spacing:.5px">{{ lang.view[12] }}</p>
                         <a-button>
-                            <b>Average Score</b> : {{ parseFloat(opened_topic_info.average).toFixed(1) }}
+                            <b>{{ lang.view[7] }}</b> : {{ parseFloat(opened_topic_info.average).toFixed(1) }}
                         </a-button>
                         <br /><br />
                         <a-button v-for="(count,index) in level_count" v-if="count > 0" style="margin: 5px 10px 5px 0px;">
@@ -415,18 +519,18 @@
                 </div>
                 <div class="topic-container">
                     <ve-line :data="opened_stats_info.chartData_all" :settings="opened_stats_info.chartSettings_all" v-if="(opened_stats_info.chartData_all.rows).length !== 0"></ve-line>
-                    <p v-else style="font-size:16px;color:#999;letter-spacing:.5px">Chart is temporarily unavailable</p>
+                    <p v-else style="font-size:16px;color:#999;letter-spacing:.5px">{{ lang.view[12] }}</p>
                     <template v-if="parseInt(user.id) == parseInt(opened_class_info.superid)">
                         <a-select placeholder="Select a subject" defaultValue="all_topics" style="width: 120px;margin-right:10px" @change="handle_switch_user">
-                            <a-select-option value="all_topics">All Topics</a-select-option>
+                            <a-select-option value="all_topics">{{ lang.view[10] }}</a-select-option>
                             <a-select-option v-for="person in opened_class_info.members" :value="person.id">{{ person.name }}</a-select-option>
                         </a-select>
                     </template>
-                    <a-button @click="display_chart()" type="primary">Click to Display</a-button>
+                    <a-button @click="display_chart()" type="primary">{{ lang.view[9] }}</a-button>
                     <template v-if="parseInt(user.id) == parseInt(opened_class_info.superid)">
                         <br /><br />
                     </template>
-                    <a-button><b>Notice</b> : You might need to reload the web page to see updates</a-button>
+                    <a-button><b>Notice</b> : {{ lang.view[11] }}</a-button>
                 </div>
             </template>
             <!-- Series 折线统计图 -->
@@ -454,7 +558,7 @@
 <link type="text/css" rel="stylesheet" href="../statics/css/chart.min.css">
 <script type="text/javascript" src="../statics/js/chart.min.js"></script>
 <script type="text/javascript" src="../statics/js/chart.index.min.js"></script>
-<script type="text/javascript" src="../src/grades.js"></script>
+<script type="text/javascript" src="../dist/js/grades.js"></script>
 
 
 <?php require 'pro_footer.php'; ?>

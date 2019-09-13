@@ -1,6 +1,42 @@
 <?php require 'pro_header.php'; ?>
 
-
+<script>
+if (cookie.get('eugrade_lang') == 'zh_cn') {
+        var lang_json = {
+            title: {
+                1: '文件',
+                2: '全部已加入班级上传的文件'
+            },
+            tab: {
+                2: '班级列表',
+                3: '未加入班级',
+                4: '建立于',
+                5: '主题',
+                6: '下载',
+                7: '预览',
+                8: '删除',
+                9: '编辑'
+            }
+        }
+    } else {
+        var lang_json = {
+            title: {
+                1: 'Files',
+                2: 'All files in classes you joined'
+            },
+            tab: {
+                2: 'Classes',
+                3: 'No joined classes yet',
+                4: 'Created on',
+                5: 'Thread',
+                6: 'Download',
+                7: 'Preview',
+                8: 'Delete',
+                9: 'Edit'
+            }
+        }
+    }
+</script>
 
 
 <div class="main-container" id="main-container" style="opacity:0">
@@ -8,13 +44,13 @@
     <div class="left">
         <a-spin :spinning="spinning.left">
             <div class="main-header">
-                <h3>Files</h3>
-                <p>All files in classes you joined</p>
+                <h3>{{ lang.title[1] }}</h3>
+                <p>{{ lang.title[2].substr(1,lang.title[2].length) }}</p>
             </div>
             <template v-if="!!user.joined_classes">
             <div class="mes-item">
                     <p>
-                        <a-icon type="team"></a-icon>&nbsp;&nbsp;Classes
+                        <a-icon type="team"></a-icon>&nbsp;&nbsp;{{ lang.tab[2] }}
                         <a-button size="small" @click="reverse_order('classes')" style="font-size:14px;"><a-icon type="sort-descending" /></a-button>
                     </p>
                 </div>
@@ -38,7 +74,7 @@
             <template v-else>
                 <div class="class-item">
                     <p>
-                        No joined class yet
+                        {{ lang.tab[3] }}
                     </p>
                 </div>
             </template>
@@ -50,7 +86,7 @@
             <template v-if="status.thread">
                 <div class="mes-header">
                     <p style="color:#666;">
-                        <a-icon type="folder"></a-icon>&nbsp;&nbsp;Thread
+                        <a-icon type="folder"></a-icon>&nbsp;&nbsp;{{ lang.tab[5] }}
                         <a-button size="small" @click="reverse_order('threads')" style="right:20px;position:absolute"><a-icon type="sort-descending" /></a-button>
                     </p>
                 </div>
@@ -58,7 +94,7 @@
                     <div v-for="(thread_c,index) in opened_thread_info" class="class-item files-folder" :id="'thread_sub'+thread_c.id" @click="open_mes(index,thread_c.id,thread_c.belong_class)">
                         <div>
                             <h3 v-html="thread_c.name"></h3>
-                            <p>Created on {{ get_mes_date(thread_c.date) }}</p>
+                            <p>{{ lang.tab[4] }} {{ get_mes_date(thread_c.date) }}</p>
                         </div>
                     </div>
                 </template>
@@ -114,16 +150,16 @@
                                     <div style="margin-left: 10px;">
                                         <h3>{{ file.file_name }}</h3>
                                         <p style="margin: 0px;">
-                                            <a :href="'../extension/download.php?filename='+file.file_url" target="_blank">Download</a>
+                                            <a :href="'../extension/download.php?filename='+file.file_url" target="_blank">{{ lang.tab[6] }}</a>
                                             <template v-if="get_suffix(file.file_name).substr(1) == 'pdf'">
-                                                <a-divider type="vertical"></a-divider><a :href="file.file_url" target="_blank">Preview</a>
+                                                <a-divider type="vertical"></a-divider><a :href="file.file_url" target="_blank">{{ lang.tab[7] }}</a>
                                             </template>
                                             <template v-else-if="if_office(get_suffix(file.file_name).substr(1))">
-                                                <a-divider type="vertical"></a-divider><a @click="open_office_preview(file.file_url,file.file_name)">Preview</a>
+                                                <a-divider type="vertical"></a-divider><a @click="open_office_preview(file.file_url,file.file_name)">{{ lang.tab[7] }}</a>
                                             </template>
                                             <template v-if="file.speaker == user.id || opened_class_info.superid == user.id">
-                                                <a-divider type="vertical"></a-divider><a style="color: rgb(233, 30, 99);" @click="remove_file(file.id)">Delete</a>
-                                                <a-divider type="vertical"></a-divider><a style="color:#333" @click="open_file_edit(file.id,file.file_name)">Edit</a>
+                                                <a-divider type="vertical"></a-divider><a style="color: rgb(233, 30, 99);" @click="remove_file(file.id)">{{ lang.tab[8] }}</a>
+                                                <a-divider type="vertical"></a-divider><a style="color:#333" @click="open_file_edit(file.id,file.file_name)">{{ lang.tab[9] }}</a>
                                             </template>
                                         </p>
                                     </div>

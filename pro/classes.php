@@ -1,6 +1,70 @@
 <?php require 'pro_header.php'; ?>
 
-
+<script>
+if (cookie.get('eugrade_lang') == 'zh_cn') {
+        var lang_json = {
+            title: {
+                1: '班级',
+                2: '查看/管理全部已加入班级'
+            },
+            tab: {
+                1: '班级列表',
+                2: '加入新班级',
+                3: '建立新班级',
+                4: '位成员'
+            },
+            view: {
+                1: '设置',
+                2: '编辑信息',
+                3: '离开班级',
+                4: '移除星标',
+                5: '星标班级',
+                6: '邀请成员',
+                7: '是管理员',
+                8: '账户',
+                9: '邀请码',
+                10: '分享你的邀请码',
+                11: '其他用户可以使用此邀请码加入你的班级',
+                12: '编辑班级',
+                13: '编辑信息',
+                14: '班级描述',
+                15: '班级名',
+                16: '上传'
+            }
+        }
+    } else {
+        var lang_json = {
+            title: {
+                1: 'Classes',
+                2: 'All the classes you joined'
+            },
+            tab: {
+                1: 'Classes',
+                2: 'Join a new Class',
+                3: 'Create a new Class',
+                4: 'Members'
+            },
+            view: {
+                1: 'Settings',
+                2: 'Edit Info',
+                3: 'Leave the class',
+                4: 'Remove the mark',
+                5: 'Mark this class',
+                6: 'Invite People',
+                7: 'is the admin',
+                8: 'Account',
+                9: 'Invite Code',
+                10: 'Share your class’s invite ID code',
+                11: 'People can use this code to join your Pokers class. Copy and share!',
+                12: 'Edit Class',
+                13: 'Edit Info',
+                14: 'Class Description',
+                15: 'Class Name',
+                16: 'Upload'
+            }
+        }
+    }
+</script>
 
 
 <div class="main-container" id="main-container" style="opacity:0">
@@ -8,13 +72,13 @@
     <div class="left">
         <a-spin :spinning="spinning.left">
             <div class="main-header">
-                <h3>Classes</h3>
-                <p>All the classes you joined</p>
+                <h3>{{ lang.title[1] }}</h3>
+                <p>{{ lang.title[2].substr(1,lang.title[2].length) }}</p>
             </div>
             <template v-if="Object.keys(user.joined_classes).length">
             <div class="mes-item">
                     <p>
-                        <a-icon type="team"></a-icon>&nbsp;&nbsp;Classes
+                        <a-icon type="team"></a-icon>&nbsp;&nbsp;{{ lang.tab[1] }}
                         <a-button size="small" @click="reverse_order('classes')" style="font-size:14px;"><a-icon type="sort-descending" /></a-button>
                     </p>
                 </div>
@@ -37,13 +101,13 @@
             </template>
             <div class="class-item" @click="join_class()">
                 <p>
-                    <a-icon type="plus-square"></a-icon>&nbsp;&nbsp;Join a new Class
+                    <a-icon type="plus-square"></a-icon>&nbsp;&nbsp;{{ lang.tab[2] }}
                 </p>
             </div>
             <?php if ($type == 2) { ?>
                 <div class="class-item" @click="add_class()">
                     <p>
-                        <a-icon type="plus-square"></a-icon>&nbsp;&nbsp;Create a new Class
+                        <a-icon type="plus-square"></a-icon>&nbsp;&nbsp;{{ lang.tab[3] }}
                     </p>
                 </div>
             <?php } ?>
@@ -66,37 +130,37 @@
                     </div>
                     <div class="class-info-info">
                         <h2 v-html="opened_class_info.name"></h2>
-                        <p>{{ opened_class_info.members.length }} Members</p>
+                        <p>{{ opened_class_info.members.length }} {{ lang.tab[4] }}</p>
                     </div>
                     <div class="class-settings">
                         <a-dropdown placement="bottomRight">
-                            <a-button>Settings</a-button>
+                            <a-button>{{ lang.view[1] }}</a-button>
                             <a-menu slot="overlay">
                                 <template v-if="user.id == opened_class_info.superid">
                                     <a-menu-item>
                                         <a @click="edit.class.visible = true">
-                                            <a-icon type="edit"></a-icon> Edit Info
+                                            <a-icon type="edit"></a-icon> {{ lang.view[2] }}
                                         </a>
                                     </a-menu-item>
                                 </template>
                                 <template v-else>
                                     <a-menu-item>
                                         <a @click="stu_remove(opened_class_info.id)">
-                                            <a-icon type="logout"></a-icon> Leave the class
+                                            <a-icon type="logout"></a-icon> {{ lang.view[3] }}
                                         </a>
                                     </a-menu-item>
                                 </template>
                                 <template v-if="class_marked">
                                     <a-menu-item>
                                         <a style="color:#FF4040" @click="demark_process(opened_class_info.id,'class')">
-                                            <a-icon type="delete"></a-icon> Remove the mark
+                                            <a-icon type="delete"></a-icon> {{ lang.view[4] }}
                                         </a>
                                     </a-menu-item>
                                 </template>
                                 <template v-else>
                                     <a-menu-item>
                                         <a style="color:#FFC125" @click="mark_process(opened_class_info.id,'class')">
-                                            <a-icon type="star"></a-icon> Mark this class
+                                            <a-icon type="star"></a-icon> {{ lang.view[5] }}
                                         </a>
                                     </a-menu-item>
                                 </template>
@@ -109,11 +173,11 @@
                 </div>
                 <div class="class-invite" @click="handle_invite(opened_class_info.id)">
                     <a>
-                        <a-icon type="plus-circle"></a-icon>&nbsp;&nbsp;Invite People
+                        <a-icon type="plus-circle"></a-icon>&nbsp;&nbsp;{{ lang.view[6] }}
                     </a>
                 </div>
                 <div class="class-info-admin">
-                    <p>{{ opened_class_info.supername }} is the admin</p>
+                    <p>{{ opened_class_info.supername }} {{ lang.view[7] }}</p>
                 </div>
                 <div>
                     <div v-for="(member,index_info) in opened_class_info.members" class="class-item class-info-member" @click="open_member_info(member.id)" :id="'member'+member.id">
@@ -163,7 +227,7 @@
                     </div>
                     <div class="class-info-info class-member-info" style="padding-top: 5px;">
                         <h2 v-html="opened_member_info.info.name"></h2>
-                        <p>{{ get_level(opened_member_info.info.type) }} Account</p>
+                        <p>{{ get_level(opened_member_info.info.type) }} {{ lang.view[8] }}</p>
                     </div>
                     <div class="class-member-subscribe">
                         <!-- 只允许 opened_member 对应的 super 删除账户,super 不可删除自己 -->
@@ -231,16 +295,16 @@
 
 <?php if ((int)$type == 2) { ?>
     <!-- 新建班级 -->
-    <a-modal title="Create a new Class" :visible="add.visible" @ok="handle_create_submit" :confirm-loading="add.confirm_create_loading" @cancel="handle_create_cancel">
-        <a-input placeholder="Class Name" v-model="add.class.name">
+    <a-modal :title="lang.tab[3]" :visible="add.visible" @ok="handle_create_submit" :confirm-loading="add.confirm_create_loading" @cancel="handle_create_cancel">
+        <a-input :placeholder="lang.view[15]" v-model="add.class.name">
             <a-icon slot="prefix" type="team" />
         </a-input>
         <br /><br />
-        <a-textarea placeholder="Class Description" v-model="add.class.des" :rows="4" />
+        <a-textarea :placeholder="lang.view[14]" v-model="add.class.des" :rows="4" />
     </a-modal>
     <!-- 新建班级结束 -->
     <!-- 班级信息修改 -->
-    <a-modal title="Edit Class" :visible="edit.class.visible" @ok="handle_edit_class_submit" :confirm-loading="edit.confirm_edit_class_loading" @cancel="handle_edit_class_cancel">
+    <a-modal :title="lang.view[12]" :visible="edit.class.visible" @ok="handle_edit_class_submit" :confirm-loading="edit.confirm_edit_class_loading" @cancel="handle_edit_class_cancel">
         <div>
             <template v-if="!!opened_class_info.img">
                 <a-avatar size="large" :src="opened_class_info.img"></a-avatar>
@@ -249,22 +313,22 @@
                 <a-avatar size="large" :style="{backgroundColor: '#32a3bf', verticalAlign: 'middle'}">{{ opened_class_info.name }}</a-avatar>
             </template>
             <input type="file" name="class_img" id="class_img" />
-            <a-button size="small" :style="{ marginLeft: 16, verticalAlign: 'middle' }" @click="upload_class_img('<?php echo $upToken; ?>')">Upload</a-button>
+            <a-button size="small" :style="{ marginLeft: 16, verticalAlign: 'middle' }" @click="upload_class_img('<?php echo $upToken; ?>')">{{ lang.view[16] }}</a-button>
         </div>
         <div v-show="edit.class.display_percent">
             <a-progress :percent="edit.class.percent" status="active"></a-progress>
             <br />
         </div>
         <br />
-        <a-input placeholder="Class Name" v-model="edit.class.name">
+        <a-input :placeholder="lang.view[15]" v-model="edit.class.name">
             <a-icon slot="prefix" type="team" />
         </a-input>
         <br /><br />
-        <a-textarea placeholder="Class Description" v-model="edit.class.des" :rows="4" />
+        <a-textarea :placeholder="lang.view[14]" v-model="edit.class.des" :rows="4" />
     </a-modal>
     <!-- 班级信息修改结束 -->
     <!-- 用户信息修改 -->
-    <a-modal title="Edit Info" :visible="edit.user.visible" @ok="handle_edit_user_submit('teacher')" :confirm-loading="edit.confirm_edit_user_loading" @cancel="handle_edit_user_cancel">
+    <a-modal :title="lang.view[13]" :visible="edit.user.visible" @ok="handle_edit_user_submit('teacher')" :confirm-loading="edit.confirm_edit_user_loading" @cancel="handle_edit_user_cancel">
         <div>
             <template v-if="!!edit.user.avatar">
                 <a-avatar size="large" :src="edit.user.avatar"></a-avatar>
@@ -289,7 +353,7 @@
     <!-- 用户信息修改结束 -->
 <?php } else { ?>
     <!-- 用户信息修改 -->
-    <a-modal title="Edit Info" :visible="edit.user.visible" @ok="handle_edit_user_submit('user')" :confirm-loading="edit.confirm_edit_user_loading" @cancel="handle_edit_user_cancel">
+    <a-modal :title="lang.view[13]" :visible="edit.user.visible" @ok="handle_edit_user_submit('user')" :confirm-loading="edit.confirm_edit_user_loading" @cancel="handle_edit_user_cancel">
         <div>
             <template v-if="!!edit.user.avatar">
                 <a-avatar size="large" :src="edit.user.avatar"></a-avatar>
@@ -321,17 +385,17 @@
 <?php } ?>
 
 <!-- 加入班级 -->
-<a-modal title="Join a new Class" :visible="join.visible" @ok="handle_join_submit" :confirm-loading="join.confirm_join_loading" @cancel="handle_join_cancel">
+<a-modal :title="lang.tab[2]" :visible="join.visible" @ok="handle_join_submit" :confirm-loading="join.confirm_join_loading" @cancel="handle_join_cancel">
         <a-input placeholder="Class ID" v-model="join.id">
             <a-icon slot="prefix" type="team" />
         </a-input>
     </a-modal>
     <!-- 加入班级结束 -->
 
-<a-modal :footer="null" title="Invite Code" centered v-model="invite.visible" @cancel="handle_invite_close">
+<a-modal :footer="null" :title="lang.view[9]" centered v-model="invite.visible" @cancel="handle_invite_close">
     <div class="class-invite-div">
-        <h2>Share your class’s invite ID code</h2>
-        <p>People can use this code to join your Pokers class. Copy and share!</p>
+        <h2>{{ lang.view[10] }}</h2>
+        <p>{{ lang.view[11] }}</p>
     </div>
     <p class="class-invite-code">
         <a-tag color="#2db7f5">{{ invite.id }}</a-tag>

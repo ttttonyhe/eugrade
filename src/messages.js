@@ -2,6 +2,7 @@ var antd = new Vue({
     el: '#app',
     data() {
         return {
+            lang: [],
             ws: null,
             ws_status: 'fi',
             md: null,
@@ -170,6 +171,7 @@ var antd = new Vue({
         }
     },
     mounted() {
+        this.lang = lang_json;
         axios.get('../interact/select_users.php?type=name&id=' + parseInt(cookie.get('logged_in_id')) + '&form=all')
             .then(re => {
                 this.user.info = re.data[0];

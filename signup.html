@@ -57,26 +57,26 @@
 
     <div class="login-card">
       <div style="text-align: center">
-        <h1>Create/Join Eugrade</h1>
+        <h1>Join Eugrade</h1>
         <p>Let’s set up your account</p>
       </div>
       <a-form id="components-form-demo-normal-login" :form="form" class="login-form" @submit="handleSubmit"
         style="padding: 0px 20px">
         <a-form-item style="margin-bottom: 15px;">
-          <a-input v-decorator="[
+          <a-input size="large" v-decorator="[
         'name',
         {
           rules: [{
             required: true, message: 'Please input your Nickname!',
           }]
         }
-      ]" placeholder="Nickname">
+      ]" placeholder="Real Name">
             <a-icon slot="prefix" type="user" style="color: rgba(0,0,0,.25)" />
           </a-input>
         </a-form-item>
 
         <a-form-item style="margin-bottom: 15px;">
-          <a-input v-decorator="[
+          <a-input size="large" v-decorator="[
         'email',
         {
           rules: [{
@@ -91,7 +91,7 @@
         </a-form-item>
 
         <a-form-item>
-          <a-input v-decorator="[
+          <a-input size="large" v-decorator="[
           'password',
           { rules: [{ required: true, message: 'Please input your Password!' }] }
         ]" type="password" placeholder="Password">
@@ -100,10 +100,12 @@
         </a-form-item>
 
         <a-form-item label="Account type">
-          <a-radio-group v-decorator="[
+          <a-radio-group size="large" v-decorator="[
     'type',
     { rules: [{ required: true, message: 'Please choose your account type' }] }
-  ]">
+  ]"
+    @change="handle_type_change"
+  >
             <a-radio-button value="a">
               Student
             </a-radio-button>
@@ -113,13 +115,27 @@
           </a-radio-group>
         </a-form-item>
 
+        <a-form-item v-if="type == 2">
+          <a-input size="large" v-decorator="[
+          'invite',
+          { rules: [{ required: true, message: 'Please input your invite code!' }] }
+        ]" type="password" placeholder="Invite Code">
+            <a-icon slot="prefix" type="audit" style="color: rgba(0,0,0,.25)" />
+          </a-input>
+        </a-form-item>
+
         <a-form-item>
-          <a-button type="primary" html-type="submit" class="login-form-button">
-            Sign up
+          <a-checkbox @change="handle_check_change">
+              I agree to the <a target="_blank" href="https://www.ouorz.com/pokers-terms-of-service.html" target="_blank">Terms of Service</a> and the <a target="_blank" href="https://www.ouorz.com/pokers-privacy-policy.html" target="_blank">Privacy Policy</a>.
+          </a-checkbox>
+        </a-form-item>
+
+        <a-form-item>
+          <a-button style="width:100%" :disabled="disable" type="primary" size="large" html-type="submit" class="login-form-button">
+            Sign Up
           </a-button>
-          &nbsp;Or <a href="login.html">
-            Login
-          </a>
+          <br/>
+          <p style="text-align: center;margin: 0px;margin-bottom: -20px;margin-top: 10px;">Already have an account? <a href="login.html">Log in!</a></p>
         </a-form-item>
       </a-form>
     </div>

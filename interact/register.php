@@ -58,12 +58,16 @@ if (!empty($_POST['email']) && !empty($_POST['password']) && !empty($_POST['name
     $name = input($_POST['name']);
     $email = input($_POST['email']);
     $type = input($_POST['type']);
+    $code = input($_POST['invite']);
 
     //业务逻辑
     $check = new check();
     if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
         if ($check->email()) {
             if ($check->name()) {
+                //判断注册类型，教师账户需要输入邀请码
+                if($type == 'a' || ($type == 'b' && $code == 'eugrade_teacher')){
+                    
                     $this_id = Lazer::table('users')->findAll()->count() + 1;
                     $row = Lazer::table('users');
                     $row->id = $this_id;
@@ -86,6 +90,11 @@ if (!empty($_POST['email']) && !empty($_POST['password']) && !empty($_POST['name
                 session_start();
                 $_SESSION['logged_in_id'] = (int)$this_id;
 
+                }else {
+                    $status = 0;
+                    $code = 105;
+                    $mes = 'Invaild invite code';
+                }
             } else {
                 $status = 0;
                 $code = 103;

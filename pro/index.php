@@ -64,36 +64,36 @@
                         <img src="https://static.ouorz.com/eugrade_logo.png" class="header-logo" />
                     </span>
                     <a-menu-item><a href="https://www.ouorz.com/pokers-terms-of-service.html">
-                            <a-icon type="file-done"></a-icon>Terms of Service
+                            <a-icon type="file-done"></a-icon>{{ lang[6] }}
                         </a></a-menu-item>
                     <a-menu-item><a href="https://www.ouorz.com/pokers-privacy-policy.html">
-                            <a-icon type="file-protect"></a-icon>Privacy Policy
+                            <a-icon type="file-protect"></a-icon>{{ lang[7] }}
                         </a></a-menu-item>
                     <a-menu-item><a href="https://www.snapaper.com/donate" style="color:hotpink">
-                            <a-icon type="pay-circle"></a-icon>Dnoate to Me
+                            <a-icon type="pay-circle"></a-icon>{{ lang[8] }}
                         </a></a-menu-item>
                     <a-menu-item>
                         <a-icon type="robot"></a-icon>Beta v0.181
                     </a-menu-item>
                     <a-menu-item><a href="https://shimo.im/forms/KghdKCKqGYtHygKj/fill">
-                            <a-icon type="customer-service"></a-icon>FeedBack
+                            <a-icon type="customer-service"></a-icon>{{ lang[9] }}
                         </a></a-menu-item>
                 </a-sub-menu>
                 <a-menu-item key="messages" @click="switch_section('messages')" style="border-right: 1px solid #eee;">
-                    <a-icon type="project"></a-icon>Messages
+                    <a-icon type="project"></a-icon>{{ lang[1] }}
                 </a-menu-item>
                 <a-menu-item key="files" @click="switch_section('files')" style="border-right: 1px solid #eee;">
-                    <a-icon type="save"></a-icon>Files
+                    <a-icon type="save"></a-icon>{{ lang[2] }}
                 </a-menu-item>
                 <a-menu-item key="grades" @click="switch_section('grades')" style="border-right: 1px solid #eee;">
-                    <a-icon type="bar-chart"></a-icon>Grades
+                    <a-icon type="bar-chart"></a-icon>{{ lang[3] }}
                 </a-menu-item>
                 <a-menu-item key="classes" @click="switch_section('classes')" style="border-right: 1px solid #eee;">
-                    <a-icon type="bank"></a-icon>Classes
+                    <a-icon type="bank"></a-icon>{{ lang[4] }}
                 </a-menu-item>
                 <a-sub-menu style="border-right: 1px solid #eee;">
                     <span slot="title" class="submenu-title-wrapper">
-                        <a-icon type="appstore"></a-icon>Resources
+                        <a-icon type="appstore"></a-icon>{{ lang[5] }}
                     </span>
                     <a-menu-item><a href="https://www.snapaper.com">
                             <a-icon type="solution"></a-icon>Snapaper
@@ -103,7 +103,15 @@
                         </a></a-menu-item>
                 </a-sub-menu>
             </a-menu>
-            <div class="header-user">
+            <div class="header-user" style="display:flex">
+                <a-dropdown>
+                    <a-menu slot="overlay">
+                        <a-menu-item @click="switch_lang">{{ option_lang }}</a-menu-item>
+                    </a-menu>
+                    <a-button style="margin-right: 20px;transform:translateY(-1.5px)" size="small">
+                        <a-icon type="global"></a-icon>{{ current_lang }}
+                    </a-button>
+                </a-dropdown>
                 <a-dropdown :trigger="['click']">
                     <a style="color:#555">
                         <div style="display: flex">
@@ -121,11 +129,11 @@
                         </a-menu-item>
                         <a-menu-divider></a-menu-divider>
                         <a-menu-item key="1" @click="edit.user.visible = true">
-                            <a-icon type="form"></a-icon>Edit Profile
+                            <a-icon type="form"></a-icon>{{ lang[10] }}
                         </a-menu-item>
                         <a-menu-item key="2">
                             <a href="logout.php">
-                                <a-icon type="logout"></a-icon>&nbsp;&nbsp;Logout
+                                <a-icon type="logout"></a-icon>&nbsp;&nbsp;{{ lang[11] }}
                             </a>
                         </a-menu-item>
                     </a-menu>
@@ -137,7 +145,7 @@
         </div>
 
         <!-- 用户信息修改 -->
-        <a-modal title="Edit Profile" :visible="edit.user.visible" @ok="handle_edit_submit()" :confirm-loading="edit.confirm_edit_loading" @cancel="handle_edit_cancel">
+        <a-modal :title="lang[10]" :visible="edit.user.visible" @ok="handle_edit_submit()" :confirm-loading="edit.confirm_edit_loading" @cancel="handle_edit_cancel">
             <div>
                 <template v-if="!!edit.user.avatar">
                     <a-avatar size="large" :src="edit.user.avatar"></a-avatar>
@@ -146,22 +154,22 @@
                     <a-avatar size="large" :style="{backgroundColor: '#32a3bf', verticalAlign: 'middle'}">{{ edit.user.name }}</a-avatar>
                 </template>
                 <input type="file" name="user_img" id="user_img" />
-                <a-button size="small" :style="{ marginLeft: 16, verticalAlign: 'middle' }" @click="upload_img('<?php echo $upToken; ?>')">Upload</a-button>
+                <a-button size="small" :style="{ marginLeft: 16, verticalAlign: 'middle' }" @click="upload_img('<?php echo $upToken; ?>')">{{ lang[12] }}</a-button>
             </div>
             <div v-show="edit.user.display_percent">
                 <a-progress :percent="edit.user.percent" status="active"></a-progress>
                 <br />
             </div>
             <br />
-            <a-input placeholder="Nickname" v-model="edit.user.name">
+            <a-input :placeholder="lang[13]" v-model="edit.user.name">
                 <a-icon slot="prefix" type="user" />
             </a-input>
             <br /><br />
-            <a-input placeholder="Email" v-model="edit.user.email">
+            <a-input :placeholder="lang[14]" v-model="edit.user.email">
                 <a-icon slot="prefix" type="mail" />
             </a-input>
             <br /><br />
-            <a-input placeholder="Password(stays the same if kept empty)" v-model="edit.user.pwd">
+            <a-input :placeholder="lang[15]" v-model="edit.user.pwd">
                 <a-icon slot="prefix" type="key" />
             </a-input>
         </a-modal>
@@ -206,6 +214,8 @@
         el: '#app',
         data() {
             return {
+                current_lang: '',
+                option_lang: '',
                 current: {
                     nav: ['messages'],
                     page: 'messages.php',
@@ -228,14 +238,65 @@
                 notice: {
                     status: false,
                     content: null
-                }
+                },
+                lang: []
             }
         },
         mounted() {
+            if (cookie.get('eugrade_lang') !== 'zh_cn') {
+                this.current_lang = 'English';
+                this.option_lang = '简体中文';
+                this.lang = {
+                    1: 'Messages',
+                    2: 'Files',
+                    3: 'Grades',
+                    4: 'Classes',
+                    5: 'Resources',
+                    6: 'Terms of Service',
+                    7: 'Privacy Policy',
+                    8: 'Donate to Me',
+                    9: 'FeedBack',
+                    10: 'Edit Profile',
+                    11: 'Logout',
+                    12: 'Upload',
+                    13: 'Real Name',
+                    14: 'Email',
+                    15: 'Password(stays the same if kept empty)'
+                }
+            } else {
+                this.current_lang = '简体中文';
+                this.option_lang = 'English';
+                this.lang = {
+                    1: '消息',
+                    2: '文件',
+                    3: '成绩',
+                    4: '班级',
+                    5: '资源',
+                    6: '服务协议',
+                    7: '隐私条款',
+                    8: '向我投食',
+                    9: '反馈建议',
+                    10: '编辑信息',
+                    11: '登出',
+                    12: '上传',
+                    13: '真实姓名',
+                    14: '电子邮件',
+                    15: '密码(留空则不作更改)'
+                }
+            }
             $('#app').css('opacity', 1);
             this.spinning = false;
         },
         methods: {
+            switch_lang(){
+                if(this.current_lang == 'English'){
+                    cookie.set('eugrade_lang','zh_cn');
+                    location.reload();
+                }else{
+                    cookie.set('eugrade_lang','english');
+                    location.reload();
+                }
+            },
             switch_section(key) {
                 this.current.nav = key;
                 this.current.title = 'Pokers | ' + this.capital(key);

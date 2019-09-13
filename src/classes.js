@@ -2,6 +2,7 @@ var antd = new Vue({
     el: '#app',
     data() {
         return {
+            lang: [],
             user: {
                 id: cookie.get('logged_in_id'),
                 joined_classes: [],
@@ -74,6 +75,7 @@ var antd = new Vue({
         }
     },
     mounted() {
+        this.lang = lang_json;
         axios.get('../interact/select_users.php?type=class&id=' + cookie.get('logged_in_id') + '&form=single')
             .then(re => {
                 if (!!re.data.class) {

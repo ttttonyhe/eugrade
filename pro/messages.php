@@ -1,6 +1,86 @@
 <?php require 'pro_header.php'; ?>
 
-
+<script>
+    if (cookie.get('eugrade_lang') == 'zh_cn') {
+        var lang_json = {
+            title: {
+                1: '消息',
+                2: '全部已加入班级消息主题'
+            },
+            tab: {
+                1: '星标收藏',
+                2: '班级列表',
+                3: '加入新班级',
+                4: '班级 ID',
+                5: '主题',
+                6: '增加新主题',
+                7: '主题名',
+                8: '用户',
+                9: '条消息',
+                10: '增加'
+            },
+            chat: {
+                1: '条消息',
+                2: '位参与者',
+                3: '关闭',
+                4: '移除',
+                5: '置顶消息',
+                6: '置顶',
+                7: '删除',
+                8: '编辑',
+                9: '编辑消息',
+                10: '编辑主题',
+                11: '班级日志',
+                12: '消息日志',
+                13: '新消息',
+                14: '取消',
+                15: '上传',
+                16: '上传图像',
+                17: '上传文件',
+                18: '发送方式'
+            },
+        }
+    } else {
+        var lang_json = {
+            title: {
+                1: 'Messages',
+                2: 'All threads in classes you joined'
+            },
+            tab: {
+                1: 'Starred',
+                2: 'Classes',
+                3: 'Join a new Class',
+                4: 'Class ID',
+                5: 'Thread',
+                6: 'Add a new thread',
+                7: 'Thread Name',
+                8: 'Users',
+                9: 'messages',
+                10: 'Add'
+            },
+            chat: {
+                1: 'Messages',
+                2: 'Followers',
+                3: 'Close',
+                4: 'Remove',
+                5: 'Pinned Message',
+                6: 'Pin',
+                7: 'Delete',
+                8: 'Edit',
+                9: 'Edit Message',
+                10: 'Edit Thread',
+                11: 'Class Logs',
+                12: 'Thread Logs',
+                13: 'New Messages',
+                14: 'Discard',
+                15: 'Upload',
+                16: 'Upload an Image',
+                17: 'Upload a File',
+                18: 'Sending Method'
+            },
+        }
+    }
+</script>
 
 
 <div class="main-container" id="main-container" style="opacity:0">
@@ -8,18 +88,18 @@
     <div class="left">
         <a-spin :spinning="spinning.left">
             <div class="main-header">
-                <h3>Messages</h3>
-                <p>All threads in classes you joined</p>
+                <h3>{{ lang.title[1] }}</h3>
+                <p>{{ lang.title[2].substr(1,lang.title[2].length) }}</p>
             </div>
             <div class="mes-item" @click="open_marks">
                 <p style="color:rgb(255, 193, 37)">
-                    <a-icon type="star"></a-icon>&nbsp;&nbsp;Starred
+                    <a-icon type="star"></a-icon>&nbsp;&nbsp;{{ lang.tab[1] }}
                 </p>
             </div>
             <template v-if="!!user.joined_classes">
                 <div class="mes-item">
                     <p style="color:rgb(90, 148, 241)">
-                        <a-icon type="team"></a-icon>&nbsp;&nbsp;Classes
+                        <a-icon type="team"></a-icon>&nbsp;&nbsp;{{ lang.tab[2] }}
                         <a-button size="small" @click="reverse_order('classes')" style="font-size:14px;right:80px">
                             <a-icon type="sort-descending"></a-icon>
                         </a-button>
@@ -47,7 +127,7 @@
             </template>
             <div class="class-item" @click="add_class()">
                 <p>
-                    <a-icon type="plus-square"></a-icon>&nbsp;&nbsp;Join a new Class
+                    <a-icon type="plus-square"></a-icon>&nbsp;&nbsp;{{ lang.tab[3] }}
                 </p>
             </div>
         </a-spin>
@@ -55,16 +135,16 @@
 
 
     <!-- 加入班级 -->
-    <a-modal title="Join a new Class" :visible="add.visible" @ok="handle_join_submit" :confirm-loading="add.confirm_join_loading" @cancel="handle_create_cancel">
-        <a-input placeholder="Class ID" v-model="add.join.id">
+    <a-modal :title="lang.tab[3]" :visible="add.visible" @ok="handle_join_submit" :confirm-loading="add.confirm_join_loading" @cancel="handle_create_cancel">
+        <a-input :placeholder="lang.tab[4]" v-model="add.join.id">
             <a-icon slot="prefix" type="team" />
         </a-input>
     </a-modal>
     <!-- 加入班级结束 -->
 
     <!-- 增加主题 -->
-    <a-modal title="Add a new thread" :visible="add.visible_thread" @ok="handle_thread_submit(opened_class_info.id)" :confirm-loading="add.confirm_thread_loading" @cancel="handle_thread_cancel">
-        <a-input placeholder="Thread Name" v-model="add.thread.name">
+    <a-modal :title="lang.tab[6]" :visible="add.visible_thread" @ok="handle_thread_submit(opened_class_info.id)" :confirm-loading="add.confirm_thread_loading" @cancel="handle_thread_cancel">
+        <a-input :placeholder="lang.tab[7]" v-model="add.thread.name">
             <a-icon slot="prefix" type="appstore" />
         </a-input>
     </a-modal>
@@ -166,21 +246,21 @@
     </a-drawer>
     <!-- 结束消息列表用户信息 -->
     <!-- 主题信息修改 -->
-    <a-modal title="Edit Thread" :visible="edit.visible" @ok="handle_edit_submit" :confirm-loading="edit.confirm_edit_loading" @cancel="handle_edit_cancel">
+    <a-modal :title="lang.chat[10]" :visible="edit.visible" @ok="handle_edit_submit" :confirm-loading="edit.confirm_edit_loading" @cancel="handle_edit_cancel">
         <a-input placeholder="Thread Subject" v-model="edit.name">
             <a-icon slot="prefix" type="appstore" />
         </a-input>
     </a-modal>
     <!-- 主题信息修改结束 -->
     <!-- 内容段修改 -->
-    <a-modal title="Edit Message" :visible="edit.mes.visible" @ok="handle_edit_mes_submit" :confirm-loading="edit.mes.confirm_edit_mes_loading" @cancel="handle_edit_mes_cancel">
+    <a-modal :title="lang.chat[9]" :visible="edit.mes.visible" @ok="handle_edit_mes_submit" :confirm-loading="edit.mes.confirm_edit_mes_loading" @cancel="handle_edit_mes_cancel">
         <a-input placeholder="Content" v-model="edit.mes.content">
             <a-icon slot="prefix" type="align-center" />
         </a-input>
     </a-modal>
     <!-- 内容段修改结束 -->
     <!-- 日志查看 -->
-    <a-modal title="Thread Logs" :visible="log.visible" :footer="null" @cancel="log.visible = false">
+    <a-modal :title="lang.chat[12]" :visible="log.visible" :footer="null" @cancel="log.visible = false">
         <template v-if="!!opened_mes_info.logs.length">
             <div style="max-height: 60vh;overflow-y: auto;">
                 <div v-for="log in opened_mes_info.logs" class="logs-info">
@@ -199,7 +279,7 @@
     </a-modal>
     <!-- 日志查看结束 -->
     <!-- 日志查看 -->
-    <a-modal title="Class Logs" :visible="log.visible_class" :footer="null" @cancel="log.visible_class = false">
+    <a-modal :title="lang.chat[11]" :visible="log.visible_class" :footer="null" @cancel="log.visible_class = false">
         <template v-if="!!opened_class_info.logs.length">
             <div style="max-height: 60vh;overflow-y: auto;">
                 <div v-for="(log,index) in opened_class_info.logs" class="logs-info" v-if="log.divide == null">
@@ -226,16 +306,17 @@
     </a-modal>
     <!-- office 内容预览结束 -->
 
+    <!-- 星标收藏列 -->
     <div class="center class-center mes-column">
         <a-spin :spinning="spinning.center">
             <template v-if="status.mark">
                 <div class="mes-header">
                     <p style="color:#666;">
-                        <a-icon type="star"></a-icon>&nbsp;&nbsp;Starred
+                        <a-icon type="star"></a-icon>&nbsp;&nbsp;{{ lang.tab[1] }}
                     </p>
                 </div>
                 <template v-if="Object.keys(opened_mark_info.class_c).length - 1">
-                    <p class="mes-sub-header">Classes</p>
+                    <p class="mes-sub-header">{{ lang.tab[2] }}</p>
                     <div v-for="(class_c,index) in opened_mark_info.class_info" class="class-item" :id="'class_sub'+class_c.id" @click="open_class(class_c.id,index)">
                         <div style="margin-right: 10px;">
                             <template v-if="!!class_c.img">
@@ -254,7 +335,7 @@
                     </div>
                 </template>
                 <template v-if="Object.keys(opened_mark_info.user).length - 1">
-                    <p class="mes-sub-header">Users</p>
+                    <p class="mes-sub-header">{{ lang.tab[8] }}</p>
                     <div v-for="user_c in opened_mark_info.user_info" class="class-item" :id="'member'+user_c.id" @click="open_user(user_c.id)">
                         <div style="margin-right: 15px;">
                             <template v-if="!!user_c.avatar">
@@ -281,14 +362,14 @@
             <template v-else-if="status.thread">
                 <div class="mes-header">
                     <p style="color:#666;">
-                        <a-icon type="appstore"></a-icon>&nbsp;&nbsp;Thread
+                        <a-icon type="appstore"></a-icon>&nbsp;&nbsp;{{ lang.tab[5] }}
                         <a-button size="small" @click="view_logs('class')" style="margin-right:10px;font-size:16px;right:112px;position:absolute" v-if="user.info.type == 2">
                             <a-icon type="database"></a-icon>
                         </a-button>
                         <a-button size="small" @click="reverse_order('threads')" style="right:83px;position:absolute">
                             <a-icon type="sort-descending" />
                         </a-button>
-                        <a-button size="small" @click="add.visible_thread = true" style="right:20px;position:absolute">+ Add</a-button>
+                        <a-button size="small" @click="add.visible_thread = true" style="right:20px;position:absolute">+ {{ lang.tab[10] }}</a-button>
                     </p>
                 </div>
                 <template v-if="opened_thread_info.length">
@@ -296,7 +377,7 @@
                         <div class="thread-notify" v-if="thread_c.id == push.thread"></div>
                         <div>
                             <h3 v-html="thread_c.name"></h3>
-                            <p>{{ thread_c.message_count }} messages</p>
+                            <p>{{ thread_c.message_count }} {{ lang.tab[9] }}</p>
                         </div>
                     </div>
                 </template>
@@ -378,7 +459,7 @@
                 <div class="mes-header mes-list">
                     <div>
                         <p style="color:#333;" v-html="opened_mes_info.thread_info.name"></p>
-                        <p>{{ opened_mes_info.thread_info.message_count }} Messages | {{ opened_mes_info.unique_speakers.length }} Followers</p>
+                        <p>{{ opened_mes_info.thread_info.message_count }} {{ lang.chat[1] }} | {{ opened_mes_info.unique_speakers.length }} {{ lang.chat[2] }}</p>
                     </div>
                     <div>
                         <a-button type="default" @click="reverse_order('meses')" style="margin-right:10px;font-size:16px">
@@ -414,19 +495,19 @@
                                 <a-menu slot="overlay">
                                     <a-menu-item key="0">
                                         <a @click="close_pin()">
-                                            <a-icon type="close"></a-icon> Close
+                                            <a-icon type="close"></a-icon> {{ lang.chat[3] }}
                                         </a>
                                     </a-menu-item>
                                     <a-menu-item key="0">
                                         <a @click="pin_mes(thread_info.pinned.id,1,'remove')">
-                                            <a-icon type="delete"></a-icon> Remove
+                                            <a-icon type="delete"></a-icon> {{ lang.chat[4] }}
                                         </a>
                                     </a-menu-item>
                                 </a-menu>
                             </a-dropdown>
                         </template>
                     </p>
-                    <p>Pinned Message</p>
+                    <p>{{ lang.chat[5] }}</p>
                     <p><a :href="'#'+thread_info.pinned.id" v-html="thread_info.pinned.mes"></a></p>
                 </div>
                 <!-- 消息顶置结束 -->
@@ -520,19 +601,19 @@
                                                 <template v-if="opened_class_info.superid == user.id">
                                                     <a-menu-item key="0">
                                                         <a @click="pin_mes(mes.id,index,'add')">
-                                                            <a-icon type="pushpin"></a-icon> Pin
+                                                            <a-icon type="pushpin"></a-icon>{{ lang.chat[6] }}
                                                         </a>
                                                     </a-menu-item>
                                                 </template>
                                                 <a-menu-item key="1">
                                                     <a class="a-d" @click="remove_mes(mes.id,index)">
-                                                        <a-icon type="delete"></a-icon> Delete
+                                                        <a-icon type="delete"></a-icon> {{ lang.chat[7] }}
                                                     </a>
                                                 </a-menu-item>
                                                 <template v-if="mes.type !== 'file'">
                                                     <a-menu-item key="2">
                                                         <a class="a-e" @click="open_mes_edit(mes.id,mes.content)">
-                                                            <a-icon type="edit"></a-icon> Edit
+                                                            <a-icon type="edit"></a-icon> {{ lang.chat[8] }}
                                                         </a>
                                                     </a-menu-item>
                                                 </template>
@@ -545,7 +626,7 @@
                         </template>
                     </div>
                 </div>
-                <div class="mes-unread-notify" v-show="unread.visible" @click="bottom_mes()">New Messages</div>
+                <div class="mes-unread-notify" v-show="unread.visible" @click="bottom_mes()">{{ lang.chat[13] }}</div>
                 <div :class="mes_input.input">
                     <div class="mes-stream-avatar" @click="view_user_info(user.id)">
                         <template v-if="user.info.avatar !== null">
@@ -582,13 +663,13 @@
                                     <a-progress :percent="mes_input.progress_img" size="small" v-show="mes_input.img_progress"></a-progress>
                                     <br /><br />
                                     <template v-if="check.img.status">
-                                        <a-button @click="mes_input.visible.picture = false;">Discard</a-button>
-                                        <a-button type="primary" @click="upload_img">Upload</a-button>
+                                        <a-button @click="mes_input.visible.picture = false;">{{ lang.chat[14] }}</a-button>
+                                        <a-button type="primary" @click="upload_img">{{ lang.chat[15] }}</a-button>
                                     </template>
                                 </template>
                                 <a-tooltip placement="top">
                                     <template slot="title">
-                                        <span>Upload an Image</span>
+                                        <span>{{ lang.chat[16] }}</span>
                                     </template>
                                     <a-button>
                                         <a-icon type="picture"></a-icon>
@@ -602,13 +683,13 @@
                                     <a-progress :percent="mes_input.progress_file" status="active" v-show="mes_input.file_progress" size="small"></a-progress>
                                     <br /><br />
                                     <template v-if="check.file.status">
-                                        <a-button @click="handle_cancel_upload();mes_input.visible.upload = false;">Discard</a-button>
-                                        <a-button type="primary" @click="upload_file">Upload</a-button>
+                                        <a-button @click="handle_cancel_upload();mes_input.visible.upload = false;">{{ lang.chat[14] }}</a-button>
+                                        <a-button type="primary" @click="upload_file">{{ lang.chat[15] }}</a-button>
                                     </template>
                                 </template>
                                 <a-tooltip placement="top">
                                     <template slot="title">
-                                        <span>Upload a File</span>
+                                        <span>{{ lang.chat[17] }}</span>
                                     </template>
                                     <a-button>
                                         <a-icon type="cloud-upload"></a-icon>
@@ -620,7 +701,7 @@
                         <div v-show="mes_input.visible.text">
                             <a-tooltip placement="top">
                                 <template slot="title">
-                                    <span>Sending Method</span>
+                                    <span>{{ lang.chat[18] }}</span>
                                 </template>
                                 <a-button @click="enter_send()" style="margin-right:0px">{{ enter.text }}</a-button>
                             </a-tooltip>

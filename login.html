@@ -60,13 +60,13 @@
 
     <div class="login-card">
       <div style="text-align: center">
-        <h1>Log in to Eugrade</h1>
-        <p>Let's get started</p>
+        <h1 style="margin-bottom: 35px;"><img src="https://static.ouorz.com/eugrade_logo_with_text@3x.png"
+            style="width: 200px;"></h1>
       </div>
       <a-form id="components-form-demo-normal-login" :form="form" class="login-form" @submit="handleSubmit"
         style="padding: 0px 20px">
         <a-form-item has-feedback :validate-status="email_valid" :help="valid_text" style="margin-bottom: 15px;">
-          <a-input v-decorator="[
+          <a-input size="large" v-decorator="[
         'email',
         {
           rules: [{
@@ -81,7 +81,7 @@
         </a-form-item>
 
         <a-form-item>
-          <a-input v-decorator="[
+          <a-input size="large" v-decorator="[
           'password',
           { rules: [{ required: true, message: 'Please input your Password!' }] }
         ]" type="password" placeholder="Password">
@@ -89,12 +89,12 @@
           </a-input>
         </a-form-item>
         <a-form-item>
-          <a-button type="primary" html-type="submit" class="login-form-button">
-            Log in
+          <a-button style="width:100%" type="primary" size="large" html-type="submit" class="login-form-button">
+            Log In
           </a-button>
-          &nbsp;Or <a href="signup.html">
-            Register
-          </a>
+          <br />
+          <p style="text-align: center;margin: 0px;margin-bottom: -20px;margin-top: 10px;">Don't have an account? <a
+              href="signup.html">Sign up!</a></p>
         </a-form-item>
       </a-form>
     </div>
