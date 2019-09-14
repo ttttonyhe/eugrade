@@ -19,7 +19,7 @@ include_once 'database/aliyun-php-sdk-core/Config.php';
 
 use Dm\Request\V20151123 as Dm;
 
-$iClientProfile = DefaultProfile::getProfile("cn-hangzhou", "LTAI4FucLenrs5vQyp2GuVQ5", "vbiaAJJZT7bI7UCPmqpYM4cFA9KphH");
+$iClientProfile = DefaultProfile::getProfile("cn-hangzhou", "xxx", "xxx");
 $client = new DefaultAcsClient($iClientProfile);
 $request = new Dm\SingleSendMailRequest();
 $request->setAccountName("noreply@eugrade.com");
