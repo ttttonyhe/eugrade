@@ -5,6 +5,7 @@ module.exports = {
         files : './src/files.js',
         classes : './src/classes.js',
         login : './src/login.js',
+        reset : './src/reset.js',
         signup : './src/signup.js',
         grades : './src/grades.js'
     },

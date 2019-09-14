@@ -45,7 +45,7 @@ if (!empty($_POST['user_id']) && !empty($_POST['type']) && isset($_SESSION['logg
                 $mes = 'User does not exist';
             } else {
                 $array = Lazer::table('users')->limit(1)->where('id', '=', (int)$_SESSION['logged_in_id'])->find();
-                if ($array->type !== 2) { //非教师操作
+                if ($array->type !== 2 || ($array->type == 2 && !$super)) { //非教师操作
                     //更改 user
                     $user = Lazer::table('users')->limit(1)->where('id', '=', (int)$id)->find();
                     if ((int)$user->id == (int)$_SESSION['logged_in_id']) { //判断账户拥有者操作
@@ -77,7 +77,7 @@ if (!empty($_POST['user_id']) && !empty($_POST['type']) && isset($_SESSION['logg
                         }
                     } else {
                         $status = 0;
-                        $code = 124;
+                        $code = 155;
                         $mes = 'Permission denied';
                     }
                 } else {
@@ -101,7 +101,7 @@ if (!empty($_POST['user_id']) && !empty($_POST['type']) && isset($_SESSION['logg
                         }
                     } else {
                         $status = 0;
-                        $code = 124;
+                        $code = 158;
                         $mes = 'Permission denied';
                     }
                 }

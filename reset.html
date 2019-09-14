@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="Shortcut Icon" href="https://static.ouorz.com/eugrade.ico" type="image/x-icon">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Eugrade | Communication and collaboration platform for Education</title>
+  <title>Eugrade | Password Reset</title>
   <script type="text/javascript" src="statics/js/vue.js"></script>
   <script type="text/javascript" src="statics/js/axios.min.js"></script>
   <link type="text/css" rel="stylesheet" href="statics/css/antd.css">
@@ -59,50 +59,48 @@
     <div class="login-hover"></div>
 
     <div class="login-card">
-      <div style="text-align: center">
-        <h1 style="margin-bottom: 35px;"><img src="https://static.ouorz.com/eugrade_logo_with_text@3x.png"
-            style="width: 200px;"></h1>
-      </div>
-      <a-form id="components-form-demo-normal-login" :form="form" class="login-form" @submit="handleSubmit"
+        <div style="text-align: center">
+            <h1>Reset Password</h1>
+            <p>Let’s find your account back</p>
+          </div>
+      <a-form class="login-form"
         style="padding: 0px 20px">
-        <a-form-item has-feedback :validate-status="email_valid" :help="valid_text" style="margin-bottom: 15px;">
-          <a-input size="large" v-decorator="[
-        'email',
-        {
-          rules: [{
-            type: 'email', message: 'The input is not valid E-mail!',
-          }, {
-            required: true, message: 'Please input your E-mail!',
-          }]
-        }
-      ]" placeholder="Email">
+        <a-form-item has-feedback style="margin-bottom: 15px;">
+          <a-input size="large" v-model="input.email" placeholder="Email">
             <a-icon slot="prefix" type="mail" style="color: rgba(0,0,0,.25)" />
           </a-input>
         </a-form-item>
 
-        <a-form-item>
-          <a-input size="large" v-decorator="[
-          'password',
-          { rules: [{ required: true, message: 'Please input your Password!' }] }
-        ]" type="password" placeholder="Password">
+        <a-form-item v-if="send.status">
+          <a-input size="large" placeholder="Verification Code" v-model="input.code">
             <a-icon slot="prefix" type="lock" style="color: rgba(0,0,0,.25)" />
           </a-input>
         </a-form-item>
-        <a-form-item>
-          <a-button style="width:100%" type="primary" size="large" html-type="submit" class="login-form-button">
-            Log In
+
+        <a-form-item v-if="!send.status">
+          <a-button @click="send_email" style="width:100%" :disabled="send.loading" type="primary" size="large" html-type="submit" class="login-form-button">
+            Send Code
           </a-button>
-          <br />
-          <p style="text-align: center;margin: 0px;margin-bottom: -20px;margin-top: 10px;">Don't have an account? <a
-              href="signup.html">Sign Up</a></p>
-          <p style="margin-bottom: -40px;text-align: center;margin-top: 10px;"><a href="reset.html">Reset Password</a>
-          </p>
         </a-form-item>
+        
+        <a-form-item v-if="send.status">
+          <div style="display: flex">
+            <a-button @click="check_code" style="width:49%;margin-right: 1%" type="primary" size="large" html-type="submit" class="login-form-button">
+              Check Code
+            </a-button>
+            <a-button @click="send_email" v-html="send.text" :disabled="send.loading" style="width:49%" type="default" size="large" html-type="submit" class="login-form-button">
+            </a-button>
+        </div>
+        </a-form-item>
+
+        <p style="text-align: center;margin: 0px;margin-bottom: -15px;margin-top: 10px;"><a
+          href="login.html">Return to Log in</a></p>
+
       </a-form>
     </div>
 
   </div>
 </body>
-<script type="text/javascript" src="dist/js/login.js"></script>
+<script type="text/javascript" src="dist/js/reset.js"></script>
 
 </html>
