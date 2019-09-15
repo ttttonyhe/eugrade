@@ -128,7 +128,8 @@ if (!empty($_POST['speaker_name']) && !empty($_POST['thread']) && !empty($_POST[
                         $mes = 'Successfully sent an image + text message';
                     } elseif ($status == 'file') { //文件上传(必须无内容)
                         if (empty($content)) {
-
+                            
+                            $size = input($_POST['size']);
                             $this_id = Lazer::table('messages')->lastId() + 1;
                             $row = Lazer::table('messages');
                             $row->id = (int) $this_id;
@@ -139,6 +140,7 @@ if (!empty($_POST['speaker_name']) && !empty($_POST['thread']) && !empty($_POST[
                             $row->thread = (int) $thread;
                             $row->file_url = $file_url;
                             $row->file_name = $file_name;
+                            $row->file_size = (string)$size;
                             $row->date = time();
                             $row->type = 'file';
 

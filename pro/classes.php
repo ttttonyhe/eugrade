@@ -88,6 +88,7 @@
                         </a-button>
                     </p>
                 </div>
+                <div class="items-count"><p>- {{ (user.joined_classes).length }} items in total -</p></div>
                 <div v-for="(joined,index) in user.joined_classes" :class="'class-item ' + class_super(index)" @click="open_class_info(index)" :id="'class'+index">
                     <div style="margin-right: 10px;">
                         <template v-if="!!user.classes_info[index].img">

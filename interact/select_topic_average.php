@@ -35,9 +35,9 @@ if (!empty($_GET['topic_ids']) && !empty($_GET['type'])) {
         $total = 0;
         $total_total = 0;
         if($type == 'all'){
-            $array_1 = Lazer::table('records')->andWhere('belong_topic', '=', (int) $topic_array[$k])->findAll()->asArray();
+            $array_1 = Lazer::table('records')->where('belong_topic', '=', (int) $topic_array[$k])->findAll()->asArray();
         }else{
-            $array_1 = Lazer::table('records')->limit(1)->andWhere('belong_topic', '=', (int) $topic_array[$k])->andWhere('user_id','=',(int)$user)->findAll()->asArray();
+            $array_1 = Lazer::table('records')->limit(1)->where('belong_topic', '=', (int) $topic_array[$k])->andWhere('user_id','=',(int)$user)->findAll()->asArray();
         }
         for ($i = 0; $i < count($array_1); $i++) { //当前 topic 的总和 score
             $total += (float) $array_1[$i]['score'];
@@ -46,6 +46,10 @@ if (!empty($_GET['topic_ids']) && !empty($_GET['type'])) {
         if (count($array_1) !== 0) {
             $array[$k][0] = $total / count($array_1);
             $array[$k][1] = $total / $total_total;
+
+            $series_id = (Lazer::table('topics')->limit(1)->where('id','=',(int)$topic_array[$k])->find()->asArray())[0]['belong_series'];
+            $series_name = (Lazer::table('series')->limit(1)->where('id', '=', (int) $series_id)->find()->asArray())[0]['name'];
+            $array[$k][2] = $series_name;
         } else {
             $array[$k][0] = 0;
             $array[$k][1] = 0;

@@ -1,7 +1,7 @@
 <?php require 'pro_header.php'; ?>
 
 <script>
-if (cookie.get('eugrade_lang') == 'zh_cn') {
+    if (cookie.get('eugrade_lang') == 'zh_cn') {
         var lang_json = {
             title: {
                 1: '成绩',
@@ -32,7 +32,7 @@ if (cookie.get('eugrade_lang') == 'zh_cn') {
                 6: '删除',
                 7: '平均分',
                 8: '系列统计',
-                9: '点击显示图表',
+                9: '点击查看最新数据',
                 10: '全部主题',
                 11: '你可能需要刷新页面以查看最新数据',
                 12: '统计表暂时不可用',
@@ -83,7 +83,7 @@ if (cookie.get('eugrade_lang') == 'zh_cn') {
                 6: 'Delete',
                 7: 'Average Score',
                 8: 'View Series Stats',
-                9: 'Click to Display',
+                9: 'Click to Update',
                 10: 'All Topics',
                 11: 'You might need to reload the web page to see updates',
                 12: 'Chart is temporarily unavailable',
@@ -112,7 +112,8 @@ if (cookie.get('eugrade_lang') == 'zh_cn') {
     <div class="left">
         <a-spin :spinning="spinning.left">
             <div class="main-header">
-                <h3>{{ lang.title[1] }}<a-tag color="green" style="transform: translateY(-3.1px);margin-left: 5px;">Beta</a-tag>
+                <h3>{{ lang.title[1] }}
+                    <a-tag color="green" style="transform: translateY(-3.1px);margin-left: 5px;">Beta</a-tag>
                 </h3>
                 <p>{{ lang.title[2].substr(1,lang.title[2].length) }}</p>
             </div>
@@ -124,6 +125,9 @@ if (cookie.get('eugrade_lang') == 'zh_cn') {
                             <a-icon type="sort-descending" />
                         </a-button>
                     </p>
+                </div>
+                <div class="items-count">
+                    <p>- {{ (user.joined_classes).length }} items in total -</p>
                 </div>
                 <div v-for="(joined,index) in user.joined_classes" :class="'class-item ' + class_super(index)" @click="open_class_info(index)" :id="'class'+index">
                     <div style="margin-right: 10px;">
@@ -174,19 +178,32 @@ if (cookie.get('eugrade_lang') == 'zh_cn') {
     </a-modal>
     <!-- 编辑系列结束 -->
     <!-- 查看 series 折线图 -->
-    <a-modal :footer="null" :title="lang.view[8]" :visible="stats.visible.all" @cancel="handle_stats_cancel()">
-        <template v-if="parseInt(user.id) == parseInt(opened_class_info.superid)">
-            <div class="select-stats" v-for="(series_c,index) in opened_series_info.info" @click="open_stats('single',index,'view_topics')">
-                <h2>{{ series_c.name }}</h2>
-                <p>{{ (series_c.topics_info).length }} {{ lang.tab[2] }}</p>
-            </div>
-        </template>
-        <template v-else>
-            <div class="select-stats" v-for="(series_c,index) in opened_series_info.info" @click="open_stats('single',index)">
-                <h2>{{ series_c.name }}</h2>
-                <p>{{ (series_c.topics_info).length }} {{ lang.tab[2] }}</p>
-            </div>
-        </template>
+    <a-modal :title="lang.view[8]" @ok="open_stats('view_topics')" :visible="stats.visible.all" @cancel="handle_stats_cancel()">
+        <p style="font-size: 16px;letter-spacing: .5px;margin-left: 1px;text-align: center;">Click on Topics to View Combined Data Chart</p>
+            <h3 v-for="(series_c,index) in opened_series_info.info">
+                <div class="select-stats" :id="'series_sub'+series_c.id">
+                    <h3>
+                        <a-icon type="fork"></a-icon>&nbsp;&nbsp;{{ series_c.name }}
+                    </h3>
+                </div>
+
+                <template v-if="series_c.topics_info.length">
+                    <div v-for="(topic_c,t_index) in series_c.topics_info" :style="(stats.topics.indexOf(topic_c.id) > -1) ? 'border-left: 5px solid rgb(2, 169, 244) !important' : ''" class="class-item topic-item select-stats-topic" @click="add_topic(topic_c.id,topic_c.name,index,t_index)">
+                        <h3>
+                            <a-icon type="branches"></a-icon>&nbsp;&nbsp;{{ topic_c.name }}
+                            <p>{{ get_date(topic_c.date) }} | {{ topic_c.candidate_count }} {{ lang.tab[6] }}</p>
+                        </h3>
+                    </div>
+                </template>
+                <template v-else>
+                    <div class="class-item topic-item">
+                        <h3>
+                            <a-icon type="branches"></a-icon>&nbsp;&nbsp;{{ lang.tab[5] }}
+                        </h3>
+                    </div>
+                </template>
+
+            </h3>
         <p class="mes-end" style="margin-top: 0px;margin-bottom: 5px;">- EOF -</p>
     </a-modal>
     <!-- 查看 series 折线图结束 -->
@@ -199,12 +216,12 @@ if (cookie.get('eugrade_lang') == 'zh_cn') {
                         <p style="color:#666;">
                             <a-icon type="bar-chart"></a-icon>&nbsp;&nbsp;{{ lang.tab[3] }}
                             <template v-if="parseInt(user.id) == parseInt(opened_class_info.superid)">
-                                <a-button size="small" @click="open_stats('all')" style="right:81px;position:absolute">
+                                <a-button size="small" @click="stats.visible.all = true" style="right:81px;position:absolute">
                                     <a-icon type="line-chart"></a-icon>
                                 </a-button>
                             </template>
                             <template v-else>
-                                <a-button size="small" @click="open_stats('all')" style="right:20px;position:absolute">
+                                <a-button size="small" @click="stats.visible.all = true" style="right:20px;position:absolute">
                                     <a-icon type="line-chart"></a-icon>
                                 </a-button>
                             </template>
@@ -213,7 +230,9 @@ if (cookie.get('eugrade_lang') == 'zh_cn') {
                     </div>
 
                     <template v-if="opened_series_info.info.length">
-
+                    <div class="items-count">
+                            <p>- {{ (opened_series_info.info).length }} items in total -</p>
+                        </div>
                         <template v-for="(series_c,index) in opened_series_info.info">
                             <div class="class-item series-item" :id="'series_sub'+series_c.id">
                                 <h3>
@@ -247,7 +266,6 @@ if (cookie.get('eugrade_lang') == 'zh_cn') {
                             </template>
 
                         </template>
-
                     </template>
                     <template v-else>
                         <p class="mes-end">- EOF -</p>
@@ -303,8 +321,46 @@ if (cookie.get('eugrade_lang') == 'zh_cn') {
     </a-modal>
     <!-- 编辑记录结束 -->
 
+    <!-- 复制范围 -->
+    <a-modal title="Copy from Another Topic" :visible="range.copy.visible" @ok="handle_range_copy_submit()" :confirm-loading="range.copy.confirm" @cancel="handle_range_copy_cancel()">
+        <p style="font-size: 16px;letter-spacing: .5px;margin-left: 1px;text-align: center;">Click on a Topic to Copy From</p>
+            <h3 v-for="(series_c,index) in opened_series_info.info">
+                <div class="select-stats" :id="'series_sub'+series_c.id">
+                    <h3>
+                        <a-icon type="fork"></a-icon>&nbsp;&nbsp;{{ series_c.name }}
+                    </h3>
+                </div>
+
+                <template v-if="series_c.topics_info.length">
+                    <div v-for="topic_c in series_c.topics_info" v-if="!!topic_c.scale" :style="(range.copy.from == topic_c.id) ? 'border-left: 5px solid rgb(2, 169, 244) !important' : ''" class="class-item topic-item select-stats-topic" @click="add_copy_topic(topic_c.id)">
+                        <h3>
+                            <a-icon type="branches"></a-icon>&nbsp;&nbsp;{{ topic_c.name }}
+                            <p>{{ get_date(topic_c.date) }} | {{ topic_c.candidate_count }} {{ lang.tab[6] }}</p>
+                        </h3>
+                    </div>
+                    <div class="class-item topic-item" v-else>
+                        <h3>
+                            <a-icon type="branches"></a-icon>&nbsp;&nbsp;{{ topic_c.name }}
+                            <p>No grading scale yet</p>
+                        </h3>
+                    </div>
+                </template>
+                <template v-else>
+                    <div class="class-item topic-item">
+                        <h3>
+                            <a-icon type="branches"></a-icon>&nbsp;&nbsp;{{ lang.tab[5] }}
+                        </h3>
+                    </div>
+                </template>
+
+            </h3>
+        <p class="mes-end" style="margin-top: 0px;margin-bottom: 5px;">- EOF -</p>
+    </a-modal>
+    <!-- 复制范围结束 -->
     <!-- 设置范围 -->
     <a-modal :title="lang.tab[13]" :visible="range.visible" @ok="handle_range_submit()" :confirm-loading="range.confirm" @cancel="handle_range_cancel()">
+        <p>You may choose to copy a grading scale from another topic:</p>
+        <p><a-button type="primary" @click="range.copy.visible = true;range.visible = false;">Copy from Another</a-button></p>
         <a-form-item label="A*(max|min)">
             <a-input-group compact>
                 <a-input-number style="width: 30%" :min="range.scale[0].min" :max="100" :step="1" :formatter="value => `${value}%`" :parser="value => value.replace('%', '')" v-model="range.scale[0].max"></a-input-number>
@@ -510,11 +566,8 @@ if (cookie.get('eugrade_lang') == 'zh_cn') {
             <template v-else-if="opened_stats_info.status">
                 <div class="mes-header" style="padding: 14.2px 23px;">
                     <p class="topic-header-p">
-                        <a-icon type="fork"></a-icon>&nbsp;&nbsp;{{ opened_stats_info.info.name }}
+                        <a-icon type="fork"></a-icon>&nbsp;&nbsp;{{ stats.topics_name.join(',') }}
                         <em class="topic-series">Stats</em>
-                        <div class="topic-op">
-                            <em class="topic-date" style="margin-right: 15px;">{{ get_date(opened_stats_info.info.date) }}</em>
-                        </div>
                     </p>
                 </div>
                 <div class="topic-container">

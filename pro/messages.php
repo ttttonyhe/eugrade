@@ -106,6 +106,9 @@
                         <a-button size="small" @click="display_class" v-html="display_classes_text"></a-button>
                     </p>
                 </div>
+                <div class="items-count">
+                    <p>- {{ (user.joined_classes).length }} items in total -</p>
+                </div>
                 <template v-if="display_classes">
                     <div :style="class_push(user.classes_info[index].id)" v-for="(joined,index) in user.joined_classes" :class="'class-item ' + class_super(index)" @click="open_class(user.classes_info[index].id,index)" :id="'class_left'+user.classes_info[index].id">
                         <div style="margin-right: 10px;">
@@ -333,6 +336,9 @@
                             <p v-html="class_c.des"></p>
                         </div>
                     </div>
+                    <div class="items-count">
+                        <p>- {{ (opened_mark_info.class_info).length }} items in total -</p>
+                    </div>
                 </template>
                 <template v-if="Object.keys(opened_mark_info.user).length - 1">
                     <p class="mes-sub-header">{{ lang.tab[8] }}</p>
@@ -351,6 +357,9 @@
                             <h3 v-html="user_c.name"></h3>
                             <p v-html="get_level(user_c.type)"></p>
                         </div>
+                    </div>
+                    <div class="items-count">
+                        <p>- {{ (opened_mark_info.user_info).length }} items in total -</p>
                     </div>
                 </template>
                 <template v-if="!Object.keys(opened_mark_info.class_c).length - 1 && !Object.keys(opened_mark_info.user).length - 1">
@@ -373,6 +382,9 @@
                     </p>
                 </div>
                 <template v-if="opened_thread_info.length">
+                    <div class="items-count">
+                        <p>- {{ (opened_thread_info).length }} items in total -</p>
+                    </div>
                     <div v-for="(thread_c,index) in opened_thread_info" class="class-item" :id="'thread_sub'+thread_c.id" @click="open_mes(index,thread_c.id,thread_c.belong_class)">
                         <div class="thread-notify" v-if="thread_c.id == push.thread"></div>
                         <div>
@@ -556,7 +568,8 @@
                                                 </div>
                                                 <div>
                                                     <h3>{{ mes.file_name }}</h3>
-                                                    <p><a :href="'../extension/download.php?filename='+mes.file_url" target="_blank">Download</a>
+                                                    <p><a style="text-decoration:none;color:#888">{{ mes.file_size }}</a>
+                                                        <a-divider type="vertical"></a-divider><a :href="'../extension/download.php?filename='+mes.file_url" target="_blank">Download</a>
                                                         <template v-if="get_suffix(mes.file_name).substr(1) == 'pdf'">
                                                             <a-divider type="vertical"></a-divider><a :href="mes.file_url" target="_blank">Preview</a>
                                                         </template>
@@ -699,14 +712,14 @@
 
                         </div>
                         <div v-show="mes_input.visible.text">
-                            <a-tooltip placement="top">
-                                <template slot="title">
-                                    <span>{{ lang.chat[18] }}</span>
-                                </template>
-                                <a-button @click="enter_send()" style="margin-right:0px">{{ enter.text }}</a-button>
-                            </a-tooltip>
                             <a-button @click="handle_input_down" style="margin-right:10px">Discard</a-button>
-                            <a-button type="primary" @click="handle_input_send(mes_input.type)">{{ mes_input.send_text }}</a-button>
+                            <a-dropdown-button type="primary" @click="handle_input_send(mes_input.type)" :trigger="['click']">
+                                {{ mes_input.send_text }}
+                                <a-menu slot="overlay">
+                                    <a-menu-item key="1" @click="enter_send('click')" style="text-align:right"><a-icon type="check" v-if="enter.text == 1"></a-icon>Click Button to Send</a-menu-item>
+                                    <a-menu-item key="2" @click="enter_send('enter')" style="text-align:right"><a-icon type="check" v-if="enter.text == 2"></a-icon>Press Enter to Send</a-menu-item>
+                                </a-menu>
+                            </a-dropdown-button>
                         </div>
                     </div>
                 </div>

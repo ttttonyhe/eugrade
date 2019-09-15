@@ -1,7 +1,15 @@
+function new_obj(a, p, n) //声明对象
+{
+    this.average = a;
+    this.percent = p;
+    this.name = n;
+}
+
 var antd = new Vue({
     el: '#app',
     data() {
         return {
+            temp_topic_info: null,
             lang: [],
             i: 0,
             sort: true,
@@ -63,6 +71,11 @@ var antd = new Vue({
                 },
             },
             range: {
+                copy: {
+                    visible: false,
+                    confirm: false,
+                    from: null
+                },
                 visible: false,
                 confirm: false,
                 scale: [{
@@ -154,7 +167,12 @@ var antd = new Vue({
                 visible: {
                     all: false,
                     member: false
-                }
+                },
+                topics: [],
+                topics_info: [],
+                topics_name: [],
+                series: [],
+                topics_index: [],
             },
             switch: {
                 user_id: null
@@ -338,6 +356,34 @@ var antd = new Vue({
         },
         handle_range_cancel() {
             this.range.visible = false;
+        },
+        //处理复制范围
+        handle_range_copy_submit() {
+            this.range.copy.confirm = true;
+
+            var query_string = "scale=xxx&belong_class=" + this.opened_class_info.id + "&belong_topic=" + this.opened_topic_info.info.id + "&type=copy&from=" + this.range.copy.from + "&creator=" + this.user.id;
+
+            axios.post(
+                    '../interact/edit_topic_scale.php',
+                    query_string
+                )
+                .then(res => {
+                    if (res.data.status) {
+                        this.$message.success(res.data.mes);
+                        this.range.copy.confirm = false;
+                        this.open_topic_info(this.opened_topic_info.info.id, this.opened_topic_info.series_index);
+                        this.range.copy.visible = false;
+                    } else {
+                        this.$message.error(res.data.mes);
+                        this.range.copy.confirm = false;
+                    }
+                })
+
+        },
+        handle_range_copy_cancel() {
+            this.range.copy.visible = false;
+            this.range.copy.from = null;
+            this.range.copy.confirm = false;
         },
         edit_record(index) {
             this.edit.visible = true;
@@ -527,76 +573,94 @@ var antd = new Vue({
             this.edit_info.visible.series = true;
         },
 
+        add_topic(id, name, series, topic) {
+            if ((this.stats.topics).indexOf(id) > -1) {
+                this.stats.topics_name.splice((this.stats.topics_name).indexOf(name), 1); //主题名
+                this.stats.topics.splice((this.stats.topics).indexOf(id), 1); //主题 ID
+                this.stats.series.splice((this.stats.series).indexOf(series), 1); //系列 index
+                this.stats.topics_index.splice((this.stats.topics_index).indexOf(topic), 1); //主题 index
+            } else {
+                this.stats.topics.push(id);
+                this.stats.series.push(series);
+                this.stats.topics_name.push(name);
+                this.stats.topics_index.push(topic);
+            }
+        },
         //打开折线图查看选择 series 的 modal
-        open_stats(key, index, type, user) {
-            if (key == 'all') {
-                this.stats.visible.all = true;
-            } else if (key == 'single') {
-                this.spinning.right = true;
-                this.opened_stats_info.index = index;
-
-                axios.get('../interact/select_series.php?class_id=' + this.opened_class_info.id)
-                    .then(resp => {
-                        var ids = '';
-                        this.opened_stats_info.info = resp.data[this.opened_stats_info.index];
-                        for (l = 0; l < (this.opened_stats_info.info.topics_info).length; l++) {
-                            ids += ',' + this.opened_stats_info.info.topics_info[l].id;
-                        }
-                        ids = ids.substr(1, ids.length - 1);
-                        if (parseInt(this.user.id) == parseInt(this.opened_class_info.superid) && type == 'view_topics') {
-                            this.opened_stats_info.chartSettings_all = {
-                                axisSite: {
-                                    left: ['average'],
-                                    right: ['percent']
-                                },
-                                yAxisType: ['KMB', 'percent'],
-                                yAxisName: ['Average', 'Percentage']
-                            };
-                            axios.get('../interact/select_topic_average.php?topic_ids=' + ids + '&type=all')
-                                .then(res => {
-                                    for (l = 0; l < (this.opened_stats_info.info.topics_info).length; l++) {
-                                        this.opened_stats_info.info.topics_info[l]['average'] = res.data[l][0];
-                                        this.opened_stats_info.info.topics_info[l]['percent'] = res.data[l][1];
-                                    }
-                                });
-                        } else {
-                            if (type == 'view_users') {
-                                var user_id = user;
-                            } else {
-                                var user_id = this.user.id;
+        open_stats(type, user) {
+            this.spinning.right = true;
+            //教师查看 topics 情况
+            if (parseInt(this.user.id) == parseInt(this.opened_class_info.superid) && type == 'view_topics') {
+                this.opened_stats_info.chartSettings_all = {
+                    axisSite: {
+                        left: ['average'],
+                        right: ['percent']
+                    },
+                    yAxisType: ['KMB', 'percent'],
+                    yAxisName: ['Average', 'Percentage']
+                };
+                axios.get('../interact/select_topic_average.php?topic_ids=' + this.stats.topics.join(',') + '&type=all')
+                    .then(res => {
+                        this.stats.topics_info = [];
+                        for (l = 0; l < (this.stats.topics).length; l++) {
+                            this.stats.topics_info[l] = new new_obj(0, 0, 'name'); //二维带对象数组需要初始化
+                            if(!!res.data[l][2]){ //判断是否存在主题名字
+                                var topic_name = '(' + res.data[l][2] + ')';
+                            }else{
+                                var topic_name = '(无记录)';
                             }
-                            this.opened_stats_info.chartSettings_all = {
-                                axisSite: {
-                                    left: ['average'],
-                                    right: ['percent']
-                                },
-                                yAxisType: ['KMB', 'percent'],
-                                yAxisName: ['Score', 'Percentage']
-                            };
-                            axios.get('../interact/select_topic_average.php?topic_ids=' + ids + '&type=student&user=' + user_id)
-                                .then(res => {
-                                    for (l = 0; l < (this.opened_stats_info.info.topics_info).length; l++) {
-                                        this.opened_stats_info.info.topics_info[l]['average'] = res.data[l][0];
-                                        this.opened_stats_info.info.topics_info[l]['percent'] = res.data[l][1];
-                                    }
-                                });
+                            this.stats.topics_info[l]['name'] = this.stats.topics_name[l] + topic_name;
+                            this.stats.topics_info[l]['average'] = res.data[l][0];
+                            this.stats.topics_info[l]['percent'] = res.data[l][1];
                         }
-                        this.opened_topic_info.status = false;
-                        this.opened_stats_info.chartData_all.rows = [];
-                        this.opened_stats_info.chartData_all.rows = this.opened_stats_info.info.topics_info;
-                        this.opened_stats_info.status = true;
-                        this.spinning.right = false;
-                        this.stats.visible.all = false;
-                    })
+                        this.display_chart();
+                    });
+            } else { //教师或学生查看用户情况
+                if (type == 'view_users') { //选择用户查看统计图
+                    var user_id = user; //教师查看
+                } else { //学生没有机会能把 type 赋值成 view_users
+                    var user_id = this.user.id;
+                }
+                this.opened_stats_info.chartSettings_all = {
+                    axisSite: {
+                        left: ['average'],
+                        right: ['percent']
+                    },
+                    yAxisType: ['KMB', 'percent'],
+                    yAxisName: ['Score', 'Percentage']
+                };
+                axios.get('../interact/select_topic_average.php?topic_ids=' + this.stats.topics.join(',') + '&type=student&user=' + user_id)
+                    .then(res => {
+                        this.stats.topics_info = [];
+                        for (l = 0; l < (this.stats.topics).length; l++) {
+                            this.stats.topics_info[l] = new new_obj(0, 0, 'name');
+                            if(!!res.data[l][2]){ //判断是否存在主题名字
+                                var topic_name = '(' + res.data[l][2] + ')';
+                            }else{
+                                var topic_name = '(无记录)';
+                            }
+                            //图标名称展示系列名+主题名+等级
+                            this.stats.topics_info[l]['name'] = this.stats.topics_name[l] + topic_name + '[' + this.get_record_level_independent(res.data[l][1], this.stats.series[l] ,this.stats.topics_index[l]) + ']';
+                            this.stats.topics_info[l]['average'] = res.data[l][0];
+                            this.stats.topics_info[l]['percent'] = res.data[l][1];
+                        }
+                        this.display_chart();
+                    });
             }
         },
         handle_stats_cancel() {
             this.stats.visible.all = false;
         },
-        display_chart() {
-            var temp = this.opened_stats_info.info.topics_info[0].name;
-            this.opened_stats_info.info.topics_info[0].name = 'XXX';
-            this.opened_stats_info.info.topics_info[0].name = temp;
+        display_chart() { //点击展示统计图改变
+            this.opened_topic_info.status = false;
+            this.opened_stats_info.chartData_all.rows = [];
+            this.opened_stats_info.chartData_all.rows = this.stats.topics_info;
+            this.opened_stats_info.status = true;
+            var temp = this.stats.topics_info[0]['average'];
+            this.stats.topics_info[0]['average'] = 0;
+            this.stats.topics_info[0]['average'] = temp;
+            this.spinning.right = false;
+            this.stats.visible.all = false;
         },
 
 
@@ -877,6 +941,32 @@ var antd = new Vue({
                 }
             }
         },
+        //独立获取成绩等级，用于统计表展示，不能从数据库获取(无法返回)，按 index 获取 scale 信息
+        get_record_level_independent(percent_get, series, topic) {
+            var top = this.opened_series_info.info[series].topics_info[topic];
+            if (!!top.scale) {
+                //百分比乘 100
+                var percent = percent_get * 100;
+                var array = [];
+                //段位数组
+                var array_1 = top.scale.split(',');
+                for (i = 0; i < array_1.length; i++) { //段位范围、名字数组
+                    array[i] = [];
+                    array[i]['sign'] = array_1[i].split('|')[0];
+                    array[i]['max'] = array_1[i].split('|')[1];
+                    array[i]['min'] = array_1[i].split('|')[2];
+                }
+                for (i = 0; i < array.length; i++) { //遍历全部段位
+                    if (this.inRange(percent, array[i]['min'], array[i]['max'])) {
+                        return array[i]['sign'].toUpperCase();
+                    } else {
+                        continue;
+                    }
+                }
+            } else {
+                return 'NG';
+            }
+        },
         //学生账户查看无匹配时
         stu_view() {
             var count = 0;
@@ -894,13 +984,21 @@ var antd = new Vue({
                 return '';
             }
         },
+        //选择其他用户切换查看统计图
         handle_switch_user(value) {
             if (value == 'all_topics') {
-                this.open_stats('single', this.opened_stats_info.index, 'view_topics');
+                this.open_stats('view_topics');
             } else {
-                this.switch.user_id = parseInt(value);
-                this.open_stats('single', this.opened_stats_info.index, 'view_users', this.switch.user_id);
+                this.open_stats('view_users', parseInt(value));
             }
-        }
+        },
+        //选择要复制的 topic
+        add_copy_topic(id){
+            if(this.range.copy.from !== id){
+                this.range.copy.from = id;
+            }else{
+                this.range.copy.from = null;
+            }
+        },
     }
 });
