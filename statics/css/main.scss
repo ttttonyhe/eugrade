@@ -486,6 +486,11 @@ body {
     margin-left: 10px;
 }
 
+.mes-input-op div:nth-child(2) div button:nth-child(2) {
+    margin-left: 0px;
+    border-left: none;
+}
+
 .mes-container-normal {
     padding-top: 10px;
     height: calc(100vh - 150px);
@@ -1165,13 +1170,14 @@ body {
 
 .select-stats {
     border: 1px solid #eee;
-    padding: 5px 15px;
-    border-radius: 4px;
+    padding: 11px 0px 2px 15px;
+    border-radius: 4px 4px 0px 0px;
     transition: all .1s;
-    margin-bottom: 10px;
+    margin-bottom: 0px;
+    margin-top: 10px;
 
-    &:hover {
-        background: #f7f8f9;
+    &:nth-child(1){
+        margin-top: 0px;
     }
 
     h2 {
@@ -1180,12 +1186,12 @@ body {
         display: inline-block;
         letter-spacing: .5px;
     }
+}
 
-    p {
-        margin: 0px;
-        color: #888;
-        font-weight: 300;
-    }
+.select-stats-topic{
+    border-left: 2px solid #eee !important;
+    border-right: 1px solid #eee !important;
+    border-bottom: 1px solid #eee !important;
 }
 
 .mes-pin {
@@ -1446,12 +1452,26 @@ $demo-width: 330px;
 
 /* 首页 */
 
-.multi-list{
+.multi-list {
     border: 1px solid #eee;
     padding: 10px;
     border-radius: 4px;
     margin-bottom: 5px;
-    p{
+
+    p {
+        margin: 0px;
+    }
+}
+
+.items-count {
+    background: #fff;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+    padding: 5px 0px 3px 0px;
+    color: #999;
+    font-weight: 300;
+
+    p {
         margin: 0px;
     }
 }

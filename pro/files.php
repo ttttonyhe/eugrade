@@ -54,6 +54,7 @@ if (cookie.get('eugrade_lang') == 'zh_cn') {
                         <a-button size="small" @click="reverse_order('classes')" style="font-size:14px;"><a-icon type="sort-descending" /></a-button>
                     </p>
                 </div>
+                <div class="items-count"><p>- {{ (user.joined_classes).length }} items in total -</p></div>
                 <div v-for="(joined,index) in user.joined_classes" :class="'class-item ' + class_super(index)" @click="open_class(user.classes_info[index].id,index)" :id="'class_left'+user.classes_info[index].id">
                     <div style="margin-right: 10px;">
                         <template v-if="!!user.classes_info[index].img">
@@ -91,6 +92,7 @@ if (cookie.get('eugrade_lang') == 'zh_cn') {
                     </p>
                 </div>
                 <template v-if="opened_thread_info.length">
+                <div class="items-count"><p>- {{ (opened_thread_info).length }} items in total -</p></div>
                     <div v-for="(thread_c,index) in opened_thread_info" class="class-item files-folder" :id="'thread_sub'+thread_c.id" @click="open_mes(index,thread_c.id,thread_c.belong_class)">
                         <div>
                             <h3 v-html="thread_c.name"></h3>
@@ -142,6 +144,7 @@ if (cookie.get('eugrade_lang') == 'zh_cn') {
                             </div>
                         </template>
                         <template v-else>
+                        <div class="items-count" style="padding-top:0px"><p>- {{ (opened_mes_info.files).length }} items in total -</p></div>
                             <div v-for="(file,index) in opened_mes_info.files" class="mes-stream-file-div">
                                 <div class="mes-stream-file-div-sub">
                                     <div :style="'font-size: 40px;margin-top: -6px;color:'+ get_file_icon(get_suffix(file.file_name).substr(1))[1]">
@@ -150,6 +153,7 @@ if (cookie.get('eugrade_lang') == 'zh_cn') {
                                     <div style="margin-left: 10px;">
                                         <h3>{{ file.file_name }}</h3>
                                         <p style="margin: 0px;">
+                                        <a style="text-decoration:none;color:#888">{{ file.file_size }}</a><a-divider type="vertical"></a-divider>
                                             <a :href="'../extension/download.php?filename='+file.file_url" target="_blank">{{ lang.tab[6] }}</a>
                                             <template v-if="get_suffix(file.file_name).substr(1) == 'pdf'">
                                                 <a-divider type="vertical"></a-divider><a :href="file.file_url" target="_blank">{{ lang.tab[7] }}</a>

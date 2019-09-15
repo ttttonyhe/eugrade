@@ -105,7 +105,8 @@ var antd = new Vue({
                 },
                 file: { //文件上传内容
                     url: null,
-                    name: null
+                    name: null,
+                    size: null,
                 },
                 send_text: 'Send', //在图片上传时会改变 send 按钮文字
                 markdown: { //支持 markdown 格式的发送
@@ -147,7 +148,7 @@ var antd = new Vue({
             },
             enter: {
                 status: false,
-                text: 'Click'
+                text: 1
             },
             check: {
                 file: {
@@ -478,89 +479,78 @@ var antd = new Vue({
         //点击主题获取消息在 right 列展示
         open_mes(index, id, belong_class) {
 
-            if(this.wss_connected){
-            window.ws.send('{"action":"join", "thread_id":' + id + ', "class_id":' + belong_class + ', "speaker":' + antd.user.id + ',"speaker_name":"' + antd.user.info.name + '","type" : "join"}');
-            //清除当前 interval
-            window.clearInterval(window.get_push_interval);
+            if (this.wss_connected) {
+                window.ws.send('{"action":"join", "thread_id":' + id + ', "class_id":' + belong_class + ', "speaker":' + antd.user.id + ',"speaker_name":"' + antd.user.info.name + '","type" : "join"}');
+                //清除当前 interval
+                window.clearInterval(window.get_push_interval);
 
-            //关闭当前 push 通知
-            this.push.classid = null;
-            this.push.thread = null;
+                //关闭当前 push 通知
+                this.push.classid = null;
+                this.push.thread = null;
 
-            this.spinning.loading = true;
-            this.status.user = false;
-            this.status.chat = true;
-            //选中增加 class，删除其余选中
-            $('.center .class-item').each(function () {
-                $(this).removeClass('clicked');
-            });
-            $('#thread_sub' + id).addClass('clicked');
+                this.spinning.loading = true;
+                this.status.user = false;
+                this.status.chat = true;
+                //选中增加 class，删除其余选中
+                $('.center .class-item').each(function () {
+                    $(this).removeClass('clicked');
+                });
+                $('#thread_sub' + id).addClass('clicked');
 
-            this.opened_mes_info.thread_id = id;
-            this.opened_mes_info.class_id = belong_class;
-            this.opened_mes_info.thread_info = this.opened_thread_info[index];
-            this.opened_mes_info.index = index;
-            this.edit.name = this.opened_mes_info.thread_info.name;
+                this.opened_mes_info.thread_id = id;
+                this.opened_mes_info.class_id = belong_class;
+                this.opened_mes_info.thread_info = this.opened_thread_info[index];
+                this.opened_mes_info.index = index;
+                this.edit.name = this.opened_mes_info.thread_info.name;
 
-            axios.get('../interact/select_messages.php?thread_id=' + this.opened_mes_info.thread_id + '&class_id=' + this.opened_mes_info.class_id)
-                .then(response => {
-                    this.opened_mes_info.meses = response.data.mes;
-                    if (!!response.data.speakers_unique) {
-                        this.opened_mes_info.unique_speakers = response.data.speakers_unique.split(',');
-                    } else {
-                        this.opened_mes_info.unique_speakers = [];
-                    }
-                    axios.get('../interact/select_users.php?type=avatar&id=' + response.data.speakers_unique + '&mes=1')
-                        .then(res => {
-                            this.opened_mes_info.speakers = res.data;
-                            //输入框监听回车发送
-                            if (cookie.get('pokers_sending') == "2") {
-                                $("#message_input").unbind();
-                                $("#message_input").bind("keydown", function (e) {
-                                    // 兼容FF和IE和Opera    
-                                    var theEvent = e || window.event;
-                                    var code = theEvent.keyCode || theEvent.which || theEvent.charCode;
-                                    if (code == 13) {
-                                        antd.handle_input_send(antd.mes_input.type);
+                axios.get('../interact/select_messages.php?thread_id=' + this.opened_mes_info.thread_id + '&class_id=' + this.opened_mes_info.class_id)
+                    .then(response => {
+                        this.opened_mes_info.meses = response.data.mes;
+                        if (!!response.data.speakers_unique) {
+                            this.opened_mes_info.unique_speakers = response.data.speakers_unique.split(',');
+                        } else {
+                            this.opened_mes_info.unique_speakers = [];
+                        }
+                        axios.get('../interact/select_users.php?type=avatar&id=' + response.data.speakers_unique + '&mes=1')
+                            .then(res => {
+                                this.opened_mes_info.speakers = res.data;
+
+                                //新消息推送 cookie 设置
+                                if (!!cookie.get('pokers_push') && !!cookie.get('pokers_thread_count')) {
+                                    if (cookie.get('pokers_push').split('a').indexOf(id.toString()) < 0) {
+                                        var push = cookie.get('pokers_push') + 'a' + id;
+                                        var count = cookie.get('pokers_thread_count') + 'a' + this.opened_mes_info.thread_info.message_count;
+                                        cookie.set('pokers_push', push);
+                                        cookie.set('pokers_thread_count', count);
                                     }
-                                });
-                                this.enter.status = true;
-                                this.enter.text = 'Enter';
-                            }
-                            //新消息推送 cookie 设置
-                            if (!!cookie.get('pokers_push') && !!cookie.get('pokers_thread_count')) {
-                                if (cookie.get('pokers_push').split('a').indexOf(id.toString()) < 0) {
-                                    var push = cookie.get('pokers_push') + 'a' + id;
-                                    var count = cookie.get('pokers_thread_count') + 'a' + this.opened_mes_info.thread_info.message_count;
-                                    cookie.set('pokers_push', push);
-                                    cookie.set('pokers_thread_count', count);
+                                } else {
+                                    cookie.set('pokers_push', id);
+                                    cookie.set('pokers_thread_count', this.opened_mes_info.thread_info.message_count);
                                 }
-                            } else {
-                                cookie.set('pokers_push', id);
-                                cookie.set('pokers_thread_count', this.opened_mes_info.thread_info.message_count);
-                            }
 
-                            //判断顶置信息
-                            if (!!this.opened_thread_info[0].pin) {
-                                this.thread_info.pinned.id = this.opened_thread_info[0].pin;
-                                axios.get('../interact/select_messages.php?thread_id=' + this.opened_mes_info.thread_id + '&class_id=' + this.opened_mes_info.class_id + '&mes_id=' + this.thread_info.pinned.id + '&type=single')
-                                    .then(resp => {
-                                        this.thread_info.pinned.mes = resp.data[0].content;
-                                    })
-                            }
-                            this.spinning.loading = false;
-                        })
-                })
+                                //判断顶置信息
+                                if (!!this.opened_thread_info[index].pin) {
+                                    this.thread_info.pinned.id = this.opened_thread_info[index].pin;
+                                    axios.get('../interact/select_messages.php?thread_id=' + this.opened_mes_info.thread_id + '&class_id=' + this.opened_mes_info.class_id + '&mes_id=' + this.thread_info.pinned.id + '&type=single')
+                                        .then(resp => {
+                                            this.thread_info.pinned.mes = resp.data[index].content;
+                                        })
+                                } else {
+                                    this.close_pin('key'); //清除顶置
+                                }
+                                this.spinning.loading = false;
+                            })
+                    })
 
-            //数据更新
-            antd.update_mes();
-            var func_push = function () {
-                antd.check_push();
+                //数据更新
+                antd.update_mes();
+                var func_push = function () {
+                    antd.check_push();
+                }
+                window.get_push_interval = setInterval(func_push, 10000);
+            } else {
+                this.$message.error('Please wait while we connect to messages server');
             }
-            window.get_push_interval = setInterval(func_push, 10000);
-        }else{
-            this.$message.error('Please wait while we connect to messages server');
-        }
         },
 
 
@@ -769,6 +759,20 @@ var antd = new Vue({
             this.mes_input.container = 'mes-container';
             this.mes_input.input = 'mes-input';
             this.bottom_mes();
+            //输入框监听回车发送
+            if (parseInt(cookie.get('pokers_sending')) == 2) {
+                $("#message_input").unbind();
+                $("#message_input").bind("keydown", function (e) {
+                    // 兼容FF和IE和Opera    
+                    var theEvent = e || window.event;
+                    var code = theEvent.keyCode || theEvent.which || theEvent.charCode;
+                    if (code == 13) {
+                        antd.handle_input_send(antd.mes_input.type);
+                    }
+                });
+                this.enter.status = true;
+                this.enter.text = 2;
+            }
         },
         //discard 按钮
         handle_input_down() {
@@ -807,7 +811,7 @@ var antd = new Vue({
                 }
             } else if (type == 'file') {
                 if (!!this.mes_input.file.url && !!this.mes_input.file.name) {
-                    query_string = query_string + '&file_url=' + encodeURIComponent(this.mes_input.file.url) + '&file_name=' + encodeURIComponent(this.mes_input.file.name);
+                    query_string = query_string + '&size=' + encodeURIComponent(this.mes_input.file.size + 'MB') + '&file_url=' + encodeURIComponent(this.mes_input.file.url) + '&file_name=' + encodeURIComponent(this.mes_input.file.name);
                     this.mes_input.type = 'file';
                     query_string = query_string + "&type=" + this.mes_input.type;
                     status = 1;
@@ -892,6 +896,7 @@ var antd = new Vue({
             if ($("#upload_file")[0].files[0] !== undefined) {
                 if ($("#upload_file")[0].files[0].size <= 50000000) {
 
+                    this.mes_input.file.size = (($("#upload_file")[0].files[0].size / 1024) / 1024).toFixed(2);
                     this.mes_input.visible.text = false;
                     this.mes_input.file_progress = true;
                     this.mes_input.disable = true;
@@ -999,6 +1004,7 @@ var antd = new Vue({
             this.mes_input.progress_img = 0;
             this.mes_input.file.name = null;
             this.mes_input.file.url = null;
+            this.mes_input.file.size = null;
             this.mes_input.img.url = null;
             this.mes_input.send_text = 'Send';
             $("#upload_img").val('');
@@ -1323,15 +1329,15 @@ var antd = new Vue({
                     break;
             }
         },
-        enter_send() {
-            if (this.enter.status) {
+        enter_send(type) {
+            if (type == 'click') {
                 $("#message_input").unbind();
                 this.enter.status = false;
-                this.enter.text = 'Click';
+                this.enter.text = 1;
                 cookie.set('pokers_sending', 1);
             } else {
                 this.enter.status = true;
-                this.enter.text = 'Enter';
+                this.enter.text = 2;
                 cookie.set('pokers_sending', 2);
                 $("#message_input").unbind();
                 //输入框监听回车发送
@@ -1456,13 +1462,13 @@ var antd = new Vue({
         //关闭顶置显示
         close_pin(key) {
             this.thread_info.pinned.mes = null;
-            if(!!key){
+            if (!!key) {
                 this.thread_info.pinned.id = null;
             }
             this.thread_info.pinned.idnex = null;
         },
         //关闭全部部分的 status
-        close_all_status(){
+        close_all_status() {
             this.status.mark = false;
             this.status.chat = false;
             this.status.user = false;
@@ -1470,8 +1476,8 @@ var antd = new Vue({
             this.status.info = false;
         },
         //存在顶置消息时的消息界面 container 判断
-        pin_mes_container(){
-            switch(this.mes_input.container){
+        pin_mes_container() {
+            switch (this.mes_input.container) {
                 case 'mes-container-normal':
                     return 'height: calc(100vh - 190px) !important;'
                     break;
