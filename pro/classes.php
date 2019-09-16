@@ -201,7 +201,7 @@
                                 <template v-if="user.id == opened_class_info.superid">
                                     <a-menu-item>
                                         <a @click="multi.visible = true">
-                                            <a-icon type="usergroup-add"></a-icon> Create Members
+                                            <a-icon type="usergroup-add"></a-icon> {{ lang.tab[5] }}
                                         </a>
                                     </a-menu-item>
                                 </template>

@@ -112,6 +112,14 @@
                         <a-icon type="global"></a-icon>{{ current_lang }}
                     </a-button>
                 </a-dropdown>
+                <template v-if="edit.user.email.indexOf('@eugrade.com') > -1">
+                    <a-tooltip placement="bottom">
+                        <template slot="title">
+                            <span>{{ lang[16] }}</span>
+                        </template>
+                        <a style="text-decoration:none;margin-right: 10px;margin-left: -7px;"><a-badge count="1"></a-badge></a>
+                    </a-tooltip>
+                </template>
                 <a-dropdown :trigger="['click']">
                     <a style="color:#555">
                         <div style="display: flex">
@@ -261,7 +269,8 @@
                     12: 'Upload',
                     13: 'Real Name',
                     14: 'Email',
-                    15: 'Password(stays the same if kept empty)'
+                    15: 'Password(stays the same if kept empty)',
+                    16: 'For your account security, please change your default email address and password'
                 }
             } else {
                 this.current_lang = '简体中文';
@@ -281,19 +290,20 @@
                     12: '上传',
                     13: '真实姓名',
                     14: '电子邮件',
-                    15: '密码(留空则不作更改)'
+                    15: '密码(留空则不作更改)',
+                    16: '为了保证你的账户安全，请及时修改你的默认邮箱地址与密码，点击右侧头像以修改信息'
                 }
             }
             $('#app').css('opacity', 1);
             this.spinning = false;
         },
         methods: {
-            switch_lang(){
-                if(this.current_lang == 'English'){
-                    cookie.set('eugrade_lang','zh_cn');
+            switch_lang() {
+                if (this.current_lang == 'English') {
+                    cookie.set('eugrade_lang', 'zh_cn');
                     location.reload();
-                }else{
-                    cookie.set('eugrade_lang','english');
+                } else {
+                    cookie.set('eugrade_lang', 'english');
                     location.reload();
                 }
             },

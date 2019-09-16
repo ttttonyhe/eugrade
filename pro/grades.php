@@ -21,7 +21,9 @@
                 11: '名',
                 12: '编辑记录信息',
                 13: '编辑等级划分',
-                14: '增加记录'
+                14: '增加记录',
+                15: '你可以选择从其他主题里复制等级划分:',
+                16: '复制等级划分'
             },
             view: {
                 1: '表格',
@@ -72,7 +74,9 @@
                 11: ' Name',
                 12: 'Edit a Record',
                 13: 'Edit Grading Scale',
-                14: 'Add a Record'
+                14: 'Add a Record',
+                15: 'You may choose to copy a grading scale from another topic:',
+                16: 'Copy from Another Topic'
             },
             view: {
                 1: 'Table',
@@ -180,30 +184,30 @@
     <!-- 查看 series 折线图 -->
     <a-modal :title="lang.view[8]" @ok="open_stats('view_topics')" :visible="stats.visible.all" @cancel="handle_stats_cancel()">
         <p style="font-size: 16px;letter-spacing: .5px;margin-left: 1px;text-align: center;">Click on Topics to View Combined Data Chart</p>
-            <h3 v-for="(series_c,index) in opened_series_info.info">
-                <div class="select-stats" :id="'series_sub'+series_c.id">
+        <h3 v-for="(series_c,index) in opened_series_info.info">
+            <div class="select-stats" :id="'series_sub'+series_c.id">
+                <h3>
+                    <a-icon type="fork"></a-icon>&nbsp;&nbsp;{{ series_c.name }}
+                </h3>
+            </div>
+
+            <template v-if="series_c.topics_info.length">
+                <div v-for="(topic_c,t_index) in series_c.topics_info" :style="(stats.topics.indexOf(topic_c.id) > -1) ? 'border-left: 5px solid rgb(2, 169, 244) !important' : ''" class="class-item topic-item select-stats-topic" @click="add_topic(topic_c.id,topic_c.name,index,t_index)">
                     <h3>
-                        <a-icon type="fork"></a-icon>&nbsp;&nbsp;{{ series_c.name }}
+                        <a-icon type="branches"></a-icon>&nbsp;&nbsp;{{ topic_c.name }}
+                        <p>{{ get_date(topic_c.date) }} | {{ topic_c.candidate_count }} {{ lang.tab[6] }}</p>
                     </h3>
                 </div>
+            </template>
+            <template v-else>
+                <div class="class-item topic-item">
+                    <h3>
+                        <a-icon type="branches"></a-icon>&nbsp;&nbsp;{{ lang.tab[5] }}
+                    </h3>
+                </div>
+            </template>
 
-                <template v-if="series_c.topics_info.length">
-                    <div v-for="(topic_c,t_index) in series_c.topics_info" :style="(stats.topics.indexOf(topic_c.id) > -1) ? 'border-left: 5px solid rgb(2, 169, 244) !important' : ''" class="class-item topic-item select-stats-topic" @click="add_topic(topic_c.id,topic_c.name,index,t_index)">
-                        <h3>
-                            <a-icon type="branches"></a-icon>&nbsp;&nbsp;{{ topic_c.name }}
-                            <p>{{ get_date(topic_c.date) }} | {{ topic_c.candidate_count }} {{ lang.tab[6] }}</p>
-                        </h3>
-                    </div>
-                </template>
-                <template v-else>
-                    <div class="class-item topic-item">
-                        <h3>
-                            <a-icon type="branches"></a-icon>&nbsp;&nbsp;{{ lang.tab[5] }}
-                        </h3>
-                    </div>
-                </template>
-
-            </h3>
+        </h3>
         <p class="mes-end" style="margin-top: 0px;margin-bottom: 5px;">- EOF -</p>
     </a-modal>
     <!-- 查看 series 折线图结束 -->
@@ -230,7 +234,7 @@
                     </div>
 
                     <template v-if="opened_series_info.info.length">
-                    <div class="items-count">
+                        <div class="items-count">
                             <p>- {{ (opened_series_info.info).length }} items in total -</p>
                         </div>
                         <template v-for="(series_c,index) in opened_series_info.info">
@@ -322,45 +326,47 @@
     <!-- 编辑记录结束 -->
 
     <!-- 复制范围 -->
-    <a-modal title="Copy from Another Topic" :visible="range.copy.visible" @ok="handle_range_copy_submit()" :confirm-loading="range.copy.confirm" @cancel="handle_range_copy_cancel()">
+    <a-modal :title="lang.tab[16]" :visible="range.copy.visible" @ok="handle_range_copy_submit()" :confirm-loading="range.copy.confirm" @cancel="handle_range_copy_cancel()">
         <p style="font-size: 16px;letter-spacing: .5px;margin-left: 1px;text-align: center;">Click on a Topic to Copy From</p>
-            <h3 v-for="(series_c,index) in opened_series_info.info">
-                <div class="select-stats" :id="'series_sub'+series_c.id">
+        <h3 v-for="(series_c,index) in opened_series_info.info">
+            <div class="select-stats" :id="'series_sub'+series_c.id">
+                <h3>
+                    <a-icon type="fork"></a-icon>&nbsp;&nbsp;{{ series_c.name }}
+                </h3>
+            </div>
+
+            <template v-if="series_c.topics_info.length">
+                <div v-for="topic_c in series_c.topics_info" v-if="!!topic_c.scale" :style="(range.copy.from == topic_c.id) ? 'border-left: 5px solid rgb(2, 169, 244) !important' : ''" class="class-item topic-item select-stats-topic" @click="add_copy_topic(topic_c.id)">
                     <h3>
-                        <a-icon type="fork"></a-icon>&nbsp;&nbsp;{{ series_c.name }}
+                        <a-icon type="branches"></a-icon>&nbsp;&nbsp;{{ topic_c.name }}
+                        <p>{{ get_date(topic_c.date) }} | {{ topic_c.candidate_count }} {{ lang.tab[6] }}</p>
                     </h3>
                 </div>
+                <div class="class-item topic-item" v-else>
+                    <h3>
+                        <a-icon type="branches"></a-icon>&nbsp;&nbsp;{{ topic_c.name }}
+                        <p>No grading scale yet</p>
+                    </h3>
+                </div>
+            </template>
+            <template v-else>
+                <div class="class-item topic-item">
+                    <h3>
+                        <a-icon type="branches"></a-icon>&nbsp;&nbsp;{{ lang.tab[5] }}
+                    </h3>
+                </div>
+            </template>
 
-                <template v-if="series_c.topics_info.length">
-                    <div v-for="topic_c in series_c.topics_info" v-if="!!topic_c.scale" :style="(range.copy.from == topic_c.id) ? 'border-left: 5px solid rgb(2, 169, 244) !important' : ''" class="class-item topic-item select-stats-topic" @click="add_copy_topic(topic_c.id)">
-                        <h3>
-                            <a-icon type="branches"></a-icon>&nbsp;&nbsp;{{ topic_c.name }}
-                            <p>{{ get_date(topic_c.date) }} | {{ topic_c.candidate_count }} {{ lang.tab[6] }}</p>
-                        </h3>
-                    </div>
-                    <div class="class-item topic-item" v-else>
-                        <h3>
-                            <a-icon type="branches"></a-icon>&nbsp;&nbsp;{{ topic_c.name }}
-                            <p>No grading scale yet</p>
-                        </h3>
-                    </div>
-                </template>
-                <template v-else>
-                    <div class="class-item topic-item">
-                        <h3>
-                            <a-icon type="branches"></a-icon>&nbsp;&nbsp;{{ lang.tab[5] }}
-                        </h3>
-                    </div>
-                </template>
-
-            </h3>
+        </h3>
         <p class="mes-end" style="margin-top: 0px;margin-bottom: 5px;">- EOF -</p>
     </a-modal>
     <!-- 复制范围结束 -->
     <!-- 设置范围 -->
     <a-modal :title="lang.tab[13]" :visible="range.visible" @ok="handle_range_submit()" :confirm-loading="range.confirm" @cancel="handle_range_cancel()">
-        <p>You may choose to copy a grading scale from another topic:</p>
-        <p><a-button type="primary" @click="range.copy.visible = true;range.visible = false;">Copy from Another</a-button></p>
+        <p>{{ lang.tab[15] }}</p>
+        <p>
+            <a-button type="primary" @click="range.copy.visible = true;range.visible = false;">{{ lang.tab[16] }}</a-button>
+        </p>
         <a-form-item label="A*(max|min)">
             <a-input-group compact>
                 <a-input-number style="width: 30%" :min="range.scale[0].min" :max="100" :step="1" :formatter="value => `${value}%`" :parser="value => value.replace('%', '')" v-model="range.scale[0].max"></a-input-number>
@@ -473,12 +479,24 @@
                             </div>
                             <template v-for="(data,index) in opened_topic_info.records_data">
                                 <div class="table-item">
-                                    <div>{{ index + 1 }}</div>
-                                    <div>{{ get_date(data.date) }}</div>
-                                    <div>{{ data.name }}</div>
-                                    <div>{{ data.score }}</div>
-                                    <div>{{ data.total }}</div>
-                                    <div v-if="!!opened_topic_info.grading">{{ data.level ? data.level.toUpperCase() : get_record_level(data.percent,index) }}</div>
+                                    <a-tooltip placement="bottom" :title="index + 1">
+                                        <div>{{ index + 1 }}</div>
+                                    </a-tooltip>
+                                    <a-tooltip placement="bottom" :title="get_date(data.date)">
+                                        <div>{{ get_date(data.date) }}</div>
+                                    </a-tooltip>
+                                    <a-tooltip placement="bottom" :title="data.name">
+                                        <div>{{ data.name }}</div>
+                                    </a-tooltip>
+                                    <a-tooltip placement="bottom" :title="data.score">
+                                        <div>{{ data.score }}</div>
+                                    </a-tooltip>
+                                    <a-tooltip placement="bottom" :title="data.total">
+                                        <div>{{ data.total }}</div>
+                                    </a-tooltip>
+                                    <a-tooltip placement="bottom" :title="data.level ? data.level.toUpperCase() : get_record_level(data.percent,index)">
+                                        <div v-if="!!opened_topic_info.grading">{{ data.level ? data.level.toUpperCase() : get_record_level(data.percent,index) }}</div>
+                                    </a-tooltip>
                                     <div style="font-size:16px" v-else>
                                         <a-tooltip placement="topLeft">
                                             <template slot="title">
@@ -579,7 +597,7 @@
                             <a-select-option v-for="person in opened_class_info.members" :value="person.id">{{ person.name }}</a-select-option>
                         </a-select>
                     </template>
-                    <a-button @click="display_chart()" type="primary">{{ lang.view[9] }}</a-button>
+                    <a-button @click="location.reload()" type="primary">{{ lang.view[9] }}</a-button>
                     <template v-if="parseInt(user.id) == parseInt(opened_class_info.superid)">
                         <br /><br />
                     </template>

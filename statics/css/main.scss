@@ -988,6 +988,7 @@ body {
         overflow: hidden;
         text-align: center;
         border-left: 1px solid #eee;
+        white-space: nowrap;
 
         &:last-child {
             border-right: 1px solid #eee;
