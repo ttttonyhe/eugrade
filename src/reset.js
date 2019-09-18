@@ -38,6 +38,9 @@ var antd = new Vue({
             }
         }
     },
+    mounted(){
+        document.getElementById('form_view').style.opacity = 1;
+    },
     methods: {
         send_email() {
             this.send.loading = true;

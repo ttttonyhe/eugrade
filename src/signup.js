@@ -34,6 +34,7 @@ var antd = new Vue({
         }
     },
     mounted() {
+        document.getElementById('form_view').style.opacity = 1;
         this.form = this.$form.createForm(this);
     },
     methods: {
