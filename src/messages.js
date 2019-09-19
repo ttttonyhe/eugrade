@@ -168,6 +168,10 @@ var antd = new Vue({
                 visible: false,
                 visible_class: false
             },
+            delete_mes: {
+                id: null,
+                index: null
+            },
             wss_connected: false
         }
     },
@@ -1216,21 +1220,31 @@ var antd = new Vue({
             }
         },
         remove_mes(mes_id, index) {
+            this.delete_mes.id = mes_id;
+            this.delete_mes.index = index;
+            this.$confirm({
+                title: 'Do you want to delete this message?',
+                content: 'the process can not be redone',
+                onOk() {
 
-            var query_string = "user=" + this.user.id + "&mes_id=" + mes_id + "&class_id=" + this.opened_mes_info.class_id + "&thread_id=" + this.opened_mes_info.thread_id;
+                    var query_string = "user=" + antd.user.id + "&mes_id=" + antd.delete_mes.id + "&class_id=" + antd.opened_mes_info.class_id + "&thread_id=" + antd.opened_mes_info.thread_id;
 
-            axios.post(
-                    '../interact/delete_message.php',
-                    query_string
-                )
-                .then(res => {
-                    if (res.data.status) {
-                        window.ws.send('{"action":"send", "thread_id":' + antd.opened_mes_info.thread_id + ', "class_id":' + antd.opened_mes_info.class_id + ', "speaker":' + antd.user.id + ',"speaker_name":"' + antd.user.info.name + '","mes_id":' + mes_id + ',"type":"delete","count_id":' + (index + 1) + '}');
-                        this.opened_thread_info[this.opened_mes_info.index].message_count--;
-                    } else {
-                        this.$message.error(res.data.mes);
-                    }
-                })
+                    axios.post(
+                            '../interact/delete_message.php',
+                            query_string
+                        )
+                        .then(res => {
+                            if (res.data.status) {
+                                window.ws.send('{"action":"send", "thread_id":' + antd.opened_mes_info.thread_id + ', "class_id":' + antd.opened_mes_info.class_id + ', "speaker":' + antd.user.id + ',"speaker_name":"' + antd.user.info.name + '","mes_id":' + antd.delete_mes.id + ',"type":"delete","count_id":' + (antd.delete_mes.index + 1) + '}');
+                                antd.opened_thread_info[antd.opened_mes_info.index].message_count--;
+                            } else {
+                                antd.$message.error(res.data.mes);
+                                antd.delete_mes.id = null;
+                                antd.delete_mes.index = null;
+                            }
+                        })
+                }
+            })
 
         },
         handle_edit_mes_submit() {
