@@ -20,18 +20,23 @@
 
 ## Main Features 功能特色
 + **Based on PHP & Vue.js & And Design for Vue**
-  - 基于 PHP 、Vue.js 与 Antd
+  - PHP 7.2
+  - Vue.js + jQuery
+  - Ant Design for Vue
 + **Developed using Webpack & Sass**
-  - 采用了 Webpack 与 Sass
+  - Webpack 打包
+  - Scss 样式
 + **WebSocket Supported (Based on Workerman)**
-  - 采用 WebSocket 并支持心跳的聊天系统
+  - WebSocket 聊天系统(支持心跳)
+  - PHP Workerman
 + **Organized Classes / Files / Grades System**
   - 高效的团队(班级)/绩点/文件系统
     - 班级(成员)管理
     - 成绩录入
     - 成绩展示
-    - 成绩图标
-    - 成绩趋势
+    - 成绩等级划分/自动匹配
+    - 成绩统计图
+    - 成绩变化趋势
     - 文件名编辑
     - 文件按话题归档
     - Office 文件预览
@@ -40,11 +45,12 @@
 + **Powerful Instant messaging system**
   - 简洁强大的群聊系统
     - 图片上传
-    - 文件上传
-    - MarkDown 渲染
+    - 文件上传/大小展示
+    - MarkDown 内容渲染
     - emoji 评论
     - 删除/编辑消息
-    - 消息置顶
+    - 主题消息置顶
+    - 发送模式切换
     - ...
 + **Neat UI design (English/Chinese Language Supported)**
   - 美丽的 UI 设计
@@ -52,11 +58,11 @@
     - 简体中文
     - 语言一键切换
 + **0 sql everywhere (Based on Lazer-Database)**
-  - 完全无数据库 (整个系统基于 json)
+  - 完全无数据库 (基于 json)
+  - PHP Lazer-database
 + **All-round UX Design (Inspired from Twist)**
   - 全方位多元的用户交互操作
-+ **Easy to do secondary development**
-  - 易于二次开发
+  - 阿里云邮件推送
 
 <br/>
 
@@ -100,7 +106,6 @@
 
 ## Todo List 正在开发
 + [x] 群聊支持 WebSocket
-+ [ ] 用户系统支持 JWT
 + [ ] API 请求 JWT 鉴权
 + [x] Sass 重写 CSS
 + [x] Grades 成绩管理系统
@@ -116,8 +121,6 @@ If you feel that my project is helpful to you and you are willing to give me a l
 
 ![Donate](https://i.loli.net/2019/02/18/5c6a80afd1e26.png)
 
-Your name will be kept on the list [Donation](https://www.snapaper.com/donate)
+Your name will be kept on the list [Donation](https://www.ouorz.com/donation.html)
 
 <br/>
-
-This is a personal project, you will get no help from me :)
