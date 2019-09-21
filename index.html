@@ -7,7 +7,7 @@
     <link rel="Shortcut Icon" href="https://static.ouorz.com/eugrade.ico" type="image/x-icon">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Eugrade | Communication and collaboration platform for Education</title>
-    <script type="text/javascript" src="statics/js/vue.js"></script>
+    <meta name="keywords" content="eugrade,lms,engrade,engrade pro,learning management system">
     <link type="text/css" rel="stylesheet" href="dist/css/main.css">
     <style>
         body {
@@ -64,14 +64,31 @@
 
 
     <script type="text/javascript">
-        var antd = new Vue({
-            el: '#app',
-            mounted() {
-                if (!!cookie.get('logged_in_id')) {
-                    window.location.href = 'https://www.eugrade.com/pro';
-                }
+        var cookie = {
+            "set": function setCookie(name, value) {
+                var Days = 30;
+                var exp = new Date();
+                exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
+                document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString();
+            },
+            "get": function getCookie(name) {
+                var arr, reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
+                if (arr = document.cookie.match(reg))
+                    return unescape(arr[2]);
+                else
+                    return null;
+            },
+            "del": function delCookie(name) {
+                var exp = new Date();
+                exp.setTime(exp.getTime() - 1);
+                var cval = cookie.get(name);
+                if (cval != null)
+                    document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString();
             }
-        });
+        }
+        if (!!cookie.get('logged_in_id')) {
+            window.location.href = 'https://www.eugrade.com/pro';
+        }
     </script>
 
 

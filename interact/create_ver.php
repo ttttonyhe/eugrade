@@ -61,7 +61,7 @@ if (!empty($_POST['ran']) && !empty($_POST['name'])) {
     $name = input($_POST['name']);
 
     //生成保存参数
-    $token = md5(md5($ran) . md5($name));
+    $token = md5(md5($ran) . md5($name) . md5(rand(0,555)));
     $expire_date = strtotime('+1day', time());
     $rand = rand(0, 32768);
 
