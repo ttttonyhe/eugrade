@@ -309,17 +309,21 @@ body {
     width: 80px !important;
     height: 80px !important;
     margin-top: 0px !important;
+    box-shadow: 0 6px 12px 0 rgba(0,0,0,.1);
+    border: none;
 }
 
 .class-member-info h2 {
     font-size: 28px;
     max-width: 250px;
+    margin-top: 5px;
 }
 
 .class-member-info p {
     font-size: 15px;
     letter-spacing: .5px;
     margin-left: 2px;
+    margin-top: -3px;
 }
 
 .class-member-img p {
@@ -1475,4 +1479,25 @@ $demo-width: 330px;
     p {
         margin: 0px;
     }
+}
+
+.class-item-join-btn{
+    color: #0183ff !important;
+    font-weight: 400 !important;
+    font-size: 13px !important;
+}
+
+.class-item-create-btn{
+    color: rgb(0, 150, 136) !important;
+    font-weight: 400 !important;
+    font-size: 13px !important;
+}
+
+.profile-blur-bg{
+    width: 100% !important;
+    filter: blur(60px);
+    -webkit-filter: blur(60px);
+    border-radius: 50% !important;
+    margin-top: -40px !important;
+    opacity: 0.3;
 }

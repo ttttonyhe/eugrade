@@ -107,14 +107,14 @@
                 </div>
             </template>
             <div class="class-item" @click="join_class()">
-                <p>
-                    <a-icon type="plus-square"></a-icon>&nbsp;&nbsp;{{ lang.tab[2] }}
+                <p class="class-item-join-btn">
+                    <a-icon type="plus-circle"></a-icon>&nbsp;&nbsp;{{ lang.tab[2] }}
                 </p>
             </div>
             <?php if ($type == 2) { ?>
                 <div class="class-item" @click="add_class()">
-                    <p>
-                        <a-icon type="plus-square"></a-icon>&nbsp;&nbsp;{{ lang.tab[3] }}
+                    <p class="class-item-create-btn">
+                        <a-icon type="play-circle"></a-icon>&nbsp;&nbsp;{{ lang.tab[3] }}
                     </p>
                 </div>
             <?php } ?>
@@ -273,7 +273,8 @@
     <div class="right">
         <a-spin :spinning="spinning.right">
             <template v-if="opened_member_info.status">
-                <div class="class-info-header class-member-header">
+            <img v-if="!!opened_member_info.info.avatar" :src="opened_member_info.info.avatar" class="class-item-img class-member-img profile-blur-bg">
+                <div class="class-info-header class-member-header" style="margin-top: -30px;">
                     <div style="margin-right: 20px;">
                         <template v-if="!!opened_member_info.info.avatar">
                             <img :src="opened_member_info.info.avatar" class="class-item-img class-member-img" />
@@ -291,22 +292,22 @@
                     <div class="class-member-subscribe">
                         <!-- 只允许 opened_member 对应的 super 删除账户,super 不可删除自己 -->
                         <template v-if="(parseInt(opened_member_info.superid) == parseInt(user.id)) && (parseInt(user.id) !== parseInt(opened_member_info.info.id))">
-                            <a-button type="danger" @click="tea_remove(opened_member_info.classid,opened_member_info.info.id)">
+                            <a-button style="border: none;box-shadow: 0 1px 4px 0 rgba(0,0,0,.1);" type="danger" @click="tea_remove(opened_member_info.classid,opened_member_info.info.id)">
                                 <a-icon type="delete"></a-icon>
                             </a-button>
                         </template>
                         <template v-if="(parseInt(opened_member_info.superid) !== parseInt(user.id)) && (parseInt(user.id) == parseInt(opened_member_info.info.id))">
-                            <a-button type="default" @click="edit.user.visible = true">
+                            <a-button style="border: none;box-shadow: 0 1px 4px 0 rgba(0,0,0,.1);" type="default" @click="edit.user.visible = true">
                                 <a-icon type="edit"></a-icon>
                             </a-button>
                         </template>
                         <template v-if="member_marked">
-                            <a-button type="default" @click="demark_process(opened_member_info.info.id,'user')">
+                            <a-button style="border: none;box-shadow: 0 1px 4px 0 rgba(0,0,0,.1);" type="default" @click="demark_process(opened_member_info.info.id,'user')">
                                 <a-icon type="star" style="color:#FFC125"></a-icon>
                             </a-button>
                         </template>
                         <template v-else>
-                            <a-button type="default" @click="mark_process(opened_member_info.info.id,'user')">
+                            <a-button style="border: none;box-shadow: 0 1px 4px 0 rgba(0,0,0,.1);" type="default" @click="mark_process(opened_member_info.info.id,'user')">
                                 <a-icon type="star"></a-icon>
                             </a-button>
                         </template>
