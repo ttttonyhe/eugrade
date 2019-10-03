@@ -1,3 +1,7 @@
+//引入 css 文件
+import '../dist/css/main.css';
+import 'ant-design-vue/dist/antd.css';
+
 var antd = new Vue({
     el: '#app',
     data() {

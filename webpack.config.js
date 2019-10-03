@@ -1,5 +1,6 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const ExtractTextPlugin = require('extract-text-webpack-plugin')
 
 module.exports = {
     entry: {
@@ -16,8 +17,22 @@ module.exports = {
         filename : '[name].js',
         path : path.resolve('dist/js/')
     },
+
+    module: {
+      rules: [
+        {
+          test: /\.css$/,
+          // 因为这个插件需要干涉模块转换的内容，所以需要使用它对应的 loader
+          use: ExtractTextPlugin.extract({ 
+            fallback: 'style-loader',
+            use: 'css-loader',
+          }), 
+        }
+      ],
+    },
     
     plugins: [
+        new ExtractTextPlugin('main.css'),
         new HtmlWebpackPlugin({
             chunks:['login'],
             minify:{

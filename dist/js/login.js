@@ -86,14 +86,37 @@
 /************************************************************************/
 /******/ ({
 
+/***/ "./dist/css/main.css":
+/*!***************************!*\
+  !*** ./dist/css/main.css ***!
+  \***************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+eval("// removed by extract-text-webpack-plugin\n\n//# sourceURL=webpack:///./dist/css/main.css?");
+
+/***/ }),
+
+/***/ "./node_modules/_ant-design-vue@1.3.17@ant-design-vue/dist/antd.css":
+/*!**************************************************************************!*\
+  !*** ./node_modules/_ant-design-vue@1.3.17@ant-design-vue/dist/antd.css ***!
+  \**************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+eval("// removed by extract-text-webpack-plugin\n\n//# sourceURL=webpack:///./node_modules/_ant-design-vue@1.3.17@ant-design-vue/dist/antd.css?");
+
+/***/ }),
+
 /***/ "./src/login.js":
 /*!**********************!*\
   !*** ./src/login.js ***!
   \**********************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-eval("var cookie = {\n    \"set\": function setCookie(name, value) {\n        var Days = 30;\n        var exp = new Date();\n        exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);\n        document.cookie = name + \"=\" + escape(value) + \";expires=\" + exp.toGMTString();\n    },\n    \"get\": function getCookie(name) {\n        var arr, reg = new RegExp(\"(^| )\" + name + \"=([^;]*)(;|$)\");\n        if (arr = document.cookie.match(reg))\n            return unescape(arr[2]);\n        else\n            return null;\n    },\n    \"del\": function delCookie(name) {\n        var exp = new Date();\n        exp.setTime(exp.getTime() - 1);\n        var cval = cookie.get(name);\n        if (cval != null)\n            document.cookie = name + \"=\" + cval + \";expires=\" + exp.toGMTString();\n    }\n}\n\nvar antd = new Vue({\n    el: '#app',\n    data() {\n        return {\n            login_status: 0,\n            form: null,\n            email_valid: null,\n            valid_text: null\n        }\n    },\n    mounted() {\n        document.getElementById('form_view').style.opacity = 1;\n        this.form = this.$form.createForm(this);\n    },\n    methods: {\n        handleSubmit(e) {\n            e.preventDefault();\n            this.form.validateFields((err, values) => {\n                console.log(values);\n                if (!err) { //无填写错误\n                    this.email_valid = 'validating';\n                    var formData = new FormData();\n                    formData.append('email', values['email']);\n                    formData.append('password', values['password']);\n\n                    $.ajax({\n                        url: 'interact/login.php',\n                        type: \"POST\",\n                        data: formData,\n                        cache: false,\n                        dataType: 'json',\n                        processData: false,\n                        contentType: false,\n                        success: function (data) {\n                            if (data.status) {\n                                antd.email_valid = 'success';\n                                antd.valid_text = null;\n                                cookie.set('logged_in_id',parseInt(data.user_id));\n                                window.location.href = 'pro';\n                            } else {\n                                antd.email_valid = 'error';\n                                antd.valid_text = data.mes;\n                            }\n                        }\n                    });\n                } else {\n                    this.email_valid = 'warning';\n                    this.valid_text = 'Incorrect email or password';\n                }\n            });\n        },\n    },\n});\n\n//# sourceURL=webpack:///./src/login.js?");
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _dist_css_main_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../dist/css/main.css */ \"./dist/css/main.css\");\n/* harmony import */ var _dist_css_main_css__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_dist_css_main_css__WEBPACK_IMPORTED_MODULE_0__);\n/* harmony import */ var ant_design_vue_dist_antd_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ant-design-vue/dist/antd.css */ \"./node_modules/_ant-design-vue@1.3.17@ant-design-vue/dist/antd.css\");\n/* harmony import */ var ant_design_vue_dist_antd_css__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(ant_design_vue_dist_antd_css__WEBPACK_IMPORTED_MODULE_1__);\n//引入 css 文件\n\n\n\nvar cookie = {\n    \"set\": function setCookie(name, value) {\n        var Days = 30;\n        var exp = new Date();\n        exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);\n        document.cookie = name + \"=\" + escape(value) + \";expires=\" + exp.toGMTString();\n    },\n    \"get\": function getCookie(name) {\n        var arr, reg = new RegExp(\"(^| )\" + name + \"=([^;]*)(;|$)\");\n        if (arr = document.cookie.match(reg))\n            return unescape(arr[2]);\n        else\n            return null;\n    },\n    \"del\": function delCookie(name) {\n        var exp = new Date();\n        exp.setTime(exp.getTime() - 1);\n        var cval = cookie.get(name);\n        if (cval != null)\n            document.cookie = name + \"=\" + cval + \";expires=\" + exp.toGMTString();\n    }\n}\n\nvar antd = new Vue({\n    el: '#app',\n    data() {\n        return {\n            login_status: 0,\n            form: null,\n            email_valid: null,\n            valid_text: null\n        }\n    },\n    mounted() {\n        document.getElementById('form_view').style.opacity = 1;\n        this.form = this.$form.createForm(this);\n    },\n    methods: {\n        handleSubmit(e) {\n            e.preventDefault();\n            this.form.validateFields((err, values) => {\n                console.log(values);\n                if (!err) { //无填写错误\n                    this.email_valid = 'validating';\n                    var formData = new FormData();\n                    formData.append('email', values['email']);\n                    formData.append('password', values['password']);\n\n                    $.ajax({\n                        url: 'interact/login.php',\n                        type: \"POST\",\n                        data: formData,\n                        cache: false,\n                        dataType: 'json',\n                        processData: false,\n                        contentType: false,\n                        success: function (data) {\n                            if (data.status) {\n                                antd.email_valid = 'success';\n                                antd.valid_text = null;\n                                cookie.set('logged_in_id',parseInt(data.user_id));\n                                window.location.href = 'pro';\n                            } else {\n                                antd.email_valid = 'error';\n                                antd.valid_text = data.mes;\n                            }\n                        }\n                    });\n                } else {\n                    this.email_valid = 'warning';\n                    this.valid_text = 'Incorrect email or password';\n                }\n            });\n        },\n    },\n});\n\n//# sourceURL=webpack:///./src/login.js?");
 
 /***/ })
 

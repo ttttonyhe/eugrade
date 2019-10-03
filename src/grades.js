@@ -1,3 +1,7 @@
+//引入 css 文件
+import '../dist/css/main.css';
+import 'ant-design-vue/dist/antd.css';
+
 function new_obj(a, p, n) //声明对象
 {
     this.average = a;
