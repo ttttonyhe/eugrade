@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="Shortcut Icon" href="https://static.ouorz.com/eugrade.ico" type="image/x-icon">
+  <title>Eugrade | Signup</title>
+  <script type="text/javascript" src="statics/js/vue.js"></script>
+  <script type="text/javascript" src="statics/js/axios.min.js"></script>
+  <link type="text/css" rel="stylesheet" href="statics/css/antd.css">
+  <script type="text/javascript" src="statics/js/antd.js"></script>
+  <script type="text/javascript" src="statics/js/jquery.min.js"></script>
+  <script type="text/javascript" src="statics/js/moment.min.js"></script>
+  <link type="text/css" rel="stylesheet" href="dist/css/main.css">
+</head>
+
+<body>
+  <div id="app">
+    <div>
+      <a-menu mode="horizontal" style="padding: 0 13px">
+        <a-menu-item class="header-placeholder"></a-menu-item>
+        <a-menu-item class="header-placeholder" style="margin-left: 20px"></a-menu-item>
+        <a-menu-item class="header-placeholder" style="margin-left: 20px"></a-menu-item>
+        <a-menu-item style="float:right" class="header-placeholder-2"></a-menu-item>
+      </a-menu>
+      </a-menu-item>
+    </div>
+
+    <div class="main-container" style="height: calc(100vh - 50px)">
+
+      <div class="left" style="height: calc(100vh - 50px);overflow: hidden;">
+        <div style="margin-top:10px;padding:10px 20px">
+          <a-skeleton :paragraph="{rows: 2}" v-for="i in 8"></a-skeleton>
+        </div>
+      </div>
+
+      <div class="center class-center" style="height: calc(100vh - 50px);overflow: hidden;">
+        <div style="margin-top:-10px">
+          <a-skeleton :paragraph="{rows: 2}" v-for="i in 8"></a-skeleton>
+        </div>
+      </div>
+
+      <div class="right" style="height: calc(100vh - 50px);overflow: hidden;">
+        <div style="padding:20px 30px">
+          <a-skeleton avatar :paragraph="{rows: 1}" v-for="i in 11"></a-skeleton>
+        </div>
+        <!-- 占位 -->
+      </div>
+
+
+
+    </div>
+
+    <div class="login-hover"></div>
+
+    <div class="login-card" id="form_view" style="opacity: 0">
+      <div style="text-align: center">
+        <h1>Join Eugrade</h1>
+        <p>Let’s set up your account</p>
+      </div>
+      <a-form id="components-form-demo-normal-login" :form="form" class="login-form" @submit="handleSubmit"
+        style="padding: 0px 20px">
+        <a-form-item style="margin-bottom: 15px;">
+          <a-input size="large" v-decorator="[
+        'name',
+        {
+          rules: [{
+            required: true, message: 'Please input your Nickname!',
+          }]
+        }
+      ]" placeholder="Real Name">
+            <a-icon slot="prefix" type="user" style="color: rgba(0,0,0,.25)" />
+          </a-input>
+        </a-form-item>
+
+        <a-form-item style="margin-bottom: 15px;">
+          <a-input size="large" v-decorator="[
+        'email',
+        {
+          rules: [{
+            type: 'email', message: 'The input is not valid E-mail!',
+          }, {
+            required: true, message: 'Please input your E-mail!',
+          }]
+        }
+      ]" placeholder="Email">
+            <a-icon slot="prefix" type="mail" style="color: rgba(0,0,0,.25)" />
+          </a-input>
+        </a-form-item>
+
+        <a-form-item>
+          <a-input size="large" v-decorator="[
+          'password',
+          { rules: [{ required: true, message: 'Please input your Password!' }] }
+        ]" type="password" placeholder="Password">
+            <a-icon slot="prefix" type="lock" style="color: rgba(0,0,0,.25)" />
+          </a-input>
+        </a-form-item>
+
+        <a-form-item label="Account type">
+          <a-radio-group size="large" v-decorator="[
+    'type',
+    { rules: [{ required: true, message: 'Please choose your account type' }] }
+  ]"
+    @change="handle_type_change"
+  >
+            <a-radio-button value="a">
+              Student
+            </a-radio-button>
+            <a-radio-button value="b">
+              Teacher
+            </a-radio-button>
+          </a-radio-group>
+        </a-form-item>
+
+        <a-form-item v-if="type == 2">
+          <a-input size="large" v-decorator="[
+          'invite',
+          { rules: [{ required: true, message: 'Please input your invite code!' }] }
+        ]" type="password" placeholder="Invite Code">
+            <a-icon slot="prefix" type="audit" style="color: rgba(0,0,0,.25)" />
+          </a-input>
+        </a-form-item>
+
+        <a-form-item>
+          <a-checkbox @change="handle_check_change">
+              I agree to the <a target="_blank" href="https://www.ouorz.com/pokers-terms-of-service.html" target="_blank">Terms of Service</a> and the <a target="_blank" href="https://www.ouorz.com/pokers-privacy-policy.html" target="_blank">Privacy Policy</a>.
+          </a-checkbox>
+        </a-form-item>
+
+        <a-form-item>
+          <a-button style="width:100%" :disabled="disable" type="primary" size="large" html-type="submit" class="login-form-button">
+            Sign Up
+          </a-button>
+          <br/>
+          <p style="text-align: center;margin: 0px;margin-bottom: -20px;margin-top: 10px;">Already have an account? <a href="login.html">Log in!</a></p>
+        </a-form-item>
+      </a-form>
+    </div>
+
+  </div>
+</body>
+
+</html>

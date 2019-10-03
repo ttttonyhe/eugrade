@@ -226,7 +226,7 @@
                 option_lang: '',
                 current: {
                     nav: ['messages'],
-                    page: 'messages.php',
+                    page: 'messages.html',
                     title: 'Eugrade | Messages'
                 },
                 spinning: true,
@@ -310,7 +310,7 @@
             switch_section(key) {
                 this.current.nav = key;
                 this.current.title = 'Eugrade | ' + this.capital(key);
-                this.current.page = key + '.php';
+                this.current.page = key + '.html';
                 this.spinning = true;
                 setTimeout('antd.spinning = false;', 1000);
             },

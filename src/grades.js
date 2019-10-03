@@ -15,6 +15,7 @@ var antd = new Vue({
             sort: true,
             stu_view_count: 0,
             user: {
+                info: [],
                 id: cookie.get('logged_in_id'),
                 joined_classes: [],
                 classes_info: []
@@ -202,11 +203,12 @@ var antd = new Vue({
     },
     mounted() {
         this.lang = lang_json;
-        axios.get('../interact/select_users.php?type=class&id=' + cookie.get('logged_in_id') + '&form=single')
+        axios.get('../interact/select_users.php?type=class&id=' + cookie.get('logged_in_id') + '&form=all')
             .then(re => {
-                if (!!re.data.class) {
-                    this.user.joined_classes = re.data.class.split(',');
-                    axios.get('../interact/select_classes.php?type=class&id=' + re.data.class + '&form=all')
+                this.user.info = re.data[0];
+                if (!!re.data[0].class) {
+                    this.user.joined_classes = re.data[0].class.split(',');
+                    axios.get('../interact/select_classes.php?type=class&id=' + re.data[0].class + '&form=all')
                         .then(res => {
                             this.user.classes_info = res.data;
                             this.spinning.left = false;

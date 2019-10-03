@@ -1,4 +1,6 @@
-import { throws } from "assert";
+import {
+    throws
+} from "assert";
 
 var antd = new Vue({
     el: '#app',
@@ -6,9 +8,11 @@ var antd = new Vue({
         return {
             lang: [],
             user: {
+                info: [],
                 id: cookie.get('logged_in_id'),
                 joined_classes: [],
-                classes_info: []
+                classes_info: [],
+                token: null
             },
             spinning: {
                 left: true,
@@ -92,11 +96,12 @@ var antd = new Vue({
     },
     mounted() {
         this.lang = lang_json;
-        axios.get('../interact/select_users.php?type=class&id=' + cookie.get('logged_in_id') + '&form=single')
+        axios.get('../interact/select_users.php?type=class&id=' + cookie.get('logged_in_id') + '&form=all')
             .then(re => {
-                if (!!re.data.class) {
-                    this.user.joined_classes = re.data.class.split(',');
-                    axios.get('../interact/select_classes.php?type=class&id=' + re.data.class + '&form=all')
+                this.user.info = re.data[0];
+                if (!!re.data[0].class) {
+                    this.user.joined_classes = re.data[0].class.split(',');
+                    axios.get('../interact/select_classes.php?type=class&id=' + re.data[0].class + '&form=all')
                         .then(res => {
                             this.user.classes_info = res.data;
                             this.spinning.left = false;
@@ -106,6 +111,12 @@ var antd = new Vue({
                     this.spinning.left = false;
                 }
                 $('#main-container').attr('style', ''); //避免爆代码
+            })
+            .then(() => {
+                axios.get('../interact/get_token.php?user=' + parseInt(this.user.id) + '&email=' + this.user.info.email)
+                    .then(res => {
+                        this.user.token = res.data.key;
+                    })
             });
     },
     methods: {
@@ -831,17 +842,17 @@ var antd = new Vue({
             this.multi.visible = false;
         },
         add_multi_member() {
-            if((this.multi.count + 1) < 50){
+            if ((this.multi.count + 1) < 50) {
                 this.multi.count += 1;
-            }else{
+            } else {
                 this.multi.count = 50;
                 antd.$message.error('You are only allow to create maximum 50 accounts at a time');
             }
         },
         remove_multi_member() {
-            if((this.multi.count - 1) > 0){
+            if ((this.multi.count - 1) > 0) {
                 this.multi.count -= 1;
-            }else{
+            } else {
                 this.multi.count = 0;
             }
         }

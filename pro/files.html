@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Eugrade Inside</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="Shortcut Icon" href="https://static.ouorz.com/eugrade.ico" type="image/x-icon">
+    <script type="text/javascript" src="../statics/js/vue.js"></script>
+    <script>
+        Vue.config.devtools = true
+    </script>
+    <script type="text/javascript" src="../statics/js/axios.min.js"></script>
+    <link type="text/css" rel="stylesheet" href="../statics/css/antd.css">
+    <script type="text/javascript" src="../statics/js/sort.js"></script>
+    <script type="text/javascript" src="../statics/js/antd.js"></script>
+    <script type="text/javascript" src="../statics/js/jquery.min.js"></script>
+    <script type="text/javascript" src="../statics/js/moment.min.js"></script>
+    <link type="text/css" rel="stylesheet" href="../dist/css/main.css">
+    <script type="text/javascript" src="../statics/js/qiniu.js"></script>
+    <script>
+    var cookie={"set":function setCookie(name,value){var Days=30;var exp=new Date();exp.setTime(exp.getTime()+Days*24*60*60*1000);document.cookie=name+"="+escape(value)+";expires="+exp.toGMTString()},"get":function getCookie(name){var arr,reg=new RegExp("(^| )"+name+"=([^;]*)(;|$)");if(arr=document.cookie.match(reg)){return unescape(arr[2])}else{return null}},"del":function delCookie(name){var exp=new Date();exp.setTime(exp.getTime()-1);var cval=cookie.get(name);if(cval!=null){document.cookie=name+"="+cval+";expires="+exp.toGMTString()}}};if(!cookie.get("PHPSESSID")||!cookie.get("logged_in_id")){window.history.go(-1)};
+    </script>
+</head>
+
+<body>
+    <div id="app">
+<script>
+if (cookie.get('eugrade_lang') == 'zh_cn') {
+        var lang_json = {
+            title: {
+                1: '文件',
+                2: '全部已加入班级上传的文件'
+            },
+            tab: {
+                2: '班级列表',
+                3: '未加入班级',
+                4: '建立于',
+                5: '主题',
+                6: '下载',
+                7: '预览',
+                8: '删除',
+                9: '编辑'
+            }
+        }
+    } else {
+        var lang_json = {
+            title: {
+                1: 'Files',
+                2: 'All files in classes you joined'
+            },
+            tab: {
+                2: 'Classes',
+                3: 'No joined classes yet',
+                4: 'Created on',
+                5: 'Thread',
+                6: 'Download',
+                7: 'Preview',
+                8: 'Delete',
+                9: 'Edit'
+            }
+        }
+    }
+</script>
+
+
+<div class="main-container" id="main-container" style="opacity:0">
+
+    <div class="left">
+        <a-spin :spinning="spinning.left">
+            <div class="main-header">
+                <h3>{{ lang.title[1] }}</h3>
+                <p>{{ lang.title[2].substr(1,lang.title[2].length) }}</p>
+            </div>
+            <template v-if="!!user.joined_classes">
+            <div class="mes-item">
+                    <p>
+                        <a-icon type="team"></a-icon>&nbsp;&nbsp;{{ lang.tab[2] }}
+                        <a-button size="small" @click="reverse_order('classes')" style="font-size:14px;"><a-icon type="sort-descending" /></a-button>
+                    </p>
+                </div>
+                <div class="items-count"><p>- {{ (user.joined_classes).length }} items in total -</p></div>
+                <div v-for="(joined,index) in user.joined_classes" :class="'class-item ' + class_super(index)" @click="open_class(user.classes_info[index].id,index)" :id="'class_left'+user.classes_info[index].id">
+                    <div style="margin-right: 10px;">
+                        <template v-if="!!user.classes_info[index].img">
+                            <img :src="user.classes_info[index].img" class="class-item-img" />
+                        </template>
+                        <template v-else>
+                            <div class="class-img-default">
+                                <p>{{ user.classes_info[index].name.substring(0,1) }}</p>
+                            </div>
+                        </template>
+                    </div>
+                    <div>
+                        <h3 v-html="user.classes_info[index].name"></h3>
+                        <p v-html="user.classes_info[index].des"></p>
+                    </div>
+                </div>
+            </template>
+            <template v-else>
+                <div class="class-item">
+                    <p>
+                        {{ lang.tab[3] }}
+                    </p>
+                </div>
+            </template>
+        </a-spin>
+    </div>
+
+    <div class="center class-center mes-column">
+        <a-spin :spinning="spinning.center">
+            <template v-if="status.thread">
+                <div class="mes-header">
+                    <p style="color:#666;">
+                        <a-icon type="folder"></a-icon>&nbsp;&nbsp;{{ lang.tab[5] }}
+                        <a-button size="small" @click="reverse_order('threads')" style="right:20px;position:absolute"><a-icon type="sort-descending" /></a-button>
+                    </p>
+                </div>
+                <template v-if="opened_thread_info.length">
+                <div class="items-count"><p>- {{ (opened_thread_info).length }} items in total -</p></div>
+                    <div v-for="(thread_c,index) in opened_thread_info" class="class-item files-folder" :id="'thread_sub'+thread_c.id" @click="open_mes(index,thread_c.id,thread_c.belong_class)">
+                        <div>
+                            <h3 v-html="thread_c.name"></h3>
+                            <p>{{ lang.tab[4] }} {{ get_mes_date(thread_c.date) }}</p>
+                        </div>
+                    </div>
+                </template>
+                <template v-else>
+                    <p class="mes-end">- EOF -</p>
+                </template>
+            </template>
+        </a-spin>
+        <!-- 占位 -->
+        <template v-if="!spinning.center && !status.thread && !status.mark">
+            <div style="padding:20px 30px">
+                <a-skeleton :paragraph="{rows: 2}" v-for="i in 6"></a-skeleton>
+            </div>
+        </template>
+        <!-- 占位 -->
+    </div>
+
+    <!-- 文件名修改 -->
+    <a-modal title="Edit FileName" :visible="edit.file.visible" @ok="handle_edit_file_submit" :confirm-loading="edit.file.confirm_edit_file_loading" @cancel="handle_edit_file_cancel">
+        <a-input defaultValue="edit.file.content" v-model="edit.file.content" addonAfter="edit.file.type">
+            <a-icon slot="prefix" type="align-center" />
+        </a-input>
+    </a-modal>
+    <!-- 文件名修改结束 -->
+
+    <div class="right">
+        <a-spin :spinning="spinning.right">
+            <!-- 消息框开始 -->
+            <template v-if="status.files">
+                <div class="mes-header">
+                    <p style="color:#333;font-weight:600">
+                        <a-icon type="folder-open"></a-icon>&nbsp;&nbsp;<span v-html="opened_mes_info.thread_info.name"></span>
+                        <a-button size="small" @click="reverse_order('files')" style="right:20px;position:absolute"><a-icon type="sort-descending" /></a-button>
+                    </p>
+                </div>
+                <div class="mes_container">
+                    <div id="mes-inner" style="padding-top:5px">
+                        <template v-if="spinning.loading">
+                            <div style="padding:5px 30px">
+                                <a-skeleton avatar :paragraph="{rows: 1}" active></a-skeleton>
+                                <a-skeleton avatar :paragraph="{rows: 1}" active></a-skeleton>
+                                <a-skeleton avatar :paragraph="{rows: 1}" active></a-skeleton>
+                                <a-skeleton avatar :paragraph="{rows: 1}" active></a-skeleton>
+                                <a-skeleton avatar :paragraph="{rows: 1}" active></a-skeleton>
+                            </div>
+                        </template>
+                        <template v-else>
+                        <div class="items-count" style="padding-top:0px"><p>- {{ (opened_mes_info.files).length }} items in total -</p></div>
+                            <div v-for="(file,index) in opened_mes_info.files" class="mes-stream-file-div">
+                                <div class="mes-stream-file-div-sub">
+                                    <div :style="'font-size: 40px;margin-top: -6px;color:'+ get_file_icon(get_suffix(file.file_name).substr(1))[1]">
+                                        <a-icon :type="'file-' + get_file_icon(get_suffix(file.file_name).substr(1))[0]"></a-icon>
+                                    </div>
+                                    <div style="margin-left: 10px;">
+                                        <h3>{{ file.file_name }}</h3>
+                                        <p style="margin: 0px;">
+                                        <a style="text-decoration:none;color:#888">{{ file.file_size }}</a><a-divider type="vertical"></a-divider>
+                                            <a :href="'../extension/download.php?filename='+file.file_url" target="_blank">{{ lang.tab[6] }}</a>
+                                            <template v-if="get_suffix(file.file_name).substr(1) == 'pdf'">
+                                                <a-divider type="vertical"></a-divider><a :href="file.file_url" target="_blank">{{ lang.tab[7] }}</a>
+                                            </template>
+                                            <template v-else-if="if_office(get_suffix(file.file_name).substr(1))">
+                                                <a-divider type="vertical"></a-divider><a @click="open_office_preview(file.file_url,file.file_name)">{{ lang.tab[7] }}</a>
+                                            </template>
+                                            <template v-if="file.speaker == user.id || opened_class_info.superid == user.id">
+                                                <a-divider type="vertical"></a-divider><a style="color: rgb(233, 30, 99);" @click="remove_file(file.id)">{{ lang.tab[8] }}</a>
+                                                <a-divider type="vertical"></a-divider><a style="color:#333" @click="open_file_edit(file.id,file.file_name)">{{ lang.tab[9] }}</a>
+                                            </template>
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="mes-stream-file-profile" style="margin:0px">
+                                    <div style="margin-right: 10px;">
+                                        <template v-if="opened_mes_info.speakers[0][file.speaker.toString()] !== null">
+                                            <img :src="opened_mes_info.speakers[0][file.speaker.toString()]" class="class-item-img" />
+                                        </template>
+                                        <template v-else>
+                                            <div class="class-img-default">
+                                                <p>{{ opened_mes_info.speakers[1][file.speaker.toString()].substring(0,1) }}</p>
+                                            </div>
+                                        </template>
+                                    </div>
+                                    <div>
+                                        <h3 v-html="opened_mes_info.speakers[1][file.speaker.toString()]"></h3>
+                                        <p style="color:#999;white-space: nowrap;" v-html="get_mes_date(file.date)"></p>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                            <p class="mes-end">- EOF -</p>
+                        </template>
+                    </div>
+                </div>
+            </template>
+            <!-- 消息框结束 -->
+
+
+
+
+        </a-spin>
+        <!-- 占位 -->
+        <template v-if="!spinning.right && !status.files">
+            <div style="padding:20px 30px">
+                <a-skeleton avatar :paragraph="{rows: 1}" v-for="i in 9"></a-skeleton>
+            </div>
+        </template>
+        <!-- 占位 -->
+    </div>
+
+
+
+</div>
+
+
+<!-- office 内容预览 -->
+<a-modal :footer="null" :title="office.title" centered v-model="office.visible" @cancel="handle_office_close" width="80%">
+    <iframe :src="'https://view.officeapps.live.com/op/embed.aspx?src=' + office.url" width="100%" height="600px" frameborder="0"></iframe>
+</a-modal>
+<!-- office 内容预览结束 -->
+
+
+</div>
+
+<script type="text/javascript" src="../dist/js/files.js?bf3092ce4328c0eaebc8"></script></body>
+</html>
