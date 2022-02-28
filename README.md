@@ -1,6 +1,6 @@
 <div align="center">
   <h1>Eugrade</h1>
-  <p>Communication and Collaboration Platform for Education</p>
+  <p>All-in-on Educational Communication and Collaboration Platform</p>
   <a href="https://github.com/HelipengTony/pokers">
     <img src="https://img.shields.io/github/forks/HelipengTony/pokers.svg" alt="forks">
   </a>
@@ -16,13 +16,15 @@
 
 <br/>
 
+> This project is not actively maintained. Also, legacy code alert!
+
 <br/>
 
 ## Main Features 功能特色
 + **Based on PHP & Vue.js & And Design for Vue**
   - PHP 7.2
   - Vue.js + jQuery
-  - Ant Design for Vue
+  - Ant Design for Vue
 + **Developed using Webpack & Sass**
   - Webpack 打包
   - Scss 样式
