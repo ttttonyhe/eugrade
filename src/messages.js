@@ -227,7 +227,7 @@ var antd = new Vue({
         /* WebSocket 开始 */
         function reconnect_wss() {
             //websocket 连接
-            window.ws = new WebSocket('ws://localhost/wss');
+            window.ws = new WebSocket('wss://eugrade.onrender.com/wss');
             window.ws.onmessage = function (data) {
                 var re = eval('(' + data.data + ')');
                 switch (re.op) {

@@ -85,7 +85,7 @@ if (!empty($_POST['ran']) && !empty($_POST['name'])) {
                     $request->setTagName("resetpwd");
                     $request->setToAddress($email_get);
                     $request->setSubject("Eugrade Password Reset");
-                    $request->setHtmlBody("Hi there,<br/><br/>This is your verification code for Eugrade password reset request: <b style='font-size:20px'>" . (string) $rand . "</b><br/>Please verify your request within one day, thank you.<br/><br/><a href='https://www.eugrade.com'>www.eugrade.com</a>");
+                    $request->setHtmlBody("Hi there,<br/><br/>This is your verification code for Eugrade password reset request: <b style='font-size:20px'>" . (string) $rand . "</b><br/>Please verify your request within one day, thank you.<br/><br/><a href='https://eugrade.onrender.com'>eugrade.onrender.com</a>");
                     $client = $client->getAcsResponse($request);
 
                     $status = 1;
