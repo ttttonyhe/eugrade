@@ -1,9 +1,9 @@
 <?php
 
-require '../vendor/autoload.php';
-require_once '../vendor/workerman/workerman/Autoloader.php';
-require_once '../vendor/workerman/channel/src/Server.php';
-require_once '../vendor/workerman/channel/src/Client.php';
+require dirname(dirname(__FILE__)).'/vendor/autoload.php';
+require_once dirname(dirname(__FILE__)).'/vendor/workerman/workerman/Autoloader.php';
+require_once dirname(dirname(__FILE__)).'/vendor/workerman/channel/src/Server.php';
+require_once dirname(dirname(__FILE__)).'/vendor/workerman/channel/src/Client.php';
 define('LAZER_DATA_PATH', dirname(dirname(__FILE__)) . '/data/');
 
 use Lazer\Classes\Database as Lazer;

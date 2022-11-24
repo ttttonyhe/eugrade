@@ -3,4 +3,3 @@ composer.lock
 /node_modules
 .sass-cache
 /node
-/dist

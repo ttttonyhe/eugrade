@@ -2,6 +2,8 @@
 import '../dist/css/main.css';
 import 'ant-design-vue/dist/antd.css';
 
+const PRODUCTION = process.env.NODE_ENV === 'production';
+
 var antd = new Vue({
     el: '#app',
     data() {
@@ -225,7 +227,7 @@ var antd = new Vue({
         /* WebSocket 开始 */
         function reconnect_wss() {
             //websocket 连接
-            window.ws = new WebSocket('wss://www.eugrade.com/wss');
+            window.ws = new WebSocket('ws://localhost/wss');
             window.ws.onmessage = function (data) {
                 var re = eval('(' + data.data + ')');
                 switch (re.op) {

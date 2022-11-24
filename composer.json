@@ -1,10 +1,10 @@
 {
     "require": {
-        "greg0/lazer-database": "1.1.6",
-        "qiniu/php-sdk": "^7.2",
-        "cboden/ratchet": "^0.4.1",
+        "greg0/lazer-database": "2.0.1",
+        "qiniu/php-sdk": "^7.8.0",
+        "cboden/ratchet": "^0.4.4",
         "psecio/jwt": "1.*",
-        "workerman/workerman": "^3.5",
-        "workerman/channel": "^1.0"
+        "workerman/workerman": "^4.1.4",
+        "workerman/channel": "^1.1.0"
     }
 }
