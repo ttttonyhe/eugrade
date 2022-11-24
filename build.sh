@@ -1,3 +1,3 @@
-#!/usr/bin/env sh
+#!/bin/bash
 
 docker build --tag=eugrade .
