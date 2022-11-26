@@ -27,9 +27,9 @@ if (!empty($_GET['user']) && !empty($_GET['email'])) {
     //业务逻辑
     $a = Lazer::table('users')->limit(1)->where('id', '=', (int)$id)->andWhere('email', '=', $email)->find();
     if (!!$a->type) {
-        $bucket = 'ouorz';
-        $accessKey = '4mGogia1PY-PXaYvct65vITq9PeZtZXa1qxE5Ce8';
-        $secretKey = 'J-NECV03NfUfVgrdIfA1jkSoqMf6PS5XauY-BcxN';
+        $bucket = 'xxx';
+        $accessKey = 'xxx';
+        $secretKey = 'xxx';
         $auth = new Auth($accessKey, $secretKey);
         $upToken = $auth->uploadToken($bucket);
         $array['key'] = $upToken;
